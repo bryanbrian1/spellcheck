@@ -15,8 +15,10 @@ summoners, skill order) for that champion-role pair.
   full dataset into memory.
 - No Riot API key ever ships in the app binary. Keys live only in GitHub
   Actions secrets.
-- Never scrape u.gg, op.gg, or any third-party site. Riot's official API and
-  Data Dragon only.
+- Never scrape any third-party site. Data comes from documented APIs only:
+  Riot's official API, Data Dragon, and the OP.GG MCP endpoint.
+- OP.GG data is per-request only. Never cache it into the repo or
+  redistribute it. Only Riot-sourced data is distributable.
 
 ## Architecture
 
@@ -25,6 +27,43 @@ summoners, skill order) for that champion-role pair.
 - `scripts/ingest/` — Node crawler. Runs in CI only, never in the app.
 - `data/builds/{Champion}/{role}.json` — generated build data, committed by CI.
 - `.github/workflows/ingest.yml` — scheduled crawl.
+
+## Data providers
+
+All build data goes through a `BuildDataProvider` interface so sources are
+swappable. Two implementations:
+
+- `OpggProvider` — live queries to https://mcp-api.op.gg/mcp, tool
+  `lol_get_champion_analysis`. Per-request only. NEVER cache OP.GG data into
+  the repo or redistribute it — that's republishing their dataset.
+- `RiotProvider` — reads our own crawled data/builds/*.json. This is the
+  distributable path.
+
+Start on OpggProvider, migrate to RiotProvider as our data accumulates.
+The UI must not know which one is active.
+
+## Recommendation engine — three independent checks
+
+Each check returns zero or more suggestions. A suggestion is
+{ itemId, priority, reason, source } where source is "stat" or "rule".
+Never present a rule-based suggestion as a statistic.
+
+1. **Enemy threat** — enemy comp tags → what to build against
+   (armor/MR split, antiheal + timing, tenacity, defensive actives)
+2. **Team gaps** — own team tags → what to build for
+   (missing frontline, all-AD comp, nobody has antiheal, no engage)
+3. **Game state** — behind/even/ahead vs lane opponent, from Live Client
+   Data allgamedata (items, level, KDA for all players)
+   - behind: components over spikes, defensive, waveclear
+   - ahead: snowball items, damage spikes
+   Only available in phase 3. Checks 1 and 2 run in champ select.
+
+## Tag files
+
+- data/meta/champions.json — damageType (ad/ap/mixed/true), sustain,
+  hardCC, dive, poke, frontline, engage
+- data/meta/items.json — answers (armor, mr, antiheal, tenacity,
+  anti-shield, anti-crit), cost, buildsInto, isComponent
 
 ## LCU integration notes
 
