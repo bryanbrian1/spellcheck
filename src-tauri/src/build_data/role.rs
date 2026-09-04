@@ -46,14 +46,16 @@ impl Role {
         self.as_str()
     }
 
-    /// OP.GG's position vocabulary.
+    /// OP.GG's position vocabulary, which is lowercase and case-sensitive:
+    /// the tool schema's enum is `all`, `none`, `top`, `mid`, `jungle`,
+    /// `adc`, `support`.
     pub fn opgg_position(self) -> &'static str {
         match self {
-            Role::Top => "TOP",
-            Role::Jungle => "JUNGLE",
-            Role::Middle => "MID",
-            Role::Bottom => "ADC",
-            Role::Utility => "SUPPORT",
+            Role::Top => "top",
+            Role::Jungle => "jungle",
+            Role::Middle => "mid",
+            Role::Bottom => "adc",
+            Role::Utility => "support",
         }
     }
 

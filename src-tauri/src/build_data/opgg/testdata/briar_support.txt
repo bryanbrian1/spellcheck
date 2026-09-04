@@ -1,0 +1,15 @@
+class LolGetChampionAnalysis: champion,position,data
+class Data: summary,core_items,boots,starter_items,last_items,summoner_spells,runes,skills,skill_masteries,trends,counters_meta
+class Summary: average_stats
+class AverageStats: play,win_rate,pick_rate,ban_rate,tier_data
+class TierData: tier
+class CoreItems: ids,ids_names,play,win
+class SummonerSpells: ids,win,play
+class Runes: primary_page_id,primary_page_name,primary_rune_ids,secondary_page_id,secondary_rune_ids,stat_mod_ids,play,win
+class Skills: order,play,win
+class SkillMasteries: ids
+class Trends: win,pick
+class Win: version
+class CountersMeta: message
+
+LolGetChampionAnalysis("BRIAR","SUPPORT",Data(Summary(AverageStats(84068,0.51,0.05,0.09,TierData(3))),CoreItems([6697,6676,3036],["Hubris","The Collector","Lord Dominik's Regards"],23,13),CoreItems([3047],["Plated Steelcaps"],417,168),CoreItems([2003,2003],["Health Potion","Health Potion"],860,355),[CoreItems([3877],["Bloodsong"],717,300),CoreItems([6676],["The Collector"],638,283),CoreItems([3748],["Titanic Hydra"],237,111)],SummonerSpells([4,14],290,703),Runes(8000,"Precision",[8005,9111,9104,8014],8100,[8135,8143],[5008,5008,5001],268,114),Skills(["W","Q","E","W","W","R","W","Q","W","Q","R","Q","Q","E","E"],66,44),SkillMasteries(["W","Q","E"]),Trends(Win("16.17"),Win("16.17")),CountersMeta("Insufficient matchup sample. See data.summary.positions[].counters[] for raw matchup data (smaller sample).")))
