@@ -1,12 +1,19 @@
 //! leaguechecker core.
 //!
-//! Today this is the build data layer. The Tauri shell (lockfile parsing, LCU
-//! client, champ select WebSocket) will sit on top of it and expose
-//! [`BuildService`] as managed state.
+//! The build data layer, plus the Tauri shell that hosts it. Lockfile
+//! parsing, the LCU client and the champ select WebSocket are still to come;
+//! they will feed [`BuildService::build_for`] the same way the search box
+//! does today.
 
 pub mod build_data;
+pub mod commands;
 
+use std::path::PathBuf;
 use std::sync::Arc;
+
+use tauri::Manager;
+
+use build_data::config::CONFIG_FILE_NAME;
 
 pub use build_data::{
     BuildDataProvider, BuildLookup, BuildRequest, ChampionBuild, ProviderConfig, ProviderError,
@@ -56,6 +63,54 @@ impl BuildService {
         request.champion_id = champion_id;
         self.build(&request).await
     }
+}
+
+/// Boot the desktop app.
+///
+/// One window, one piece of managed state. The provider is chosen from config
+/// at startup and never re-examined by anything downstream.
+pub fn run() {
+    tauri::Builder::default()
+        .setup(|app| {
+            let config = resolve_config(app.handle());
+            app.manage(build_service(&config));
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![
+            commands::source_label,
+            commands::fetch_build,
+        ])
+        .run(tauri::generate_context!())
+        .expect("leaguechecker failed to start");
+}
+
+/// A broken config must not be fatal. The user still gets a working window on
+/// the default provider, and the reason lands in the log.
+fn build_service(config: &ProviderConfig) -> BuildService {
+    match BuildService::from_config(config) {
+        Ok(service) => service,
+        Err(error) => {
+            eprintln!("leaguechecker: provider setup failed ({error}); using defaults");
+            BuildService::from_config(&ProviderConfig::default())
+                .expect("the default provider is always constructible")
+        }
+    }
+}
+
+/// `providers.json` in the OS app-config directory, falling back to the
+/// working directory when the platform will not name one. A missing file is
+/// the normal first-run case and yields defaults.
+fn resolve_config(handle: &tauri::AppHandle) -> ProviderConfig {
+    let path = handle
+        .path()
+        .app_config_dir()
+        .map(|dir| dir.join(CONFIG_FILE_NAME))
+        .unwrap_or_else(|_| PathBuf::from(CONFIG_FILE_NAME));
+
+    ProviderConfig::load(&path).unwrap_or_else(|error| {
+        eprintln!("leaguechecker: {}: {error}; using defaults", path.display());
+        ProviderConfig::default()
+    })
 }
 
 #[cfg(test)]
