@@ -4,7 +4,7 @@
   "opgg": {
     "endpoint": "https://mcp-api.op.gg/mcp",
     "tool": "lol_get_champion_analysis",
-    "region": null,
+    "gameMode": "ranked",
     "tier": null,
     "timeoutSecs": 10,
     "label": "OP.GG"

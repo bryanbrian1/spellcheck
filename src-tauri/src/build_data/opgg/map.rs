@@ -1,62 +1,43 @@
 //! OP.GG payload → internal schema.
 //!
-//! The response shape is not something we control, so nothing here is a strict
-//! struct: sections are located by name via
-//! [`find_container`](crate::build_data::mapping::find_container) and read with
-//! the shared field helpers. A new wrapper level or a renamed field costs one
-//! optional value, not the whole lookup.
+//! The payload arrives as [`wire`](super::wire) JSON: a `data` object holding
+//! one section per part of a build, each section carrying parallel `ids` and
+//! `ids_names` arrays plus its own `play` and `win` counts. The shape is known
+//! exactly — it was read off the live endpoint — so this maps it directly
+//! rather than searching for candidate key names.
+//!
+//! Every section is optional. A champion-role pair with no core items is a
+//! pair we have nothing to show, which is [`BuildLookup::NoData`], not an
+//! error; a missing rune page just means no rune block.
 
 use serde_json::{json, Value};
 
-use crate::build_data::mapping::{
-    self, field, find_container, find_nested, item_groups_field, rune_pages_field, skill_plan,
-    stats_from, summoner_sets_field,
-};
+use crate::build_data::mapping::{ids_field, skill_plan, stats_from, str_field};
 use crate::build_data::schema::{
-    BuildLookup, BuildRequest, ChampionBuild, ChampionRef, ItemPlan, SkillPlan, SourceInfo,
+    BuildLookup, BuildRequest, ChampionBuild, ChampionRef, ItemGroup, ItemPlan, ItemRef, RunePage,
+    SkillPlan, SourceInfo, SummonerSet, SummonerSpell,
 };
-
-/// How deep to look for the analysis object before giving up.
-const MAX_DEPTH: usize = 5;
-/// Sections sit alongside `items` on the analysis object; a small budget here
-/// keeps the search from wandering into per-build sub-objects.
-const SIBLING_DEPTH: usize = 1;
-
-const ITEMS_KEYS: &[&str] = &["items", "itemBuilds", "item_builds", "builds", "itemSets"];
-const STARTER_KEYS: &[&str] = &["starters", "starterItems", "starter_items", "startItems", "start"];
-const BOOTS_KEYS: &[&str] = &["boots", "bootItems", "boot_items", "shoes"];
-const CORE_KEYS: &[&str] = &["core", "coreItems", "core_items", "mythic", "main", "recommended"];
-const SITUATIONAL_KEYS: &[&str] = &["situational", "options", "lastItems", "last_items", "late", "optional"];
-const RUNES_KEYS: &[&str] = &["runes", "runePages", "rune_pages", "perks", "runeBuilds"];
-const SUMMONERS_KEYS: &[&str] = &["summonerSpells", "summoner_spells", "summoners", "spells"];
-const SKILLS_KEYS: &[&str] = &["skills", "skillOrder", "skill_order", "skillTree", "skillBuilds"];
-const PATCH_KEYS: &[&str] = &["patch", "version", "gameVersion", "game_version"];
-const REGION_KEYS: &[&str] = &["region", "server"];
-const TIER_KEYS: &[&str] = &["tier", "rank", "elo", "averageTier"];
-const UPDATED_KEYS: &[&str] = &["updatedAt", "updated_at", "lastUpdated", "last_updated"];
-const CHAMPION_NAME_KEYS: &[&str] = &["championName", "champion_name", "name"];
-const CHAMPION_ID_KEYS: &[&str] = &["championId", "champion_id"];
 
 /// Translate one `lol_get_champion_analysis` payload.
-///
-/// Off-meta champion-role pairs legitimately have no build, so an empty
-/// payload maps to [`BuildLookup::NoData`], not an error.
 pub fn build_from_payload(
     payload: &Value,
     request: &BuildRequest,
     provider_label: &str,
 ) -> BuildLookup {
-    // A bare string means the server answered in prose rather than data —
-    // in practice, "nothing found for this pair".
+    // A bare string is the endpoint answering in prose rather than data — in
+    // practice, "nothing found for this pair".
     if let Value::String(text) = payload {
         return BuildLookup::no_data(request, summarise(text));
     }
 
-    // The object that holds `items` is the analysis itself. Anchoring here
-    // keeps build-level stats from being read off a single item path.
-    let analysis = find_container(payload, ITEMS_KEYS, MAX_DEPTH).unwrap_or(payload);
+    let data = payload.get("data").unwrap_or(payload);
 
-    let items = map_items(analysis);
+    let items = ItemPlan {
+        starters: group(data.get("starter_items")).into_iter().collect(),
+        boots: group(data.get("boots")).into_iter().collect(),
+        core: group(data.get("core_items")).into_iter().collect(),
+        situational: groups(data.get("last_items")),
+    };
 
     // Items are what the app exists to show. Without them there is no build,
     // whatever else came back.
@@ -71,107 +52,141 @@ pub fn build_from_payload(
         );
     }
 
-    let runes = section(analysis, payload, RUNES_KEYS)
-        .map(|found| rune_pages_field(&wrap(found), &["value"]))
-        .unwrap_or_default();
-    let summoners = section(analysis, payload, SUMMONERS_KEYS)
-        .map(|found| summoner_sets_field(&wrap(found), &["value"]))
-        .unwrap_or_default();
-    let skills = section(analysis, payload, SKILLS_KEYS)
-        .map(map_skills)
-        .unwrap_or_default();
-
     let build = ChampionBuild {
         champion: ChampionRef {
             key: request.champion_key.clone(),
-            // Only the analysis object itself, never a deep search: `name`
-            // is a common key and an item's name must not become the
-            // champion's.
-            name: find_nested(analysis, CHAMPION_NAME_KEYS, 0)
-                .and_then(|value| value.as_str())
-                .map(|name| name.trim().to_string())
-                .filter(|name| !name.is_empty())
-                .unwrap_or_else(|| request.display_name().to_string()),
-            id: find_nested(analysis, CHAMPION_ID_KEYS, 0)
-                .and_then(mapping::id_of)
-                .or(request.champion_id),
+            // The payload echoes the champion in the endpoint's own spelling
+            // (`AHRI`, `MONKEYKING`), which is an argument, not a display
+            // name. What the caller already knew is better.
+            name: request.display_name().to_string(),
+            id: request.champion_id,
         },
         role: request.role,
         source: SourceInfo {
             provider_label: provider_label.to_string(),
-            patch: text_at(analysis, payload, PATCH_KEYS),
-            region: text_at(analysis, payload, REGION_KEYS),
-            tier: text_at(analysis, payload, TIER_KEYS),
-            updated_at: text_at(analysis, payload, UPDATED_KEYS),
+            patch: patch(data),
+            // Region and tier are query parameters, not payload fields; the
+            // provider fills them in from the configuration it asked with.
+            region: None,
+            tier: None,
+            updated_at: None,
         },
-        stats: stats_from(analysis),
+        stats: data
+            .get("summary")
+            .and_then(|summary| summary.get("average_stats"))
+            .and_then(stats_from),
         items,
-        runes,
-        summoners,
-        skills,
+        runes: runes(data.get("runes")).into_iter().collect(),
+        summoners: summoners(data.get("summoner_spells")).into_iter().collect(),
+        skills: skills(data),
     };
 
     BuildLookup::found(build)
 }
 
-/// Look on the analysis object first, then fall back to a wider search of the
-/// whole payload for sources that hang metadata off the envelope.
-fn section<'a>(analysis: &'a Value, payload: &'a Value, keys: &[&str]) -> Option<&'a Value> {
-    find_nested(analysis, keys, SIBLING_DEPTH).or_else(|| find_nested(payload, keys, MAX_DEPTH))
+/// One item section: `{ ids, ids_names, play, win }`.
+///
+/// The two arrays are parallel, so the names are zipped onto the ids here —
+/// the UI shows "Malignance" rather than "#3118" only because of this step.
+/// An id with no matching name keeps the id.
+fn group(section: Option<&Value>) -> Option<ItemGroup> {
+    let section = section?;
+    let ids = ids_field(section, &["ids"]);
+    if ids.is_empty() {
+        return None;
+    }
+
+    let names = section.get("ids_names").and_then(Value::as_array);
+    let items = ids
+        .iter()
+        .enumerate()
+        .map(|(index, id)| ItemRef {
+            id: *id,
+            name: names
+                .and_then(|names| names.get(index))
+                .and_then(Value::as_str)
+                .map(|name| name.trim().to_string())
+                .filter(|name| !name.is_empty()),
+        })
+        .collect();
+
+    Some(ItemGroup {
+        items,
+        stats: stats_from(section),
+        label: None,
+    })
 }
 
-fn map_items(analysis: &Value) -> ItemPlan {
-    let Some(items) = field(analysis, ITEMS_KEYS) else {
-        return ItemPlan::default();
+/// `last_items` is a list of one-item sections, each its own option.
+fn groups(section: Option<&Value>) -> Vec<ItemGroup> {
+    section
+        .and_then(Value::as_array)
+        .map(|entries| entries.iter().filter_map(|entry| group(Some(entry))).collect())
+        .unwrap_or_default()
+}
+
+fn runes(section: Option<&Value>) -> Option<RunePage> {
+    let section = section?;
+    let page = RunePage {
+        primary_style: section.get("primary_page_id").and_then(Value::as_u64).map(|id| id as u32),
+        secondary_style: section.get("secondary_page_id").and_then(Value::as_u64).map(|id| id as u32),
+        primary: ids_field(section, &["primary_rune_ids"]),
+        secondary: ids_field(section, &["secondary_rune_ids"]),
+        shards: ids_field(section, &["stat_mod_ids"]),
+        stats: stats_from(section),
+        // "Domination", "Precision" — the tree, which is what the block is
+        // usefully called.
+        label: str_field(section, &["primary_page_name"]),
     };
 
-    // A bare array under `items` is a list of builds with no categories.
-    if items.is_array() {
-        return ItemPlan {
-            core: item_groups_field(&wrap(items), &["value"]),
-            ..ItemPlan::default()
-        };
-    }
-
-    let plan = ItemPlan {
-        starters: item_groups_field(items, STARTER_KEYS),
-        boots: item_groups_field(items, BOOTS_KEYS),
-        core: item_groups_field(items, CORE_KEYS),
-        situational: item_groups_field(items, SITUATIONAL_KEYS),
-    };
-
-    // None of the category names matched, but the object may hold ids
-    // directly (`{"items": {"items": [...]}}`).
-    if plan.is_empty() {
-        return ItemPlan {
-            core: item_groups_field(items, mapping::ITEM_LIST_KEYS),
-            ..ItemPlan::default()
-        };
-    }
-
-    plan
+    (!page.is_empty()).then_some(page)
 }
 
-fn map_skills(found: &Value) -> SkillPlan {
-    match found {
-        // A bare list or string is the level-by-level order.
-        Value::Array(_) | Value::String(_) => skill_plan(&json!({ "order": found.clone() })),
-        _ => skill_plan(found),
+fn summoners(section: Option<&Value>) -> Option<SummonerSet> {
+    let section = section?;
+    let spells: Vec<SummonerSpell> = ids_field(section, &["ids"])
+        .into_iter()
+        // OP.GG returns the ids twice rather than naming them, so there is no
+        // name to carry here.
+        .map(|id| SummonerSpell { id, name: None })
+        .collect();
+
+    if spells.is_empty() {
+        return None;
     }
+
+    Some(SummonerSet {
+        spells,
+        stats: stats_from(section),
+    })
 }
 
-/// The field helpers read named fields off an object, so a located section
-/// that is itself an array gets wrapped to be readable the same way.
-fn wrap(value: &Value) -> Value {
-    json!({ "value": value.clone() })
+/// The level-by-level order and the max order arrive in separate sections.
+fn skills(data: &Value) -> SkillPlan {
+    let order = data
+        .get("skills")
+        .and_then(|skills| skills.get("order"))
+        .cloned()
+        .unwrap_or(Value::Null);
+    let priority = data
+        .get("skill_masteries")
+        .and_then(|masteries| masteries.get("ids"))
+        .cloned()
+        .unwrap_or(Value::Null);
+
+    skill_plan(&json!({ "order": order, "priority": priority }))
 }
 
-fn text_at(analysis: &Value, payload: &Value, keys: &[&str]) -> Option<String> {
-    match section(analysis, payload, keys)? {
-        Value::String(text) if !text.trim().is_empty() => Some(text.trim().to_string()),
-        Value::Number(number) => Some(number.to_string()),
-        _ => None,
+/// The patch these numbers describe, which the endpoint reports as a trend
+/// version rather than a field of its own.
+fn patch(data: &Value) -> Option<String> {
+    let trends = data.get("trends")?;
+    for key in ["win", "pick", "ban"] {
+        if let Some(version) = trends.get(key).and_then(|trend| str_field(trend, &["version"])) {
+            return Some(version);
+        }
     }
+    None
 }
 
 fn summarise(text: &str) -> String {
@@ -185,117 +200,122 @@ fn summarise(text: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::build_data::opgg::wire;
     use crate::build_data::role::Role;
     use crate::build_data::schema::Skill;
+
+    /// Ahri mid, captured from the live endpoint.
+    const AHRI: &str = include_str!("testdata/ahri_mid.txt");
+    /// Briar support: real, and thin — 23 games on the core path. The kind of
+    /// sample the confidence rail exists to dim.
+    const BRIAR: &str = include_str!("testdata/briar_support.txt");
 
     fn request() -> BuildRequest {
         BuildRequest::new("Ahri", Role::Middle).with_champion_id(103)
     }
 
-    /// Shaped the way an MCP analysis response tends to arrive: a wrapper
-    /// object, categorised items, rates as percentages.
-    fn payload() -> Value {
-        json!({
-            "data": {
-                "championName": "Ahri",
-                "championId": 103,
-                "patch": "14.18",
-                "region": "GLOBAL",
-                "tier": "EMERALD_PLUS",
-                "games": 240000,
-                "win_rate": 51.8,
-                "pick_rate": 9.2,
-                "items": {
-                    "starterItems": [{ "items": [1056, 2003], "win_rate": 52.0, "games": 90000 }],
-                    "boots": [{ "items": [3020] }],
-                    "coreItems": [
-                        { "items": [6655, 3020, 3089], "win_rate": 53.5, "games": 40000 },
-                        { "items": [6653, 3020, 3089], "win_rate": 51.0, "games": 12000 }
-                    ],
-                    "lastItems": [{ "items": [3135] }]
-                },
-                "runes": [{
-                    "primaryStyle": 8100,
-                    "secondaryStyle": 8200,
-                    "primary": [8112, 8139, 8138, 8106],
-                    "secondary": [8226, 8210],
-                    "shards": [5008, 5008, 5001],
-                    "win_rate": 52.4
-                }],
-                "summonerSpells": [{ "spells": [4, 12], "win_rate": 53.0 }],
-                "skills": { "priority": "Q>E>W", "order": ["Q", "E", "W", "Q"] }
-            }
-        })
+    fn ahri() -> ChampionBuild {
+        let payload = wire::parse(AHRI).unwrap();
+        build_from_payload(&payload, &request(), "OP.GG")
+            .build()
+            .expect("expected a build")
+            .clone()
     }
 
     #[test]
-    fn maps_a_full_analysis() {
-        let lookup = build_from_payload(&payload(), &request(), "OP.GG");
-        let build = lookup.build().expect("expected a build");
+    fn maps_a_live_response() {
+        let build = ahri();
 
         assert_eq!(build.champion.key, "Ahri");
         assert_eq!(build.champion.name, "Ahri");
         assert_eq!(build.champion.id, Some(103));
         assert_eq!(build.role, Role::Middle);
         assert_eq!(build.source.provider_label, "OP.GG");
-        assert_eq!(build.source.patch.as_deref(), Some("14.18"));
-        assert_eq!(build.source.tier.as_deref(), Some("EMERALD_PLUS"));
+        assert_eq!(build.source.patch.as_deref(), Some("16.17"));
 
-        let stats = build.stats.expect("expected build-level stats");
-        assert_eq!(stats.games, Some(240000));
-        assert_eq!(stats.win_rate, Some(0.518));
-        assert_eq!(stats.pick_rate, Some(0.092));
+        let stats = build.stats.expect("build-level stats");
+        assert_eq!(stats.games, Some(162598));
+        assert_eq!(stats.win_rate, Some(0.51));
+        assert_eq!(stats.pick_rate, Some(0.1));
+    }
 
-        assert_eq!(build.items.starters.len(), 1);
+    #[test]
+    fn item_names_are_carried_next_to_their_ids() {
+        let build = ahri();
+        let core = &build.items.core[0];
+        assert_eq!(core.items[0].id, 3118);
+        assert_eq!(core.items[0].name.as_deref(), Some("Malignance"));
+        assert_eq!(core.items[2].name.as_deref(), Some("Zhonya's Hourglass"));
+        assert_eq!(build.items.boots[0].items[0].name.as_deref(), Some("Sorcerer's Shoes"));
+        assert_eq!(build.items.starters[0].items[0].name.as_deref(), Some("Doran's Ring"));
+    }
+
+    /// The four item sections share one class in the wire format and are told
+    /// apart only by position, so this is the test that catches a parser that
+    /// lost track of which is which.
+    #[test]
+    fn each_item_section_lands_where_it_belongs() {
+        let build = ahri();
+        assert_eq!(build.items.core[0].items.len(), 3);
         assert_eq!(build.items.boots[0].items[0].id, 3020);
-        assert_eq!(build.items.core.len(), 2);
-        assert_eq!(build.items.core[0].stats.unwrap().win_rate, Some(0.535));
-        assert_eq!(build.items.situational[0].items[0].id, 3135);
+        assert_eq!(build.items.starters[0].items[0].id, 1056);
+        assert_eq!(build.items.situational.len(), 3);
+        assert_eq!(build.items.situational[0].items[0].id, 3118);
+    }
 
-        assert_eq!(build.runes[0].primary_style, Some(8100));
-        assert_eq!(build.runes[0].shards.len(), 3);
+    /// `play` and `win` are counts, not a rate. 5,972 wins from 11,341 games
+    /// is 52.7%, and it must reach the UI as a fraction.
+    #[test]
+    fn win_rates_are_derived_from_counts_as_fractions() {
+        let build = ahri();
+        let stats = build.items.core[0].stats.expect("core stats");
+        assert_eq!(stats.games, Some(11341));
+        let rate = stats.win_rate.unwrap();
+        assert!((rate - 0.5266).abs() < 0.001, "{rate}");
+        assert!((0.0..=1.0).contains(&rate));
+    }
+
+    #[test]
+    fn maps_runes_summoners_and_both_skill_orders() {
+        let build = ahri();
+
+        let page = &build.runes[0];
+        assert_eq!(page.primary_style, Some(8100));
+        assert_eq!(page.secondary_style, Some(8200));
+        assert_eq!(page.primary, vec![8112, 8139, 8140, 8106]);
+        assert_eq!(page.secondary, vec![8210, 8226]);
+        assert_eq!(page.shards, vec![5005, 5008, 5001]);
+        assert_eq!(page.label.as_deref(), Some("Domination"));
+
         assert_eq!(build.summoners[0].spells.len(), 2);
-        assert_eq!(build.skills.priority, vec![Skill::Q, Skill::E, Skill::W]);
-        assert_eq!(build.skills.order.len(), 4);
+        assert_eq!(build.summoners[0].spells[0].id, 4);
+
+        assert_eq!(build.skills.priority, vec![Skill::Q, Skill::W, Skill::E]);
+        assert_eq!(build.skills.order.len(), 15);
+        assert_eq!(build.skills.order[0], Skill::W);
+    }
+
+    /// The extra `counters_meta` field this response carries shifts every
+    /// field after it; nothing may be read off by one.
+    #[test]
+    fn a_thin_sample_maps_without_shifting() {
+        let payload = wire::parse(BRIAR).unwrap();
+        let request = BuildRequest::new("Briar", Role::Utility).with_champion_id(233);
+        let build = build_from_payload(&payload, &request, "OP.GG")
+            .build()
+            .expect("expected a build")
+            .clone();
+
+        assert_eq!(build.items.core[0].items[0].name.as_deref(), Some("Hubris"));
+        assert_eq!(build.items.core[0].stats.unwrap().games, Some(23));
+        assert_eq!(build.source.patch.as_deref(), Some("16.17"));
+        assert_eq!(build.skills.priority, vec![Skill::W, Skill::Q, Skill::E]);
     }
 
     #[test]
-    fn build_stats_are_not_taken_from_one_item_path() {
-        // No build-level sample; the only `games` in the payload belongs to an
-        // item path and must not be promoted to the build.
-        let payload = json!({
-            "data": { "items": { "coreItems": [{ "items": [6655], "games": 40000 }] } }
-        });
-        let build = build_from_payload(&payload, &request(), "OP.GG");
-        assert!(build.build().unwrap().stats.is_none());
-    }
-
-    #[test]
-    fn rates_are_fractions_never_percentages() {
-        let lookup = build_from_payload(&payload(), &request(), "OP.GG");
-        let build = lookup.build().unwrap();
-        for group in &build.items.core {
-            if let Some(stats) = group.stats {
-                let rate = stats.win_rate.unwrap();
-                assert!((0.0..=1.0).contains(&rate), "rate out of range: {rate}");
-            }
-        }
-        assert!(build.stats.unwrap().win_rate.unwrap() <= 1.0);
-    }
-
-    #[test]
-    fn handles_a_flat_item_list() {
-        let payload = json!({ "items": [[1056, 2003], [6655, 3020]] });
-        let build = build_from_payload(&payload, &request(), "OP.GG");
-        let build = build.build().unwrap();
-        assert_eq!(build.items.core.len(), 2);
-        assert!(build.items.starters.is_empty());
-    }
-
-    #[test]
-    fn empty_payload_is_no_data_not_an_error() {
-        let lookup = build_from_payload(&json!({}), &request(), "OP.GG");
-        match lookup {
+    fn a_payload_with_no_items_is_no_data_not_an_error() {
+        let payload = json!({ "data": { "summary": { "average_stats": { "play": 12 } } } });
+        match build_from_payload(&payload, &request(), "OP.GG") {
             BuildLookup::NoData(no_data) => assert!(no_data.detail.contains("no build data")),
             BuildLookup::Found(_) => panic!("expected no data"),
         }
@@ -311,24 +331,19 @@ mod tests {
     }
 
     #[test]
-    fn survives_an_extra_wrapper_level() {
-        let wrapped = json!({ "result": { "analysis": payload() } });
-        let build = build_from_payload(&wrapped, &request(), "OP.GG");
-        let build = build.build().expect("expected a build");
-        assert_eq!(build.items.core.len(), 2);
-        assert_eq!(build.source.patch.as_deref(), Some("14.18"));
-    }
-
-    #[test]
     fn missing_optional_sections_do_not_fail_the_lookup() {
-        let payload = json!({ "items": { "coreItems": [{ "items": [6655] }] } });
-        let build = build_from_payload(&payload, &request(), "OP.GG");
-        let build = build.build().unwrap();
+        let payload = json!({ "data": { "core_items": { "ids": [3118] } } });
+        let build = build_from_payload(&payload, &request(), "OP.GG")
+            .build()
+            .expect("expected a build")
+            .clone();
+
+        assert_eq!(build.items.core[0].items[0].id, 3118);
+        assert!(build.items.core[0].items[0].name.is_none());
         assert!(build.runes.is_empty());
         assert!(build.summoners.is_empty());
         assert!(build.skills.is_empty());
-        // Falls back to what the request already knew.
+        assert!(build.stats.is_none());
         assert_eq!(build.champion.name, "Ahri");
-        assert_eq!(build.champion.id, Some(103));
     }
 }

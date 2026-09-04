@@ -29,7 +29,10 @@ thiserror = "2"
 async-trait = "0.1"
 # Async runtime primitives. Only the features we use: Mutex for the MCP
 # session, fs for reading build files off the UI thread.
-tokio = { version = "1", features = ["sync", "fs", "rt", "macros"] }
+tokio = { version = "1", features = ["sync", "fs", "rt", "macros", "net", "time"] }
+# The LCU authenticates with HTTP Basic and the lockfile password, and the
+# WebSocket upgrade carries that header by hand, so we encode it ourselves.
+base64 = "0.22"
 # HTTP client for the OP.GG MCP endpoint. rustls avoids linking OpenSSL;
 # the same client will serve the LCU HTTP calls later.
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
@@ -37,6 +40,20 @@ reqwest = { version = "0.12", default-features = false, features = ["json", "rus
 # system WebView (WKWebView on macOS), so no browser engine ships in the
 # binary. That is what keeps us inside the 120MB budget.
 tauri = { version = "2", features = [] }
+# The champ select listener. The client pushes changes over a WebSocket and
+# reqwest cannot speak that protocol, so this is the one new stack the LCU
+# layer needs. It is configured against rustls, which reqwest already pulls
+# in, so no second TLS implementation is linked. futures-util supplies the
+# Stream/Sink traits the socket is driven through, and rustls is named
+# directly only to build the loopback certificate verifier in lcu/ws.rs.
+#
+# __rustls-tls rather than rustls-tls-webpki-roots: we hand the connector our
+# own TLS config, so a bundled root store would be a second copy of a quarter
+# megabyte of certificates we never consult. The feature is underscored but
+# declared in the crate's manifest, and the version is pinned.
+tokio-tungstenite = { version = "0.28", default-features = false, features = ["connect", "__rustls-tls"] }
+futures-util = { version = "0.3", default-features = false, features = ["sink"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std"] }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }

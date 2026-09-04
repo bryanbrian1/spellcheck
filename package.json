@@ -8,7 +8,8 @@
     "build": "tsc && cp index.html dist/ && cp src/styles.css dist/",
     "dev": "npm run build && tauri dev",
     "app": "npm run build && tauri build",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "fake-client": "node scripts/fake-lcu.mjs"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",

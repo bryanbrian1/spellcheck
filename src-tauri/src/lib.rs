@@ -1,19 +1,24 @@
 //! leaguechecker core.
 //!
-//! The build data layer, plus the Tauri shell that hosts it. Lockfile
-//! parsing, the LCU client and the champ select WebSocket are still to come;
-//! they will feed [`BuildService::build_for`] the same way the search box
-//! does today.
+//! The build data layer, the LCU layer that watches the League client, and
+//! the Tauri shell that hosts both. The two meet in exactly one place:
+//! [`BuildService::build_for`], which the search box calls when the user
+//! types a champion and [`spawn_champ_select`] calls when the client says one
+//! was locked. Neither route knows about the other.
 
 pub mod build_data;
 pub mod commands;
+pub mod lcu;
 
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use tauri::Manager;
+use serde::Serialize;
+use tauri::{AppHandle, Emitter, Manager};
+use tokio::sync::mpsc;
 
 use build_data::config::CONFIG_FILE_NAME;
+use lcu::{ChampSelectEvent, LockedChampion, WatcherConfig};
 
 pub use build_data::{
     BuildDataProvider, BuildLookup, BuildRequest, ChampionBuild, ProviderConfig, ProviderError,
@@ -65,6 +70,25 @@ impl BuildService {
     }
 }
 
+/// Where the client's champ select state reaches the UI: `clientOffline`,
+/// `clientConnected`, `entered`, `locked`, `left`.
+pub const CHAMP_SELECT_STATUS_EVENT: &str = "lcu:status";
+
+/// Where the build for a locked champion reaches the UI.
+pub const CHAMP_SELECT_BUILD_EVENT: &str = "lcu:build";
+
+/// A build looked up because the client said so rather than because the user
+/// typed something. `lookup` and `error` are exclusive, and "this source has
+/// nothing for that pair" lives inside `lookup` as
+/// [`BuildLookup::NoData`] — not here.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChampSelectBuild {
+    pub champion: LockedChampion,
+    pub lookup: Option<BuildLookup>,
+    pub error: Option<String>,
+}
+
 /// Boot the desktop app.
 ///
 /// One window, one piece of managed state. The provider is chosen from config
@@ -73,7 +97,9 @@ pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
             let config = resolve_config(app.handle());
-            app.manage(build_service(&config));
+            let service = Arc::new(build_service(&config));
+            app.manage(Arc::clone(&service));
+            spawn_champ_select(app.handle(), service);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -94,6 +120,58 @@ fn build_service(config: &ProviderConfig) -> BuildService {
             BuildService::from_config(&ProviderConfig::default())
                 .expect("the default provider is always constructible")
         }
+    }
+}
+
+/// Watch the League client, and look a build up whenever it reports a lock.
+///
+/// This is the whole seam between the two halves of the app. The watcher
+/// knows nothing about builds and the service knows nothing about the client;
+/// they meet here, in one call. Both tasks run for the life of the app, and
+/// both are cheap while nothing is happening — the watcher is asleep on a
+/// socket and this one is asleep on a channel.
+fn spawn_champ_select(handle: &AppHandle, service: Arc<BuildService>) {
+    // Champ select produces a handful of events per game. A small buffer is
+    // plenty, and a full one would mean something is very wrong.
+    let (sender, mut receiver) = mpsc::channel(16);
+    let handle = handle.clone();
+
+    tauri::async_runtime::spawn(lcu::watch(WatcherConfig::default(), sender));
+    tauri::async_runtime::spawn(async move {
+        while let Some(event) = receiver.recv().await {
+            // The UI shows "League isn't running" from this, so every state
+            // goes out, not just the interesting one.
+            let _ = handle.emit(CHAMP_SELECT_STATUS_EVENT, &event);
+
+            if let ChampSelectEvent::Locked(locked) = event {
+                let build = build_for_locked(&service, locked).await;
+                let _ = handle.emit(CHAMP_SELECT_BUILD_EVENT, build);
+            }
+        }
+    });
+}
+
+/// The handoff itself, kept out of the Tauri task so it can be tested without
+/// an app handle.
+async fn build_for_locked(service: &BuildService, champion: LockedChampion) -> ChampSelectBuild {
+    match service
+        .build_for(
+            &champion.champion_key,
+            &champion.assigned_position,
+            Some(champion.champion_id),
+        )
+        .await
+    {
+        Ok(lookup) => ChampSelectBuild {
+            champion,
+            lookup: Some(lookup),
+            error: None,
+        },
+        Err(error) => ChampSelectBuild {
+            champion,
+            lookup: None,
+            error: Some(error.to_string()),
+        },
     }
 }
 
@@ -144,6 +222,65 @@ mod tests {
             }
             BuildLookup::Found(_) => panic!("expected no data"),
         }
+    }
+
+    #[tokio::test]
+    async fn a_locked_champion_goes_straight_to_the_active_provider() {
+        let service = BuildService::new(Arc::new(Stub));
+        let build = build_for_locked(
+            &service,
+            LockedChampion {
+                champion_id: 103,
+                champion_key: "Ahri".to_string(),
+                assigned_position: "middle".to_string(),
+            },
+        )
+        .await;
+
+        assert!(build.error.is_none());
+        assert!(matches!(build.lookup, Some(BuildLookup::NoData(_))));
+        assert_eq!(build.champion.champion_key, "Ahri");
+    }
+
+    /// Matches `ChampSelectBuild` in main.ts. `lookup` and `error` are both
+    /// present as keys and exactly one of them is null, because the UI branches
+    /// on which.
+    #[tokio::test]
+    async fn the_build_payload_the_ui_reads_is_fixed() {
+        let service = BuildService::new(Arc::new(Stub));
+        let build = build_for_locked(
+            &service,
+            LockedChampion {
+                champion_id: 103,
+                champion_key: "Ahri".to_string(),
+                assigned_position: "middle".to_string(),
+            },
+        )
+        .await;
+
+        let json = serde_json::to_value(&build).unwrap();
+        assert_eq!(json["champion"]["championKey"], "Ahri");
+        assert_eq!(json["champion"]["assignedPosition"], "middle");
+        assert_eq!(json["lookup"]["status"], "noData");
+        assert_eq!(json["error"], serde_json::Value::Null);
+    }
+
+    #[tokio::test]
+    async fn a_failed_lookup_reaches_the_ui_as_a_message() {
+        let service = BuildService::new(Arc::new(Stub));
+        let build = build_for_locked(
+            &service,
+            LockedChampion {
+                champion_id: 103,
+                champion_key: "Ahri".to_string(),
+                // Champ select in a queue that assigns no position.
+                assigned_position: String::new(),
+            },
+        )
+        .await;
+
+        assert!(build.lookup.is_none());
+        assert!(build.error.unwrap().contains("unknown role"));
     }
 
     #[tokio::test]
