@@ -12,8 +12,9 @@
 <body>
 <div id="app">
 
-  <!-- Until the champ select WebSocket exists, the mode is chosen by hand.
-       This strip disappears once the LCU drives the app. -->
+  <!-- Champ select now drives itself: locking a champion switches to that
+       screen on its own. The strip stays because Search has to work with no
+       client running at all, and because In game is still a preview. -->
   <div class="modes" role="group" aria-label="Mode">
     <button data-go="search" aria-pressed="true">Search</button>
     <button data-go="select" aria-pressed="false">Champ select</button>
@@ -43,77 +44,24 @@
     </div>
   </section>
 
-  <!-- ============ CHAMP SELECT — preview, needs the LCU listener ============ -->
+  <!-- ============ CHAMP SELECT — live, driven by the LCU events ============ -->
   <section class="screen" id="s-select">
     <div class="hdr">
-      <div class="portrait">AH</div>
+      <div class="portrait" id="select-portrait">&mdash;</div>
       <div class="hdr-main">
-        <div class="hdr-name">Ahri</div>
-        <div class="hdr-sub">Mid · into Syndra</div>
+        <div class="hdr-name" id="select-name">Champ select</div>
+        <div class="hdr-sub" id="select-sub">Waiting for the League client</div>
       </div>
-      <span class="pill preview">Preview</span>
+      <span class="pill off" id="select-pill">Offline</span>
     </div>
 
-    <div class="body">
-      <p class="note">Sample data. This screen fills itself from the champ select WebSocket, which is not built yet.</p>
-
-      <div class="block">
-        <div class="rail"></div>
-        <div class="block-in">
-          <div class="block-hd"><span class="block-t">Runes vs Syndra</span><span class="meta"><b>51.8%</b> · 2,140 games</span></div>
-          <div class="row" style="margin-bottom:6px">
-            <div class="tile key">Elec</div><div class="tile">Sudden</div><div class="tile">Eye</div><div class="tile">Ult</div>
-          </div>
-          <div class="row">
-            <div class="tile">Manaflow</div><div class="tile">Trans</div>
-            <div class="tile sm">AH</div><div class="tile sm">AP</div><div class="tile sm">HP</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="block">
-        <div class="rail mid"></div>
-        <div class="block-in">
-          <div class="block-hd"><span class="block-t">Core build vs Syndra</span><span class="meta"><b>52.9%</b> · 1,284 games</span></div>
-          <div class="seq">
-            <div class="seq-i"><span class="seq-n">1</span><div class="tile">Malig</div><span class="seq-lbl">Malignance</span></div>
-            <div class="seq-i"><span class="seq-n">2</span><div class="tile">Sorc</div><span class="seq-lbl">Sorcerer's</span></div>
-            <div class="seq-i"><span class="seq-n">3</span><div class="tile">Shadow</div><span class="seq-lbl">Shadowflame</span></div>
-            <div class="seq-i"><span class="seq-n">4</span><div class="tile">Rabad</div><span class="seq-lbl">Rabadon's</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="block">
-        <div class="rail rule"></div>
-        <div class="block-in">
-          <div class="block-hd"><span class="block-t">Situational</span><span class="meta">from team comp</span></div>
-          <div class="sug">
-            <div class="tile rule">Morell</div>
-            <div class="sug-txt"><b>Morellonomicon by item 3</b>
-              <span class="sug-why">Aatrox and Soraka both heal. Nobody on your team carries antiheal.</span></div>
-          </div>
-          <div class="sug">
-            <div class="tile rule">Zhonya</div>
-            <div class="sug-txt"><b>Consider Zhonya's over Rabadon's</b>
-              <span class="sug-why">Lee Sin and Nautilus can both reach you first.</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="block">
-        <div class="rail lo"></div>
-        <div class="block-in">
-          <div class="block-hd"><span class="block-t">Enemy damage</span><span class="meta">3 AD · 2 AP</span></div>
-          <div class="split"><i class="ad" style="flex:0 0 62%"></i><i class="ap" style="flex:0 0 38%"></i></div>
-          <div class="split-lg"><span>Lee Sin, Aatrox, Jinx</span><span>Syndra, Nautilus</span></div>
-        </div>
-      </div>
+    <div class="body" id="select-body">
+      <div class="empty"><p>League isn&#39;t running. This screen fills itself when you lock a champion.</p></div>
     </div>
 
     <div class="foot">
-      <button class="btn pri" disabled>Import runes</button>
-      <button class="btn" disabled>Import items</button>
+      <button class="btn pri" id="select-import-runes" disabled>Import runes</button>
+      <button class="btn" id="select-import-items" disabled>Import items</button>
     </div>
   </section>
 

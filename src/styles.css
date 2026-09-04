@@ -33,7 +33,8 @@ body{
 }
 #app{display:flex;flex-direction:column;height:100%}
 
-/* state switcher — stands in for the LCU until the WebSocket listener exists */
+/* state switcher — champ select switches itself, but Search must work with no
+   client running and In game is still a preview */
 .modes{display:flex;gap:5px;padding:8px 10px;border-bottom:1px solid var(--line);flex-shrink:0;background:#12161b}
 .modes button{
   flex:1;background:#151a20;color:#8b98a6;border:1px solid #232b34;
@@ -58,6 +59,9 @@ body{
   background:#1e2a33;color:var(--stat-hi);border:1px solid #2b3d47;white-space:nowrap;
 }
 .pill.preview{background:#241f14;color:var(--rule);border-color:#3d3320}
+/* Not connected. Deliberately neutral rather than amber: amber means
+   "rule-based suggestion" in this app and must not come to mean anything else. */
+.pill.off{background:#1b2027;color:var(--ink-3);border-color:#2a333d}
 
 .body{flex:1;overflow-y:auto;padding:12px 14px 16px;display:flex;flex-direction:column;gap:13px}
 .body::-webkit-scrollbar{width:6px}
