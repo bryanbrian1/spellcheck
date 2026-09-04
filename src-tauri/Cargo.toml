@@ -30,6 +30,9 @@ async-trait = "0.1"
 # Async runtime primitives. Only the features we use: Mutex for the MCP
 # session, fs for reading build files off the UI thread.
 tokio = { version = "1", features = ["sync", "fs", "rt", "macros"] }
+# The LCU authenticates with HTTP Basic and the lockfile password, and the
+# WebSocket upgrade carries that header by hand, so we encode it ourselves.
+base64 = "0.22"
 # HTTP client for the OP.GG MCP endpoint. rustls avoids linking OpenSSL;
 # the same client will serve the LCU HTTP calls later.
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }

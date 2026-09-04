@@ -7,6 +7,7 @@
 
 pub mod build_data;
 pub mod commands;
+pub mod lcu;
 
 use std::path::PathBuf;
 use std::sync::Arc;
