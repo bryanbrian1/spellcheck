@@ -579,7 +579,13 @@ npm run dev
 npm run app
 
 <span class="c"># tests</span>
-<span class="p">cd</span> src-tauri &amp;&amp; cargo test</pre>
+<span class="p">cd</span> src-tauri &amp;&amp; cargo test
+
+<span class="c"># drive champ select with no game running &#8212; prints the command to
+# start the app against it</span>
+node scripts/fake-lcu.mjs</pre>
+      <p><code>scripts/fake-lcu.mjs</code> is a stand-in League client: TLS on loopback with a self-signed certificate, the two endpoints the app reads, and the champ select event socket, in about a hundred lines of dependency-free Node. It cycles through connected, in select, locked, left and offline so every state the screen can show goes past about once a minute. It is the only way to exercise the LCU layer without a game, and it never ships &#8212; nothing in <code>src/</code> or <code>src-tauri/</code> knows it exists.</p>
+
       <p>There is no bundler. <code>tsc</code> emits <code>dist/</code>, the HTML and CSS are copied beside it, and <code>withGlobalTauri</code> means the page needs no npm package at runtime. TypeScript and the Tauri CLI are the only frontend dependencies, both build-time.</p>
 
       <div class="rail law">
