@@ -8,6 +8,7 @@
 
 pub mod map;
 pub mod mcp;
+pub mod wire;
 
 use std::time::Duration;
 
