@@ -238,8 +238,8 @@ pre .p{color:var(--stat)}
       <span>Rust <b>1.98.1</b></span>
       <span>Tauri <b>v2</b></span>
       <span>Vanilla <b>TypeScript</b></span>
-      <span><b>88</b> tests</span>
-      <span><b>5,481</b> lines</span>
+      <span><b>101</b> tests</span>
+      <span><b>5,987</b> lines</span>
       <span>Bundle <b>14 MB</b></span>
     </div>
   </header>
@@ -384,11 +384,12 @@ pre .p{color:var(--stat)}
           <tr><td class="f">&#8230;/build_data/<em>schema.rs</em></td><td class="d">The internal build shape every provider maps into. Change carefully; everything depends on it.</td><td class="l">412</td></tr>
           <tr><td class="f">&#8230;/build_data/<em>mapping.rs</em></td><td class="d">Helpers for reading messy provider payloads &#8212; alias lookup, id coercion, rate normalisation.</td><td class="l">463</td></tr>
           <tr><td class="f">&#8230;/build_data/<em>config.rs</em></td><td class="d">Which provider is live. The only file that names concrete provider types.</td><td class="l">175</td></tr>
-          <tr><td class="f">&#8230;/build_data/<em>role.rs</em></td><td class="d">Role parsing across every source vocabulary.</td><td class="l">128</td></tr>
+          <tr><td class="f">&#8230;/build_data/<em>role.rs</em></td><td class="d">Role parsing across every source vocabulary.</td><td class="l">130</td></tr>
           <tr><td class="f">&#8230;/build_data/<em>error.rs</em></td><td class="d">Typed provider errors.</td><td class="l">70</td></tr>
+          <tr><td class="f">&#8230;/build_data/opgg/<em>wire.rs</em></td><td class="d">OP.GG's compact response format &#8594; JSON. The header carries the field order and is read every time.</td><td class="l">358</td></tr>
           <tr><td class="f">&#8230;/build_data/opgg/<em>mcp.rs</em></td><td class="d">The MCP client &#8212; JSON-RPC, session handling, SSE stream parsing.</td><td class="l">455</td></tr>
-          <tr><td class="f">&#8230;/build_data/opgg/<em>map.rs</em></td><td class="d">OP.GG payload &#8594; <code>ChampionBuild</code>.</td><td class="l">334</td></tr>
-          <tr><td class="f">&#8230;/build_data/opgg/<em>mod.rs</em></td><td class="d">The provider itself: config, argument building, role translation.</td><td class="l">197</td></tr>
+          <tr><td class="f">&#8230;/build_data/opgg/<em>map.rs</em></td><td class="d">OP.GG payload &#8594; <code>ChampionBuild</code>. Written against two captured live responses.</td><td class="l">349</td></tr>
+          <tr><td class="f">&#8230;/build_data/opgg/<em>mod.rs</em></td><td class="d">The provider itself: config, the four required arguments, role translation.</td><td class="l">328</td></tr>
           <tr><td class="f">&#8230;/build_data/riot/<em>mod.rs</em></td><td class="d">Reads our own crawled files. Refuses to escape the data root.</td><td class="l">358</td></tr>
           <tr><td class="f">&#8230;/build_data/riot/<em>file.rs</em></td><td class="d">The on-disk format, with a schema version it refuses to read past.</td><td class="l">215</td></tr>
           <tr><td class="f">&#8230;/lcu/<em>mod.rs</em></td><td class="d">The layer's shape, bottom-up, and why not-running is a state.</td><td class="l">35</td></tr>
@@ -552,11 +553,11 @@ pre .p{color:var(--stat)}
       <h2><span class="n">08</span>Built vs. not built</h2>
 
       <div class="status">
-        <div><span class="k yes">Works</span><span class="v"><b>Build data layer.</b> Two providers behind one trait, warning-free build. 86 passing tests across the crate.</span></div>
+        <div><span class="k yes">Works</span><span class="v"><b>Build data layer.</b> Two providers behind one trait, warning-free build. 100 passing tests across the crate, plus one live check that stays out of the offline run.</span></div>
         <div><span class="k yes">Works</span><span class="v"><b>Desktop app.</b> 420&#215;700 window, dark UI, ~35 MB resident on a debug build.</span></div>
         <div><span class="k yes">Works</span><span class="v"><b>Search screen.</b> Type a champion, pick a role, see a build.</span></div>
-        <div><span class="k part">Untested</span><span class="v"><b>Live OP.GG requests.</b> The plumbing compiles and every response shape is handled, but no request has ever actually reached the endpoint. If their payload differs from what <code>map.rs</code> expects, that surfaces on first use.</span></div>
-        <div><span class="k part">Untested</span><span class="v"><b>Champ select screen.</b> Subscribes to <code>lcu:status</code> and <code>lcu:build</code> and renders through the same function the search box does. Every state was driven by hand; none of them has been driven by a real game.</span></div>
+        <div><span class="k yes">Works</span><span class="v"><b>Live OP.GG requests.</b> Real builds, on the current patch, for every champion tried. The endpoint requires four arguments and answers in its own compact format rather than JSON &#8212; both of which the first real request discovered. <code>cargo test --test opgg_live -- --ignored</code> checks it still holds.</span></div>
+        <div><span class="k part">Untested</span><span class="v"><b>Champ select screen.</b> Subscribes to <code>lcu:status</code> and <code>lcu:build</code> and renders through the same function the search box does. Every state was driven by hand, and by the stand-in client with real OP.GG builds coming back; none of them has been driven by a real game.</span></div>
         <div><span class="k part">Preview</span><span class="v"><b>In-game screen.</b> Static sample data, labelled as such in the UI.</span></div>
         <div><span class="k part">Untested</span><span class="v"><b>LCU layer.</b> Lockfile, loopback HTTP client, champ select socket and the watcher over them, all unit-tested and wired through to <code>build_for</code>. No build of it has met a running League client yet, so the first real champ select is the test.</span></div>
         <div><span class="k no">Missing</span><span class="v"><b>Recommendation engine.</b> All three checks, plus both tag files.</span></div>
@@ -603,8 +604,8 @@ node scripts/fake-lcu.mjs</pre>
       <div class="rail">
         <i></i>
         <div class="rail-in">
-          <h4>Cheapest first: make one live request</h4>
-          <p>Open the app, type <code>Ahri</code>. Either a build appears or a clear error does, and either way you have learned whether <code>opgg/map.rs</code> matches the real payload. Everything downstream rests on the answer, and it takes about two seconds. Then open the League client and lock something: the same two seconds test the entire LCU path, which has never met a real game.</p>
+          <h4>Cheapest first: open the League client</h4>
+          <p>The OP.GG half of this question has been answered &#8212; live requests return real builds, and <code>cargo test --test opgg_live -- --ignored</code> re-checks it in twenty seconds. What has never happened is a real champ select: every state of that screen has been driven by hand and by <code>scripts/fake-lcu.mjs</code>, but never by a game. Launch the client, lock something in a custom game, and the last untested link in the chain is tested.</p>
         </div>
       </div>
 
