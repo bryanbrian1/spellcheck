@@ -59,6 +59,7 @@ impl Default for OpggConfig {
     }
 }
 
+#[derive(Debug)]
 pub struct OpggProvider {
     config: OpggConfig,
     client: McpClient,

@@ -27,6 +27,7 @@ struct Session {
     initialized: bool,
 }
 
+#[derive(Debug)]
 pub struct McpClient {
     http: reqwest::Client,
     endpoint: String,

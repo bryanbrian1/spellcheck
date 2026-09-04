@@ -304,7 +304,7 @@ pub struct SummonerSpell {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "uppercase")]
+#[serde(rename_all = "UPPERCASE")]
 pub enum Skill {
     Q,
     W,
