@@ -364,6 +364,36 @@ mod tests {
         assert_eq!(state.observe(&session(0, "top")), vec![Change::Entered]);
     }
 
+    /// The UI's `LcuStatus` type in main.ts is hand-written against this
+    /// shape. A rename on either side is silent at compile time and shows up
+    /// as a champ select screen that never updates, so the contract is
+    /// asserted here rather than discovered in a game.
+    #[test]
+    fn the_wire_shape_the_ui_reads_is_fixed() {
+        assert_eq!(
+            serde_json::to_value(ChampSelectEvent::ClientOffline).unwrap(),
+            json!({ "event": "clientOffline" })
+        );
+        assert_eq!(
+            serde_json::to_value(ChampSelectEvent::Entered).unwrap(),
+            json!({ "event": "entered" })
+        );
+        assert_eq!(
+            serde_json::to_value(ChampSelectEvent::Locked(LockedChampion {
+                champion_id: 62,
+                champion_key: "MonkeyKing".to_string(),
+                assigned_position: "jungle".to_string(),
+            }))
+            .unwrap(),
+            json!({
+                "event": "locked",
+                "championId": 62,
+                "championKey": "MonkeyKing",
+                "assignedPosition": "jungle",
+            })
+        );
+    }
+
     #[tokio::test]
     async fn a_closed_client_is_reported_once_and_is_not_an_error() {
         let (sender, mut receiver) = mpsc::channel(4);

@@ -242,6 +242,29 @@ mod tests {
         assert_eq!(build.champion.champion_key, "Ahri");
     }
 
+    /// Matches `ChampSelectBuild` in main.ts. `lookup` and `error` are both
+    /// present as keys and exactly one of them is null, because the UI branches
+    /// on which.
+    #[tokio::test]
+    async fn the_build_payload_the_ui_reads_is_fixed() {
+        let service = BuildService::new(Arc::new(Stub));
+        let build = build_for_locked(
+            &service,
+            LockedChampion {
+                champion_id: 103,
+                champion_key: "Ahri".to_string(),
+                assigned_position: "middle".to_string(),
+            },
+        )
+        .await;
+
+        let json = serde_json::to_value(&build).unwrap();
+        assert_eq!(json["champion"]["championKey"], "Ahri");
+        assert_eq!(json["champion"]["assignedPosition"], "middle");
+        assert_eq!(json["lookup"]["status"], "noData");
+        assert_eq!(json["error"], serde_json::Value::Null);
+    }
+
     #[tokio::test]
     async fn a_failed_lookup_reaches_the_ui_as_a_message() {
         let service = BuildService::new(Arc::new(Stub));
