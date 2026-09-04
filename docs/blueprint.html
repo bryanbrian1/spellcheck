@@ -238,8 +238,8 @@ pre .p{color:var(--stat)}
       <span>Rust <b>1.98.1</b></span>
       <span>Tauri <b>v2</b></span>
       <span>Vanilla <b>TypeScript</b></span>
-      <span><b>56</b> tests</span>
-      <span><b>3,741</b> lines</span>
+      <span><b>86</b> tests</span>
+      <span><b>5,285</b> lines</span>
       <span>Bundle <b>14 MB</b></span>
     </div>
   </header>
@@ -286,7 +286,7 @@ pre .p{color:var(--stat)}
 
       <figure>
         <div class="figbox">
-          <svg viewBox="0 0 800 566" role="img" aria-label="Data flow: the League client and the search box both feed BuildService, which calls one BuildDataProvider trait; the trait resolves to either OpggProvider hitting the OP.GG endpoint or RiotProvider reading committed JSON, and a BuildLookup returns to the UI. The LCU layer between the client and BuildService does not exist yet.">
+          <svg viewBox="0 0 800 566" role="img" aria-label="Data flow: the League client and the search box both feed BuildService, which calls one BuildDataProvider trait; the trait resolves to either OpggProvider hitting the OP.GG endpoint or RiotProvider reading committed JSON, and a BuildLookup returns to the UI. The LCU layer between the client and BuildService reads the lockfile and listens on the champ select socket.">
             <defs>
               <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                 <path d="M0,0 L10,5 L0,10 z" fill="#4a5c6b"></path>
@@ -303,18 +303,18 @@ pre .p{color:var(--stat)}
             <text class="lbl" x="118" y="43" text-anchor="middle">League client</text>
             <text class="lbl-s" x="118" y="59" text-anchor="middle">usually not running</text>
 
-            <line class="edge-gap" x1="206" y1="45" x2="296" y2="45" marker-end="url(#ag)"></line>
+            <line class="edge" x1="206" y1="45" x2="296" y2="45" marker-end="url(#a)"></line>
             <text class="etxt" x="251" y="36" text-anchor="middle">lockfile</text>
 
-            <rect class="bx-gap" x="300" y="20" width="180" height="50" rx="3"></rect>
-            <text class="lbl" x="390" y="43" text-anchor="middle" style="fill:#e06a5a">LCU layer</text>
-            <text class="lbl-s" x="390" y="59" text-anchor="middle" style="fill:#a8756c">not built yet</text>
+            <rect class="bx" x="300" y="20" width="180" height="50" rx="3"></rect>
+            <text class="lbl" x="390" y="43" text-anchor="middle">LCU layer</text>
+            <text class="lbl-s" x="390" y="59" text-anchor="middle">socket, never polled</text>
 
             <rect class="bx" x="560" y="20" width="180" height="50" rx="3"></rect>
             <text class="lbl" x="650" y="43" text-anchor="middle">Search box</text>
             <text class="lbl-s" x="650" y="59" text-anchor="middle">works today</text>
 
-            <path class="edge-gap" d="M390,70 V150" marker-end="url(#ag)"></path>
+            <path class="edge" d="M390,70 V150" marker-end="url(#a)"></path>
             <text class="etxt" x="398" y="112">championId + assignedPosition</text>
 
             <path class="edge" d="M650,70 V112 H500 V150" marker-end="url(#a)"></path>
@@ -378,8 +378,8 @@ pre .p{color:var(--stat)}
         <table>
           <tr class="head"><td>Path</td><td>What it does</td><td>Lines</td></tr>
           <tr><td class="f">src-tauri/src/<em>main.rs</em></td><td class="d">Binary entry point. Calls <code>run()</code>.</td><td class="l">6</td></tr>
-          <tr><td class="f">src-tauri/src/<em>lib.rs</em></td><td class="d"><code>BuildService</code>, the single entry point the UI talks to, plus app startup and config resolution.</td><td class="l">155</td></tr>
-          <tr><td class="f">src-tauri/src/<em>commands.rs</em></td><td class="d">The frontend's entire surface: two commands, neither naming a provider.</td><td class="l">37</td></tr>
+          <tr><td class="f">src-tauri/src/<em>lib.rs</em></td><td class="d"><code>BuildService</code>, the single entry point the UI talks to, plus app startup, config resolution, and the champ select task that feeds it.</td><td class="l">269</td></tr>
+          <tr><td class="f">src-tauri/src/<em>commands.rs</em></td><td class="d">The frontend's entire surface: two commands, neither naming a provider.</td><td class="l">39</td></tr>
           <tr><td class="f">&#8230;/build_data/<em>mod.rs</em></td><td class="d">The <code>BuildDataProvider</code> trait, and champion-key validation that stops path traversal.</td><td class="l">91</td></tr>
           <tr><td class="f">&#8230;/build_data/<em>schema.rs</em></td><td class="d">The internal build shape every provider maps into. Change carefully; everything depends on it.</td><td class="l">412</td></tr>
           <tr><td class="f">&#8230;/build_data/<em>mapping.rs</em></td><td class="d">Helpers for reading messy provider payloads &#8212; alias lookup, id coercion, rate normalisation.</td><td class="l">463</td></tr>
@@ -391,6 +391,13 @@ pre .p{color:var(--stat)}
           <tr><td class="f">&#8230;/build_data/opgg/<em>mod.rs</em></td><td class="d">The provider itself: config, argument building, role translation.</td><td class="l">197</td></tr>
           <tr><td class="f">&#8230;/build_data/riot/<em>mod.rs</em></td><td class="d">Reads our own crawled files. Refuses to escape the data root.</td><td class="l">358</td></tr>
           <tr><td class="f">&#8230;/build_data/riot/<em>file.rs</em></td><td class="d">The on-disk format, with a schema version it refuses to read past.</td><td class="l">215</td></tr>
+          <tr><td class="f">&#8230;/lcu/<em>mod.rs</em></td><td class="d">The layer's shape, bottom-up, and why not-running is a state.</td><td class="l">35</td></tr>
+          <tr><td class="f">&#8230;/lcu/<em>lockfile.rs</em></td><td class="d">Port and password, rewritten every launch. Redacts itself in <code>Debug</code>.</td><td class="l">234</td></tr>
+          <tr><td class="f">&#8230;/lcu/<em>client.rs</em></td><td class="d">The client's REST API over loopback. Two reads, no writes.</td><td class="l">199</td></tr>
+          <tr><td class="f">&#8230;/lcu/<em>session.rs</em></td><td class="d">The champ select payload, reduced to champion and role.</td><td class="l">183</td></tr>
+          <tr><td class="f">&#8230;/lcu/<em>ws.rs</em></td><td class="d">The event socket, its frame format, and the loopback TLS verifier.</td><td class="l">305</td></tr>
+          <tr><td class="f">&#8230;/lcu/<em>watcher.rs</em></td><td class="d">The loop over all of it. Deduplicates champ select's chatter into real changes.</td><td class="l">391</td></tr>
+          <tr><td class="f">&#8230;/lcu/<em>error.rs</em></td><td class="d">Typed client errors &#8212; with no not-running variant, on purpose.</td><td class="l">81</td></tr>
           <tr><td class="f"><em>index.html</em></td><td class="d">Three screens. One live, two static previews.</td><td class="l">175</td></tr>
           <tr><td class="f">src/<em>main.ts</em></td><td class="d">All UI logic. Renders whatever comes back; never inspects the source.</td><td class="l">327</td></tr>
           <tr><td class="f">src/<em>styles.css</em></td><td class="d">The design tokens. The colour meanings live here.</td><td class="l">143</td></tr>
@@ -536,7 +543,7 @@ pre .p{color:var(--stat)}
         <i></i>
         <div class="rail-in">
           <h4>Imports are button presses</h4>
-          <p>Writing an item set or a rune page into the client is always user-initiated. Never automatic, never on a timer, never as a side effect of a lookup. They currently ship disabled because the client layer does not exist.</p>
+          <p>Writing an item set or a rune page into the client is always user-initiated. Never automatic, never on a timer, never as a side effect of a lookup. They currently ship disabled: the client layer reads, and has no code that could write.</p>
         </div>
       </div>
     </section>
@@ -545,12 +552,13 @@ pre .p{color:var(--stat)}
       <h2><span class="n">08</span>Built vs. not built</h2>
 
       <div class="status">
-        <div><span class="k yes">Works</span><span class="v"><b>Build data layer.</b> Two providers behind one trait, 56 passing tests, warning-free build.</span></div>
+        <div><span class="k yes">Works</span><span class="v"><b>Build data layer.</b> Two providers behind one trait, warning-free build. 86 passing tests across the crate.</span></div>
         <div><span class="k yes">Works</span><span class="v"><b>Desktop app.</b> 420&#215;700 window, dark UI, ~35 MB resident on a debug build.</span></div>
         <div><span class="k yes">Works</span><span class="v"><b>Search screen.</b> Type a champion, pick a role, see a build.</span></div>
         <div><span class="k part">Untested</span><span class="v"><b>Live OP.GG requests.</b> The plumbing compiles and every response shape is handled, but no request has ever actually reached the endpoint. If their payload differs from what <code>map.rs</code> expects, that surfaces on first use.</span></div>
         <div><span class="k part">Preview</span><span class="v"><b>Champ select and in-game screens.</b> Static sample data, labelled as such in the UI.</span></div>
-        <div><span class="k no">Missing</span><span class="v"><b>LCU layer.</b> No lockfile parsing, no client HTTP, no WebSocket. Nothing detects your champion.</span></div>
+        <div><span class="k part">Untested</span><span class="v"><b>LCU layer.</b> Lockfile, loopback HTTP client, champ select socket and the watcher over them, all unit-tested and wired through to <code>build_for</code>. No build of it has met a running League client yet, so the first real champ select is the test.</span></div>
+        <div><span class="k no">Missing</span><span class="v"><b>Champ select in the UI.</b> The Rust side emits <code>lcu:status</code> and <code>lcu:build</code>; nothing in <code>main.ts</code> listens to either yet, so the screen is still the static preview.</span></div>
         <div><span class="k no">Missing</span><span class="v"><b>Recommendation engine.</b> All three checks, plus both tag files.</span></div>
         <div><span class="k no">Missing</span><span class="v"><b>Crawler and CI.</b> <code>data/builds/</code> is empty, so <code>RiotProvider</code> has nothing to read.</span></div>
         <div><span class="k no">Missing</span><span class="v"><b>Matchup builds.</b> The design promises &#8220;core build vs. Syndra&#8221;, but <code>BuildRequest</code> carries champion and role with no opponent field. Needs a schema change and provider support on both sides.</span></div>
@@ -597,8 +605,8 @@ npm run app
       <div class="rail">
         <i></i>
         <div class="rail-in">
-          <h4>Biggest payoff: the LCU layer</h4>
-          <p>Lockfile, then the local HTTP client, then the WebSocket listener. It is the piece that turns &#8220;type a champion name&#8221; into the product. Everything it needs to hand off already exists and is tested.</p>
+          <h4>Biggest payoff: listen to the champ select events</h4>
+          <p>The LCU layer already emits <code>lcu:status</code> and <code>lcu:build</code> from Rust, and the champ select screen already knows how to render a build &#8212; it is drawing sample data. Wiring the second to the first is what turns &#8220;type a champion name&#8221; into the product, and it is the change that first puts the whole path in front of a real client.</p>
         </div>
       </div>
 
