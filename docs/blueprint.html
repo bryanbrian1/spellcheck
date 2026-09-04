@@ -238,8 +238,8 @@ pre .p{color:var(--stat)}
       <span>Rust <b>1.98.1</b></span>
       <span>Tauri <b>v2</b></span>
       <span>Vanilla <b>TypeScript</b></span>
-      <span><b>86</b> tests</span>
-      <span><b>5,285</b> lines</span>
+      <span><b>88</b> tests</span>
+      <span><b>5,481</b> lines</span>
       <span>Bundle <b>14 MB</b></span>
     </div>
   </header>
@@ -378,7 +378,7 @@ pre .p{color:var(--stat)}
         <table>
           <tr class="head"><td>Path</td><td>What it does</td><td>Lines</td></tr>
           <tr><td class="f">src-tauri/src/<em>main.rs</em></td><td class="d">Binary entry point. Calls <code>run()</code>.</td><td class="l">6</td></tr>
-          <tr><td class="f">src-tauri/src/<em>lib.rs</em></td><td class="d"><code>BuildService</code>, the single entry point the UI talks to, plus app startup, config resolution, and the champ select task that feeds it.</td><td class="l">269</td></tr>
+          <tr><td class="f">src-tauri/src/<em>lib.rs</em></td><td class="d"><code>BuildService</code>, the single entry point the UI talks to, plus app startup, config resolution, and the champ select task that feeds it.</td><td class="l">292</td></tr>
           <tr><td class="f">src-tauri/src/<em>commands.rs</em></td><td class="d">The frontend's entire surface: two commands, neither naming a provider.</td><td class="l">39</td></tr>
           <tr><td class="f">&#8230;/build_data/<em>mod.rs</em></td><td class="d">The <code>BuildDataProvider</code> trait, and champion-key validation that stops path traversal.</td><td class="l">91</td></tr>
           <tr><td class="f">&#8230;/build_data/<em>schema.rs</em></td><td class="d">The internal build shape every provider maps into. Change carefully; everything depends on it.</td><td class="l">412</td></tr>
@@ -396,11 +396,11 @@ pre .p{color:var(--stat)}
           <tr><td class="f">&#8230;/lcu/<em>client.rs</em></td><td class="d">The client's REST API over loopback. Two reads, no writes.</td><td class="l">199</td></tr>
           <tr><td class="f">&#8230;/lcu/<em>session.rs</em></td><td class="d">The champ select payload, reduced to champion and role.</td><td class="l">183</td></tr>
           <tr><td class="f">&#8230;/lcu/<em>ws.rs</em></td><td class="d">The event socket, its frame format, and the loopback TLS verifier.</td><td class="l">305</td></tr>
-          <tr><td class="f">&#8230;/lcu/<em>watcher.rs</em></td><td class="d">The loop over all of it. Deduplicates champ select's chatter into real changes.</td><td class="l">391</td></tr>
+          <tr><td class="f">&#8230;/lcu/<em>watcher.rs</em></td><td class="d">The loop over all of it. Deduplicates champ select's chatter into real changes.</td><td class="l">421</td></tr>
           <tr><td class="f">&#8230;/lcu/<em>error.rs</em></td><td class="d">Typed client errors &#8212; with no not-running variant, on purpose.</td><td class="l">81</td></tr>
-          <tr><td class="f"><em>index.html</em></td><td class="d">Three screens. One live, two static previews.</td><td class="l">175</td></tr>
-          <tr><td class="f">src/<em>main.ts</em></td><td class="d">All UI logic. Renders whatever comes back; never inspects the source.</td><td class="l">327</td></tr>
-          <tr><td class="f">src/<em>styles.css</em></td><td class="d">The design tokens. The colour meanings live here.</td><td class="l">143</td></tr>
+          <tr><td class="f"><em>index.html</em></td><td class="d">Three screens. Two live, one static preview.</td><td class="l">123</td></tr>
+          <tr><td class="f">src/<em>main.ts</em></td><td class="d">All UI logic. Both screens render through one function; neither inspects the source.</td><td class="l">518</td></tr>
+          <tr><td class="f">src/<em>styles.css</em></td><td class="d">The design tokens. The colour meanings live here.</td><td class="l">147</td></tr>
         </table>
       </div>
 
@@ -556,9 +556,9 @@ pre .p{color:var(--stat)}
         <div><span class="k yes">Works</span><span class="v"><b>Desktop app.</b> 420&#215;700 window, dark UI, ~35 MB resident on a debug build.</span></div>
         <div><span class="k yes">Works</span><span class="v"><b>Search screen.</b> Type a champion, pick a role, see a build.</span></div>
         <div><span class="k part">Untested</span><span class="v"><b>Live OP.GG requests.</b> The plumbing compiles and every response shape is handled, but no request has ever actually reached the endpoint. If their payload differs from what <code>map.rs</code> expects, that surfaces on first use.</span></div>
-        <div><span class="k part">Preview</span><span class="v"><b>Champ select and in-game screens.</b> Static sample data, labelled as such in the UI.</span></div>
+        <div><span class="k part">Untested</span><span class="v"><b>Champ select screen.</b> Subscribes to <code>lcu:status</code> and <code>lcu:build</code> and renders through the same function the search box does. Every state was driven by hand; none of them has been driven by a real game.</span></div>
+        <div><span class="k part">Preview</span><span class="v"><b>In-game screen.</b> Static sample data, labelled as such in the UI.</span></div>
         <div><span class="k part">Untested</span><span class="v"><b>LCU layer.</b> Lockfile, loopback HTTP client, champ select socket and the watcher over them, all unit-tested and wired through to <code>build_for</code>. No build of it has met a running League client yet, so the first real champ select is the test.</span></div>
-        <div><span class="k no">Missing</span><span class="v"><b>Champ select in the UI.</b> The Rust side emits <code>lcu:status</code> and <code>lcu:build</code>; nothing in <code>main.ts</code> listens to either yet, so the screen is still the static preview.</span></div>
         <div><span class="k no">Missing</span><span class="v"><b>Recommendation engine.</b> All three checks, plus both tag files.</span></div>
         <div><span class="k no">Missing</span><span class="v"><b>Crawler and CI.</b> <code>data/builds/</code> is empty, so <code>RiotProvider</code> has nothing to read.</span></div>
         <div><span class="k no">Missing</span><span class="v"><b>Matchup builds.</b> The design promises &#8220;core build vs. Syndra&#8221;, but <code>BuildRequest</code> carries champion and role with no opponent field. Needs a schema change and provider support on both sides.</span></div>
@@ -598,15 +598,15 @@ npm run app
         <i></i>
         <div class="rail-in">
           <h4>Cheapest first: make one live request</h4>
-          <p>Open the app, type <code>Ahri</code>. Either a build appears or a clear error does, and either way you have learned whether <code>opgg/map.rs</code> matches the real payload. Everything downstream rests on the answer, and it takes about two seconds.</p>
+          <p>Open the app, type <code>Ahri</code>. Either a build appears or a clear error does, and either way you have learned whether <code>opgg/map.rs</code> matches the real payload. Everything downstream rests on the answer, and it takes about two seconds. Then open the League client and lock something: the same two seconds test the entire LCU path, which has never met a real game.</p>
         </div>
       </div>
 
       <div class="rail">
         <i></i>
         <div class="rail-in">
-          <h4>Biggest payoff: listen to the champ select events</h4>
-          <p>The LCU layer already emits <code>lcu:status</code> and <code>lcu:build</code> from Rust, and the champ select screen already knows how to render a build &#8212; it is drawing sample data. Wiring the second to the first is what turns &#8220;type a champion name&#8221; into the product, and it is the change that first puts the whole path in front of a real client.</p>
+          <h4>Biggest payoff: the recommendation engine</h4>
+          <p>The whole path from lockfile to rendered build now exists, so the next thing that changes what the app <em>says</em> is the three checks &#8212; and they need <code>data/meta/champions.json</code> and <code>data/meta/items.json</code> first. Mind the colour law while you build them: a check returns <code>{ itemId, priority, reason, source }</code> and the rail follows <code>source</code>, never the designer&#8217;s eye.</p>
         </div>
       </div>
 
