@@ -1,0 +1,42 @@
+[package]
+name = "leaguechecker"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Champion select build lookup for League of Legends"
+publish = false
+
+[lib]
+name = "leaguechecker"
+path = "src/lib.rs"
+
+[[bin]]
+name = "leaguechecker"
+path = "src/main.rs"
+
+# Tauri generates the app metadata (icons, Info.plist, capabilities) at build
+# time from tauri.conf.json.
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+# Serialization of the internal build schema and of every provider payload.
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# Typed provider errors without hand-writing Display/Error impls.
+thiserror = "2"
+# `dyn BuildDataProvider` needs object-safe async methods.
+async-trait = "0.1"
+# Async runtime primitives. Only the features we use: Mutex for the MCP
+# session, fs for reading build files off the UI thread.
+tokio = { version = "1", features = ["sync", "fs", "rt", "macros"] }
+# HTTP client for the OP.GG MCP endpoint. rustls avoids linking OpenSSL;
+# the same client will serve the LCU HTTP calls later.
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+# The desktop shell. This is the whole GUI stack: Tauri renders the UI in the
+# system WebView (WKWebView on macOS), so no browser engine ships in the
+# binary. That is what keeps us inside the 120MB budget.
+tauri = { version = "2", features = [] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }

@@ -1,0 +1,17 @@
+{
+  "name": "leaguechecker",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Champion select build lookup for League of Legends",
+  "scripts": {
+    "build": "tsc && cp index.html dist/ && cp src/styles.css dist/",
+    "dev": "npm run build && tauri dev",
+    "app": "npm run build && tauri build",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "typescript": "^5"
+  }
+}

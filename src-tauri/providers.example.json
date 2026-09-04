@@ -1,0 +1,17 @@
+{
+  "provider": "opgg",
+
+  "opgg": {
+    "endpoint": "https://mcp-api.op.gg/mcp",
+    "tool": "lol_get_champion_analysis",
+    "region": null,
+    "tier": null,
+    "timeoutSecs": 10,
+    "label": "OP.GG"
+  },
+
+  "riot": {
+    "dataRoot": "data/builds",
+    "label": "leaguechecker"
+  }
+}
