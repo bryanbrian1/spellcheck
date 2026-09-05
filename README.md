@@ -19,7 +19,16 @@ skill order — for that pair.
 npm install
 npm run dev          # run it
 npm run app          # bundle a .app into src-tauri/target/release/bundle/macos/
+npm run fake-client  # a stand-in League client, to develop without a game
 cd src-tauri && cargo test
 ```
 
 Rust must be on your `PATH` (`. "$HOME/.cargo/env"`).
+
+The crawler that fills `data/builds/` runs in CI, not in the app, and is
+dependency-free — its tests need nothing installed:
+
+```sh
+npm run test:ingest
+RIOT_API_KEY=RGAPI-... node scripts/ingest/index.mjs   # a real crawl
+```
