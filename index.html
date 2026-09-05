@@ -24,7 +24,10 @@
   <!-- ============ SEARCH — live, wired to the provider ============ -->
   <section class="screen on" id="s-search">
     <div class="search-wrap">
-      <input class="input" id="champ" placeholder="Search a champion" aria-label="Champion" autocomplete="off" spellcheck="false">
+      <input class="input" id="champ" placeholder="Search a champion" aria-label="Champion"
+             autocomplete="off" spellcheck="false" role="combobox"
+             aria-expanded="false" aria-controls="suggest" aria-autocomplete="list">
+      <ul class="suggest" id="suggest" role="listbox" aria-label="Champion matches" hidden></ul>
       <div class="roles" role="group" aria-label="Role" id="roles">
         <button class="role" data-role="top" aria-pressed="false">Top</button>
         <button class="role" data-role="jungle" aria-pressed="false">Jungle</button>

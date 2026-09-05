@@ -8,7 +8,7 @@ use std::sync::Arc;
 
 use tauri::State;
 
-use crate::icons::{IconCatalog, IconState};
+use crate::ddragon::{DataDragon, DataDragonState};
 use crate::{BuildLookup, BuildService};
 
 /// Attribution string for whichever source is live. The UI renders it
@@ -48,8 +48,8 @@ pub async fn fetch_build(
 /// An error is ordinary rather than fatal: the UI falls back to the text
 /// labels it has always drawn, and the next call tries again.
 #[tauri::command]
-pub async fn icon_catalog(icons: State<'_, Arc<IconState>>) -> Result<IconCatalog, String> {
-    icons
+pub async fn data_dragon(ddragon: State<'_, Arc<DataDragonState>>) -> Result<DataDragon, String> {
+    ddragon
         .get()
         .await
         .cloned()
