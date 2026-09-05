@@ -16,6 +16,23 @@ path = "src/main.rs"
 
 # Tauri generates the app metadata (icons, Info.plist, capabilities) at build
 # time from tauri.conf.json.
+# Release builds are what people download, so they are tuned for size. The
+# app was 14MB of binary on the default profile, which is most of a 4.3MB
+# download for a program whose own source is eleven thousand lines.
+#
+# opt-level stays at the default 3 rather than dropping to "z". Size matters
+# here, but so does the app feeling instant on a machine that cannot spare a
+# core, and "z" buys a megabyte or so by making the code slower.
+#
+# panic is deliberately NOT set to "abort", though it would save more. This
+# app's job is to sit in the background for hours; unwinding means a panic in
+# the watcher task kills that task, while aborting would kill the whole app
+# out from under somebody in champion select. The megabyte is not worth that.
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
