@@ -11,9 +11,9 @@
 # Second, every artifact here is UNSIGNED. macOS marks a downloaded unsigned
 # app as quarantined and Windows shows a SmartScreen warning, so testers need
 # the install notes in the README to get past both. That is an acceptable
-# trade for a beta and a bad one for a public launch; the Apple secrets below
-# are read but not required, so signing turns on by adding them to the repo
-# rather than by editing this file.
+# trade for a beta and a bad one for a public launch. Adding the six Apple
+# secrets to the repo turns signing on without editing this file — but see
+# the signing step for why they cannot simply be listed as build env.
 name: release
 
 on:
@@ -108,18 +108,49 @@ jobs:
       - name: Build the frontend
         run: npm run build
 
+      # Tauri decides to sign when APPLE_CERTIFICATE is *present*, not when it
+      # holds anything, so handing the build an unset secret is not a no-op —
+      # it fails in `security import` on an empty certificate. That is why the
+      # variables are promoted here, only when there is something to promote,
+      # instead of being listed in the build step's env where an
+      # unconfigured repo cannot avoid them.
+      - name: Configure Apple signing, if a certificate is available
+        if: runner.os == 'macOS'
+        env:
+          CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          NOTARY_APPLE_ID: ${{ secrets.APPLE_ID }}
+          NOTARY_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -z "$CERTIFICATE" ]; then
+            echo "No APPLE_CERTIFICATE secret; building unsigned."
+            echo "Testers will need the install notes in the README."
+            exit 0
+          fi
+
+          # Heredoc form because a certificate is multi-line. The delimiter is
+          # deliberately not something base64 or a password could contain.
+          {
+            for pair in \
+              "APPLE_CERTIFICATE:$CERTIFICATE" \
+              "APPLE_CERTIFICATE_PASSWORD:$CERTIFICATE_PASSWORD" \
+              "APPLE_SIGNING_IDENTITY:$SIGNING_IDENTITY" \
+              "APPLE_ID:$NOTARY_APPLE_ID" \
+              "APPLE_PASSWORD:$NOTARY_PASSWORD" \
+              "APPLE_TEAM_ID:$TEAM_ID"
+            do
+              echo "${pair%%:*}<<__LEAGUECHECKER_EOF__"
+              echo "${pair#*:}"
+              echo "__LEAGUECHECKER_EOF__"
+            done
+          } >> "$GITHUB_ENV"
+          echo "Apple signing configured; this build will be signed and notarised."
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Absent for now, which is what makes these builds unsigned. Tauri
-          # skips signing and notarisation when they are empty rather than
-          # failing, so adding the six secrets is the whole of the change.
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           # Only publish on a tag. A workflow_dispatch run builds the matrix
           # and uploads nothing.
