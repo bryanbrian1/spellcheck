@@ -48,9 +48,11 @@ body{
 
 .hdr{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;gap:11px;align-items:center;flex-shrink:0}
 .portrait{
+  position:relative;overflow:hidden;
   width:42px;height:42px;border-radius:var(--radius);background:linear-gradient(150deg,#2b3a4a,#1b242e);
   border:1px solid #33414f;display:grid;place-items:center;font-weight:700;font-size:15px;color:#7f94a8;flex-shrink:0;
 }
+.portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .hdr-main{min-width:0;flex:1}
 .hdr-name{font-size:16px;font-weight:600;letter-spacing:-.01em}
 .hdr-sub{color:var(--ink-2);font-size:12px}
@@ -85,11 +87,15 @@ body{
    this its tiles collapsed to half size and crushed their labels into an
    unreadable stack. */
 .tile{
+  position:relative;
   width:38px;height:38px;flex-shrink:0;border-radius:var(--radius);background:var(--panel-2);
   border:1px solid #2c3742;display:grid;place-items:center;overflow:hidden;
   font-size:10px;font-weight:600;color:#8ea0b2;text-align:center;line-height:1.05;padding:2px;
 }
-.tile img{width:100%;height:100%;object-fit:cover;border-radius:2px}
+/* Art sits *over* the label rather than replacing it, so a tile whose image
+   has not arrived, failed, or does not exist (stat shards have none) reads as
+   the words it always did instead of as an empty square. */
+.tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:2px}
 .tile.key{width:44px;height:44px;background:#22303a;border-color:#3b5361;color:#a8c6d4}
 .tile.sm{width:30px;height:30px;font-size:9px}
 .tile.rule{border-color:#5c4a26;background:#231d12;color:#d5a95e}

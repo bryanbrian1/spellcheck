@@ -136,6 +136,8 @@ interface Standing {
 
 interface InGameState {
   champion: string | null;
+  /** The Data Dragon key, which is what art is filed under. */
+  championKey: string | null;
   level: number;
   gameTime: number;
   standing: Standing | null;
@@ -147,6 +149,21 @@ interface InGameState {
 }
 
 type InGameUpdate = { event: "noGame" } | ({ event: "playing" } & InGameState);
+
+/**
+ * `icon_catalog` — where Data Dragon keeps its art.
+ *
+ * Items and champions are addressable from an id and a key we already hold.
+ * Summoner spells are named rather than numbered, and runes carry their own
+ * unversioned path, so those two need a lookup the backend fetches for us —
+ * the page may display Data Dragon images but may not call it.
+ */
+interface IconCatalog {
+  /** The full build, `16.17.1`. Not the `16.17` a build file is labelled with. */
+  version: string;
+  spells: Record<string, string>;
+  perks: Record<string, string>;
+}
 
 /** `withGlobalTauri` puts the bridge on window, so we need no npm package. */
 declare global {
@@ -224,12 +241,85 @@ const clock = (seconds: number): string => {
   return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
 };
 
+/* ---------- icons ---------- */
+
+const DDRAGON = "https://ddragon.leagueoflegends.com";
+
+type IconKind = "item" | "champ" | "spell" | "perk";
+
+/** Null until the catalogue arrives, and after a failure. Every tile renders
+ *  its text label regardless, so this only ever adds. */
+let icons: IconCatalog | null = null;
+
+const iconUrl = (kind: IconKind, key: string): string | null => {
+  if (!icons) return null;
+  switch (kind) {
+    case "item":
+      return `${DDRAGON}/cdn/${icons.version}/img/item/${key}.png`;
+    case "champ":
+      return `${DDRAGON}/cdn/${icons.version}/img/champion/${key}.png`;
+    case "spell": {
+      const file = icons.spells[key];
+      return file ? `${DDRAGON}/cdn/${icons.version}/img/spell/${file}` : null;
+    }
+    case "perk": {
+      // Rune art is the one thing Data Dragon serves unversioned.
+      const path = icons.perks[key];
+      return path ? `${DDRAGON}/cdn/img/${path}` : null;
+    }
+  }
+};
+
+/**
+ * Put art into anything that asked for it and does not have it yet.
+ *
+ * Called after every render, and again when the catalogue arrives, because
+ * the two happen in either order — a build can be on screen before Data
+ * Dragon has answered. The text label is never removed: it sits underneath,
+ * so an image that fails or has not arrived shows the words instead of a
+ * gap. Stat shards have no art at all and keep their label permanently.
+ */
+const paintIcons = (): void => {
+  if (!icons) return;
+  document.querySelectorAll<HTMLElement>("[data-icon]").forEach((holder) => {
+    if (holder.querySelector("img")) return;
+    const raw = holder.dataset.icon ?? "";
+    const split = raw.indexOf(":");
+    if (split < 0) return;
+    const src = iconUrl(raw.slice(0, split) as IconKind, raw.slice(split + 1));
+    if (!src) return;
+
+    const img = document.createElement("img");
+    // Empty alt on purpose: the label is already there behind it, and a
+    // broken-image caption would print on top of it.
+    img.alt = "";
+    img.loading = "lazy";
+    img.addEventListener("error", () => img.remove());
+    img.src = src;
+    holder.prepend(img);
+  });
+};
+
+/** Champion art in a header, falling back to the initials it used to show. */
+const setPortrait = (holder: HTMLElement, key: string | null, fallback: string): void => {
+  holder.querySelector("img")?.remove();
+  holder.textContent = fallback;
+  if (key) holder.dataset.icon = `champ:${key}`;
+  else delete holder.dataset.icon;
+  paintIcons();
+};
+
 /** Providers may or may not resolve names; ids are the guaranteed field. */
 const tileLabel = (id: number, name?: string): string =>
   escape(name && name.trim() ? name.trim().slice(0, 9) : `#${id}`);
 
-const tile = (id: number, name: string | undefined, cls = "tile"): string =>
-  `<div class="${cls}" title="${escape(name ?? String(id))}">${tileLabel(id, name)}</div>`;
+const tile = (
+  id: number,
+  name: string | undefined,
+  cls = "tile",
+  kind: IconKind = "item",
+): string =>
+  `<div class="${cls}" data-icon="${kind}:${id}" title="${escape(name ?? String(id))}">${tileLabel(id, name)}</div>`;
 
 /* ---------- blocks ---------- */
 
@@ -268,8 +358,8 @@ const sugRow = (group: Suggestion[], names: Record<string, string>): string => {
   // Every suggestion arrives with a name; the fallback is a word rather than
   // an id because an amber block may not carry a number.
   const named = group.map((s) => names[String(s.itemId)] ?? "Item");
-  const tiles = named
-    .map((name) => `<div class="tile rule" title="${escape(name)}">${escape(name.slice(0, 9))}</div>`)
+  const tiles = group
+    .map((s, i) => tile(s.itemId, named[i], "tile rule"))
     .join("");
   const soonest = priorityOrder.find((p) => group.some((s) => s.priority === p)) ?? "situational";
 
@@ -337,12 +427,14 @@ const runeBlock = (page: RunePage): string => {
   const keystone = page.primary?.[0];
   const rest = (page.primary ?? []).slice(1);
   const primary = [
-    keystone === undefined ? "" : tile(keystone, undefined, "tile key"),
-    ...rest.map((id) => tile(id, undefined)),
+    keystone === undefined ? "" : tile(keystone, undefined, "tile key", "perk"),
+    ...rest.map((id) => tile(id, undefined, "tile", "perk")),
   ].join("");
   const secondary = [
-    ...(page.secondary ?? []).map((id) => tile(id, undefined)),
-    ...(page.shards ?? []).map((id) => tile(id, undefined, "tile sm")),
+    ...(page.secondary ?? []).map((id) => tile(id, undefined, "tile", "perk")),
+    // Stat shards are not in runesReforged.json and have no art, so these
+    // keep their text label.
+    ...(page.shards ?? []).map((id) => tile(id, undefined, "tile sm", "perk")),
   ].join("");
   return block(
     page.label ?? "Runes",
@@ -356,7 +448,7 @@ const summonerBlock = (set: SummonerSet): string =>
   block(
     "Summoners",
     statLine(set.stats),
-    `<div class="row">${set.spells.map((s) => tile(s.id, s.name)).join("")}</div>`,
+    `<div class="row">${set.spells.map((s) => tile(s.id, s.name, "tile", "spell")).join("")}</div>`,
     railFor(set.stats),
   );
 
@@ -453,6 +545,7 @@ const render = (lookup: BuildLookup): void => {
   }
 
   results.innerHTML = html;
+  paintIcons();
 
   // Import stays disabled: CLAUDE.md requires these to be user-initiated, and
   // the LCU layer only reads — it has no code that could write a rune page.
@@ -571,6 +664,7 @@ let suggestionHalf = "";
 
 const paintSelect = (): void => {
   selectBody.innerHTML = buildHalf + suggestionHalf;
+  paintIcons();
 };
 
 const selectMessage = (text: string, bad = false): void => {
@@ -587,14 +681,14 @@ const clearSelect = (): void => {
 /** Header for a champion we have no build for yet. The key stands in until
  *  the lookup comes back with a display name — `MonkeyKing` becomes `Wukong`. */
 const showLocked = (champion: LockedChampion): void => {
-  selectPortrait.textContent = champion.championKey.slice(0, 2).toUpperCase();
+  setPortrait(selectPortrait, champion.championKey, champion.championKey.slice(0, 2).toUpperCase());
   selectName.textContent = champion.championKey;
   selectSub.textContent =
     roleLabels[champion.assignedPosition] ?? champion.assignedPosition;
 };
 
 const showWaiting = (name: string, sub: string): void => {
-  selectPortrait.textContent = "—";
+  setPortrait(selectPortrait, null, "—");
   selectName.textContent = name;
   selectSub.textContent = sub;
 };
@@ -705,11 +799,12 @@ const paintGameBody = (html: string): void => {
   if (html === lastGameBlocks) return;
   lastGameBlocks = html;
   gameBody.innerHTML = html;
+  paintIcons();
 };
 
 const onGameState = (update: InGameUpdate): void => {
   if (update.event === "noGame") {
-    gamePortrait.textContent = "\u2014";
+    setPortrait(gamePortrait, null, "\u2014");
     gameName.textContent = "In game";
     gameSub.textContent = "No game running";
     gamePill.textContent = "No game";
@@ -719,7 +814,11 @@ const onGameState = (update: InGameUpdate): void => {
   }
 
   const champion = update.champion;
-  gamePortrait.textContent = champion ? champion.slice(0, 2).toUpperCase() : "\u2014";
+  setPortrait(
+    gamePortrait,
+    update.championKey,
+    champion ? champion.slice(0, 2).toUpperCase() : "\u2014",
+  );
   gameName.textContent = champion ?? "In game";
   gameSub.textContent = `${clock(update.gameTime)}${update.level ? ` \u00b7 level ${update.level}` : ""}`;
   gamePill.textContent = "Live";
@@ -743,6 +842,18 @@ listen<LcuStatus>("lcu:status", onStatus);
 listen<ChampSelectBuild>("lcu:build", onBuild);
 listen<ChampSelectSuggestions>("lcu:suggestions", onSuggestions);
 listen<InGameUpdate>("game:state", onGameState);
+
+/* Icons are an enhancement, never a requirement: every tile has already drawn
+   its text label by the time this resolves, and a failure leaves those in
+   place. Fetched once, then applied to whatever is on screen. */
+void invoke<IconCatalog>("icon_catalog")
+  .then((catalog) => {
+    icons = catalog;
+    paintIcons();
+  })
+  .catch(() => {
+    /* no art this session; the labels stand on their own */
+  });
 
 // Attribution for whichever source is live. Rendered verbatim, never branched on.
 void invoke<string>("source_label")

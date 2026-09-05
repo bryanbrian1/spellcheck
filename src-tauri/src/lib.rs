@@ -8,6 +8,7 @@
 
 pub mod build_data;
 pub mod commands;
+pub mod icons;
 pub mod lcu;
 pub mod live;
 pub mod recommend;
@@ -21,6 +22,7 @@ use tauri::{AppHandle, Emitter, Manager};
 use tokio::sync::mpsc;
 
 use build_data::config::CONFIG_FILE_NAME;
+use icons::IconState;
 use lcu::session::Comp;
 use lcu::{ChampSelectEvent, LockedChampion, WatcherConfig};
 use live::{GameEvent, GameSnapshot, LiveWatcherConfig};
@@ -183,6 +185,9 @@ fn suggestions_for(champion_id: u32, comp: &Comp) -> Option<ChampSelectSuggestio
 pub struct InGameState {
     /// Our champion, by display name — the only name the live API knows.
     pub champion: Option<String>,
+    /// The same champion's Data Dragon key, which is what icon art is filed
+    /// under. `None` when the champion has no tags to look it up through.
+    pub champion_key: Option<String>,
     pub level: u32,
     /// Seconds since the game started.
     pub game_time: f64,
@@ -246,6 +251,9 @@ fn in_game_state(snapshot: &GameSnapshot) -> InGameState {
 
     InGameState {
         champion: us.map(|player| player.champion_name.clone()),
+        champion_key: us
+            .and_then(|player| tags.champion_key_by_name(&player.champion_name))
+            .map(str::to_string),
         level: us.map(|player| player.level).unwrap_or(0),
         game_time: snapshot.game_time,
         standing: standing(snapshot),
@@ -265,12 +273,17 @@ pub fn run() {
             let config = resolve_config(app.handle());
             let service = Arc::new(build_service(&config));
             app.manage(Arc::clone(&service));
+            // Fetched lazily on the first render that wants an icon, then
+            // kept. Nothing is requested if the window is never opened on a
+            // build.
+            app.manage(Arc::new(IconState::new()));
             spawn_champ_select(app.handle(), service);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             commands::source_label,
             commands::fetch_build,
+            commands::icon_catalog,
         ])
         .run(tauri::generate_context!())
         .expect("leaguechecker failed to start");
