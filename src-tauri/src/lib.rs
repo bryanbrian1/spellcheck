@@ -636,6 +636,12 @@ async fn build_for(
 /// `providers.json` in the OS app-config directory, falling back to the
 /// working directory when the platform will not name one. A missing file is
 /// the normal first-run case and yields defaults.
+///
+/// The loaded config is then anchored to the bundle's resource directory,
+/// which is the only place the app can be sure `data/builds` exists. Without
+/// that step a bundled app resolves the shipped default against its working
+/// directory — `/` when macOS launches it from Finder — and RiotProvider
+/// finds nothing at all.
 fn resolve_config(handle: &tauri::AppHandle) -> ProviderConfig {
     let path = handle
         .path()
@@ -643,10 +649,21 @@ fn resolve_config(handle: &tauri::AppHandle) -> ProviderConfig {
         .map(|dir| dir.join(CONFIG_FILE_NAME))
         .unwrap_or_else(|_| PathBuf::from(CONFIG_FILE_NAME));
 
-    ProviderConfig::load(&path).unwrap_or_else(|error| {
+    let mut config = ProviderConfig::load(&path).unwrap_or_else(|error| {
         eprintln!("leaguechecker: {}: {error}; using defaults", path.display());
         ProviderConfig::default()
-    })
+    });
+
+    match handle.path().resource_dir() {
+        Ok(resources) => config.anchor_relative_paths(&resources),
+        // Not fatal, and not worth refusing to start over. OpggProvider does
+        // not read the disk at all, and RiotProvider reports a missing build
+        // the same way it reports a champion we never crawled.
+        Err(error) => eprintln!("leaguechecker: no resource directory ({error}); \
+                                 leaving build data paths as configured"),
+    }
+
+    config
 }
 
 #[cfg(test)]

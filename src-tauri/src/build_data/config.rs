@@ -109,6 +109,28 @@ impl ProviderConfig {
         Ok(())
     }
 
+    /// Anchor relative provider paths to `base`.
+    ///
+    /// A relative `data_root` means "the data the app ships with", and that
+    /// only resolves against a repo checkout. A bundled app has no such
+    /// working directory — launched from Finder it is `/` — so the path has
+    /// to be re-hung on something the app carries with it, which is the
+    /// caller's job because it is the only layer that knows where that is.
+    ///
+    /// Two things are deliberately left alone. An absolute path was written
+    /// by somebody on purpose and is not ours to move. And an anchored path
+    /// that does not exist is discarded rather than kept, so running from a
+    /// checkout still finds `data/builds` in the working directory the way it
+    /// always has.
+    pub fn anchor_relative_paths(&mut self, base: &Path) {
+        if self.riot.data_root.is_relative() {
+            let anchored = base.join(&self.riot.data_root);
+            if anchored.is_dir() {
+                self.riot.data_root = anchored;
+            }
+        }
+    }
+
     /// Build the active provider. Callers hold the returned `Arc` as app state
     /// and never learn which implementation is behind it.
     pub fn active_provider(&self) -> Result<Arc<dyn BuildDataProvider>, ProviderError> {
@@ -130,6 +152,10 @@ pub fn provider_from_kind(
 
 /// Where `data/builds` lives relative to a repo checkout, used by the ingest
 /// tooling and by [`RiotConfig::default`].
+///
+/// Relative on purpose: the ingest tooling runs from the checkout and means
+/// exactly this path. The app cannot use it as-is, which is what
+/// [`ProviderConfig::anchor_relative_paths`] exists to correct at startup.
 pub fn default_build_data_root() -> PathBuf {
     PathBuf::from("data/builds")
 }
@@ -149,6 +175,41 @@ mod tests {
     fn missing_config_file_is_not_an_error() {
         let config = ProviderConfig::load(Path::new("/nonexistent/providers.json")).unwrap();
         assert_eq!(config.provider, ProviderKind::Opgg);
+    }
+
+    #[test]
+    fn a_relative_data_root_is_anchored_to_the_bundle() {
+        let base = std::env::temp_dir().join("leaguechecker-anchor-test");
+        let builds = base.join("data/builds");
+        std::fs::create_dir_all(&builds).unwrap();
+
+        let mut config = ProviderConfig::default();
+        assert!(config.riot.data_root.is_relative());
+        config.anchor_relative_paths(&base);
+        assert_eq!(config.riot.data_root, builds);
+
+        std::fs::remove_dir_all(&base).ok();
+    }
+
+    #[test]
+    fn an_absolute_data_root_is_left_where_it_was_put() {
+        // Somebody wrote this into providers.json deliberately. Re-hanging it
+        // on the bundle would silently ignore what they asked for.
+        let mut config = ProviderConfig::default();
+        config.riot.data_root = PathBuf::from("/opt/leaguechecker/builds");
+        config.anchor_relative_paths(Path::new("/Applications/x.app/Contents/Resources"));
+        assert_eq!(config.riot.data_root, PathBuf::from("/opt/leaguechecker/builds"));
+    }
+
+    #[test]
+    fn anchoring_somewhere_the_data_is_not_changes_nothing() {
+        // The dev case: running from a checkout, where the resource directory
+        // is a build folder with no data in it. Falling back to the relative
+        // path keeps `cargo run` from the repo root working.
+        let mut config = ProviderConfig::default();
+        let before = config.riot.data_root.clone();
+        config.anchor_relative_paths(Path::new("/nonexistent/bundle/Resources"));
+        assert_eq!(config.riot.data_root, before);
     }
 
     #[test]
