@@ -1,0 +1,105 @@
+# Scheduled crawl that keeps data/builds/ current.
+#
+# The ordering here is the whole point: the crawler is tested and the key is
+# proven usable *before* a request is spent, and the output is proven
+# non-hollow *before* anything is committed. A development key expires 24
+# hours after issue, so the common failure is not a crash — it is a crawl that
+# quietly produces nothing and commits an empty tree over a working one. Every
+# gate fails the run loudly instead, and the commit step is the last thing
+# that happens, not the first.
+#
+# The crawl accumulates rather than replaces: each run merges into what is
+# already committed, which is why running daily is worth more than running
+# once. A patch change resets the sample instead of averaging across it.
+name: ingest
+
+on:
+  schedule:
+    # 09:17 UTC daily. Off the hour on purpose — the top of the hour is when
+    # every other scheduled workflow on GitHub queues up.
+    - cron: "17 9 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Crawl and verify, but do not commit"
+        type: boolean
+        default: false
+
+# The crawl rewrites tracked files, so two runs must never overlap. Queue the
+# second rather than cancelling the first: a half-killed crawl is exactly the
+# torn output this workflow is built to avoid.
+concurrency:
+  group: ingest
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # No `npm ci`: the crawler is dependency-free by design, and the only
+      # devDependencies in package.json belong to the Tauri app, which has no
+      # business being installed on a data job.
+
+      # Cheap, offline, and it fails before the key is spent rather than
+      # after. A crawler that aggregates wrongly writes files that parse and
+      # pass the output guard, so this is the only step that can catch it.
+      - name: Test the crawler
+        run: npm run test:ingest
+
+      - name: Check the Riot key is live
+        env:
+          RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
+        run: node scripts/ingest/check-key.mjs
+
+      - name: Crawl
+        env:
+          RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
+          RIOT_PLATFORM: ${{ vars.RIOT_PLATFORM || 'na1' }}
+          RIOT_RATE_LIMITS: ${{ vars.RIOT_RATE_LIMITS || '20:1,100:120' }}
+          # Ten minutes under the job timeout below. The crawl stops itself on
+          # this clock and writes what it has; being killed at sixty would
+          # commit nothing at all.
+          INGEST_MINUTES: "45"
+        run: node scripts/ingest/index.mjs
+
+      - name: Verify the output before it can be committed
+        run: node scripts/ingest/verify-output.mjs data/builds
+
+      - name: Commit if anything changed
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          if [ -z "$(git status --porcelain -- data/builds)" ]; then
+            echo "No build data changed. Nothing to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/builds
+
+          # Counting here rather than in the message template so the log line
+          # and the commit body cannot disagree.
+          changed=$(git diff --cached --name-only | wc -l | tr -d ' ')
+
+          git commit -m "Refresh crawled build data ($changed files)" -m \
+          "Scheduled crawl of the Riot API. The build data ships with the app,
+          so it goes stale against the live patch unless something regenerates
+          it on a clock; this is that clock.
+
+          Verified before commit: every file parses, declares a schema version
+          the app reads, agrees with its own path, and carries at least one
+          core item group. The run count did not shrink against what was
+          already committed."
+
+          git push
