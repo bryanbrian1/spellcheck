@@ -52,6 +52,22 @@ pub trait BuildDataProvider: Send + Sync {
     /// source simply has nothing for this pair — that is an expected answer,
     /// not a failure. `Err` is reserved for things that actually went wrong.
     async fn fetch_build(&self, request: &BuildRequest) -> Result<BuildLookup, ProviderError>;
+
+    /// The lane this champion is actually played in most.
+    ///
+    /// Asked only when nothing else named one. Practice Tool, customs, ARAM
+    /// and blind pick before the assignment lands all leave the lane blank,
+    /// and a build is filed by champion *and* lane, so without this the app
+    /// has to say nothing at all — which is the least useful thing it can do
+    /// when it already knows the champion you are playing.
+    ///
+    /// `None` means the source cannot say, and the caller shows nothing
+    /// rather than inventing a lane. The default is `None` so a new provider
+    /// is never silently guessing on our behalf.
+    async fn primary_role(&self, champion_key: &str) -> Result<Option<Role>, ProviderError> {
+        let _ = champion_key;
+        Ok(None)
+    }
 }
 
 /// Champion keys become path segments and query values, so they are validated

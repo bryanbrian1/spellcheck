@@ -32,7 +32,7 @@ async fn returns_real_builds() {
         ("KogMaw", "bottom"),
         ("Thresh", "utility"),
     ] {
-        match service.build_for(key, position, None).await {
+        match service.build_for(key, position, None).await.map(|r| r.lookup) {
             Ok(BuildLookup::Found(build)) => {
                 let core = build
                     .items
@@ -72,6 +72,41 @@ async fn returns_real_builds() {
                 failures.push(format!("{key} {position}: no data — {}", no_data.detail))
             }
             Err(error) => failures.push(format!("{key} {position}: {error}")),
+        }
+    }
+
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+/// The lane fallback, against the live summary.
+///
+/// This is the half that cannot be unit tested at all: the tool's own schema
+/// advertises `all` and `none` for `position` and the server rejects both, so
+/// the only way to know this question is still answerable the way we ask it
+/// is to ask it. A champion played in one lane and one played in three are
+/// both here, because the second is where picking the wrong entry would show.
+#[tokio::test]
+#[ignore = "hits the live OP.GG endpoint"]
+async fn names_the_lane_a_champion_is_actually_played_in() {
+    let service = BuildService::from_config(&ProviderConfig::default()).unwrap();
+    let mut failures = Vec::new();
+
+    // Yasuo is mid first and top second; Thresh is support and nothing else;
+    // Teemo is top over jungle. All three are stable enough to assert on.
+    for (key, expected) in [("Yasuo", "middle"), ("Thresh", "utility"), ("Teemo", "top")] {
+        // The empty position is exactly what Practice Tool and customs give.
+        match service.build_for(key, "", None).await {
+            Ok(resolved) => {
+                assert!(resolved.inferred_role, "{key}: reported as an assigned lane");
+                let role = match &resolved.lookup {
+                    BuildLookup::Found(build) => build.role,
+                    BuildLookup::NoData(no_data) => no_data.role,
+                };
+                if role.as_str() != expected {
+                    failures.push(format!("{key}: chose {role}, expected {expected}"));
+                }
+            }
+            Err(error) => failures.push(format!("{key}: {error}")),
         }
     }
 
