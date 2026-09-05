@@ -32,11 +32,12 @@ pub fn build_from_payload(
 
     let data = payload.get("data").unwrap_or(payload);
 
+    let core = group(data.get("core_items"));
     let items = ItemPlan {
         starters: group(data.get("starter_items")).into_iter().collect(),
         boots: group(data.get("boots")).into_iter().collect(),
-        core: group(data.get("core_items")).into_iter().collect(),
-        situational: groups(data.get("last_items")),
+        situational: situational(data, core.as_ref()),
+        core: core.into_iter().collect(),
     };
 
     // Items are what the app exists to show. Without them there is no build,
@@ -117,7 +118,41 @@ fn group(section: Option<&Value>) -> Option<ItemGroup> {
     })
 }
 
-/// `last_items` is a list of one-item sections, each its own option.
+/// What to build once the core is done.
+///
+/// The fourth, fifth and sixth slots in order, each a short menu the endpoint
+/// has already sorted by how often it is picked. They are concatenated rather
+/// than kept apart because a slot number is not advice — an item that is a
+/// popular fourth on one game is a fifth on the next, and the reader wants
+/// the pool, not the arithmetic.
+///
+/// Anything already in the core is dropped, and so is anything named twice
+/// across the three slots. Without that the list repeats itself: Serylda's
+/// Grudge finishes Zed's core *and* leads his fourth-item menu, and Edge of
+/// Night is both a fourth and a fifth. A menu that lists what you are already
+/// building is what this section used to be, and it is worth nothing.
+fn situational(data: &Value, core: Option<&ItemGroup>) -> Vec<ItemGroup> {
+    let mut seen: Vec<u32> = core
+        .into_iter()
+        .flat_map(|group| group.items.iter().map(|item| item.id))
+        .collect();
+
+    let mut out = Vec::new();
+    for slot in ["fourth_items", "fifth_items", "sixth_items"] {
+        for candidate in groups(data.get(slot)) {
+            // Every entry here is a one-item option, but the shape does not
+            // promise it, so an entry is kept only if something in it is new.
+            if candidate.items.iter().any(|item| seen.contains(&item.id)) {
+                continue;
+            }
+            seen.extend(candidate.items.iter().map(|item| item.id));
+            out.push(candidate);
+        }
+    }
+    out
+}
+
+/// A list of one-item sections, each its own option.
 fn groups(section: Option<&Value>) -> Vec<ItemGroup> {
     section
         .and_then(Value::as_array)
@@ -234,7 +269,7 @@ mod tests {
         assert_eq!(build.source.patch.as_deref(), Some("16.17"));
 
         let stats = build.stats.expect("build-level stats");
-        assert_eq!(stats.games, Some(162598));
+        assert_eq!(stats.games, Some(171985));
         assert_eq!(stats.win_rate, Some(0.51));
         assert_eq!(stats.pick_rate, Some(0.1));
     }
@@ -259,8 +294,50 @@ mod tests {
         assert_eq!(build.items.core[0].items.len(), 3);
         assert_eq!(build.items.boots[0].items[0].id, 3020);
         assert_eq!(build.items.starters[0].items[0].id, 1056);
-        assert_eq!(build.items.situational.len(), 3);
-        assert_eq!(build.items.situational[0].items[0].id, 3118);
+
+        // The fixture's three late slots offer Rabadon's, Zhonya's and Void
+        // Staff; then Rabadon's, Void Staff and Zhonya's again; then Cosmic
+        // Drive, Void Staff and Stormsurge. Zhonya's finishes the core, and
+        // the rest repeat across slots, so four distinct items survive.
+        let situational: Vec<u32> = build
+            .items
+            .situational
+            .iter()
+            .flat_map(|group| group.items.iter().map(|item| item.id))
+            .collect();
+        assert_eq!(situational, vec![3089, 3135, 4629, 4646]);
+    }
+
+    /// The bug this section had: every item it offered was already in the
+    /// core, so it told the player to build what they were building.
+    #[test]
+    fn situational_never_repeats_the_core() {
+        let build = ahri();
+        let core: Vec<u32> = build.items.core[0].items.iter().map(|item| item.id).collect();
+
+        for group in &build.items.situational {
+            for item in &group.items {
+                assert!(
+                    !core.contains(&item.id),
+                    "{:?} is in the core and offered as situational",
+                    item.name
+                );
+            }
+        }
+    }
+
+    /// And it must not repeat itself either: an item is a popular fourth on
+    /// one game and a fifth on the next, so the three slots overlap heavily.
+    #[test]
+    fn situational_never_repeats_itself() {
+        let build = ahri();
+        let mut seen = Vec::new();
+        for group in &build.items.situational {
+            for item in &group.items {
+                assert!(!seen.contains(&item.id), "{:?} listed twice", item.name);
+                seen.push(item.id);
+            }
+        }
     }
 
     /// `play` and `win` are counts, not a rate. 5,972 wins from 11,341 games
@@ -269,9 +346,9 @@ mod tests {
     fn win_rates_are_derived_from_counts_as_fractions() {
         let build = ahri();
         let stats = build.items.core[0].stats.expect("core stats");
-        assert_eq!(stats.games, Some(11341));
+        assert_eq!(stats.games, Some(11980));
         let rate = stats.win_rate.unwrap();
-        assert!((rate - 0.5266).abs() < 0.001, "{rate}");
+        assert!((rate - 0.5268).abs() < 0.001, "{rate}");
         assert!((0.0..=1.0).contains(&rate));
     }
 

@@ -119,20 +119,27 @@ impl ChampSelectSession {
 
     /// What the user locked, once they have locked something.
     ///
-    /// `None` covers every ordinary in-between state: the session exists but
-    /// our row has not arrived, the user is still hovering, or the queue
-    /// assigned no position and there is no role to look a build up for.
+    /// `None` covers the ordinary in-between states: the session exists but
+    /// our row has not arrived, or the user is still hovering.
+    ///
+    /// A blank position is *not* one of them. It used to be — there was no
+    /// way to look a build up without a lane, so a lock with no lane was
+    /// dropped here and champ select simply never fired. That meant Practice
+    /// Tool, customs and ARAM, where the client assigns no position at all,
+    /// went through the whole of champ select in silence and the app only
+    /// noticed the champion once the game had started. The build layer works
+    /// the lane out for itself now, so the lock is reported and the blank
+    /// travels with it.
     pub fn selection(&self) -> Option<Selection> {
         let member = self.local_player()?;
         if member.champion_id == 0 {
             return None;
         }
 
-        let selection = Selection {
+        Some(Selection {
             champion_id: member.champion_id,
             assigned_position: member.assigned_position.clone(),
-        };
-        selection.role().map(|_| selection)
+        })
     }
 }
 
@@ -184,11 +191,29 @@ mod tests {
         assert!(parsed.selection().is_none());
     }
 
+    /// Practice Tool, customs and ARAM assign nobody a lane. Dropping the
+    /// lock here is what kept champ select silent in all three, so that the
+    /// app first noticed your champion once the game was already running.
     #[test]
-    fn a_queue_without_assigned_positions_yields_nothing_to_look_up() {
+    fn a_queue_without_assigned_positions_still_reports_the_lock() {
         let parsed = session(
             0,
             json!([{ "cellId": 0, "championId": 103, "assignedPosition": "" }]),
+        );
+
+        let selection = parsed.selection().expect("a locked champion is news either way");
+        assert_eq!(selection.champion_id, 103);
+        assert_eq!(selection.assigned_position, "");
+        // Still no role — the blank is passed on, not invented here.
+        assert!(selection.role().is_none());
+    }
+
+    /// Hovering is not locking, whatever the lane says.
+    #[test]
+    fn a_hover_is_not_a_lock_even_with_a_lane() {
+        let parsed = session(
+            0,
+            json!([{ "cellId": 0, "championId": 0, "assignedPosition": "middle" }]),
         );
 
         assert!(parsed.local_player().is_some());

@@ -1,14 +1,13 @@
 class LolGetChampionAnalysis: champion,position,data
-class Data: summary,core_items,boots,starter_items,last_items,summoner_spells,runes,skills,skill_masteries,trends
+class Data: summary,core_items,boots,starter_items,fourth_items,fifth_items,sixth_items,summoner_spells,runes,skills,skill_masteries,trends
 class Summary: average_stats
-class AverageStats: play,win_rate,pick_rate,ban_rate,tier_data
-class TierData: tier
+class AverageStats: play,win_rate,pick_rate,ban_rate
 class CoreItems: ids,ids_names,play,win
 class SummonerSpells: ids,win,play
 class Runes: primary_page_id,primary_page_name,primary_rune_ids,secondary_page_id,secondary_rune_ids,stat_mod_ids,play,win
 class Skills: order,play,win
 class SkillMasteries: ids
-class Trends: win,pick
+class Trends: win
 class Win: version
 
-LolGetChampionAnalysis("AHRI","MID",Data(Summary(AverageStats(162598,0.51,0.1,0.03,TierData(2))),CoreItems([3118,4645,3157],["Malignance","Shadowflame","Zhonya's Hourglass"],11341,5972),CoreItems([3020],["Sorcerer's Shoes"],87760,45385),CoreItems([1056,2003,2003],["Doran's Ring","Health Potion","Health Potion"],149570,76280),[CoreItems([3118],["Malignance"],95908,49034),CoreItems([4645],["Shadowflame"],68889,36125),CoreItems([3157],["Zhonya's Hourglass"],45304,24997)],SummonerSpells([4,14],40096,76906),Runes(8100,"Domination",[8112,8139,8140,8106],8200,[8210,8226],[5005,5008,5001],72933,36651),Skills(["W","Q","E","Q","Q","R","Q","W","Q","W","R","W","W","E","E"],57157,33189),SkillMasteries(["Q","W","E"]),Trends(Win("16.17"),Win("16.17"))))
+LolGetChampionAnalysis("AHRI","MID",Data(Summary(AverageStats(171985,0.51,0.1,0.03)),CoreItems([3118,4645,3157],["Malignance","Shadowflame","Zhonya's Hourglass"],11980,6311),CoreItems([3020],["Sorcerer's Shoes"],92726,47975),CoreItems([1056,2003,2003],["Doran's Ring","Health Potion","Health Potion"],158042,80592),[CoreItems([3089],["Rabadon's Deathcap"],12328,7383),CoreItems([3157],["Zhonya's Hourglass"],9865,5848),CoreItems([3135],["Void Staff"],3430,1815)],[CoreItems([3089],["Rabadon's Deathcap"],1916,1203),CoreItems([3135],["Void Staff"],1769,1026),CoreItems([3157],["Zhonya's Hourglass"],1579,963)],[CoreItems([4629],["Cosmic Drive"],27,13),CoreItems([3135],["Void Staff"],25,17),CoreItems([4646],["Stormsurge"],21,11)],SummonerSpells([4,14],42435,81402),Runes(8100,"Domination",[8112,8139,8140,8106],8200,[8210,8226],[5005,5008,5001],76975,38753),Skills(["W","Q","E","Q","Q","R","Q","W","Q","W","R","W","W","E","E"],60340,35041),SkillMasteries(["Q","W","E"]),Trends(Win("16.17"))))
