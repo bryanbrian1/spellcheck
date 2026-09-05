@@ -233,14 +233,15 @@ pre .p{color:var(--stat)}
   <header class="mast">
     <p class="eyebrow">Developer blueprint</p>
     <h1>leaguechecker <span>&#8212; how it fits together</span></h1>
-    <p class="lede">A macOS app that watches League champion select and shows the build path for whatever you locked in. This is the map you need before changing anything: what exists, what doesn't, and which rules are load-bearing.</p>
+    <p class="lede">A macOS and Windows app that watches League champion select and shows the build path for whatever you locked in. This is the map you need before changing anything: what exists, what doesn't, and which rules are load-bearing.</p>
     <div class="facts">
       <span>Rust <b>1.98.1</b></span>
       <span>Tauri <b>v2</b></span>
       <span>Vanilla <b>TypeScript</b></span>
-      <span><b>193</b> tests</span>
+      <span><b>200</b> tests</span>
       <span><b>11,750</b> lines</span>
-      <span>Bundle <b>14 MB</b></span>
+      <span>Bundle <b>15 MB</b></span>
+      <span>Download <b>4.3 MB</b></span>
     </div>
   </header>
 
@@ -591,7 +592,8 @@ pre .p{color:var(--stat)}
       <div class="map">
         <table>
           <tr class="head"><td>Thing</td><td>Value</td></tr>
-          <tr><td class="f">Lockfile</td><td class="d"><code>/Applications/League of Legends.app/Contents/LoL/lockfile</code></td></tr>
+          <tr><td class="f">Lockfile, macOS</td><td class="d"><code>/Applications/League of Legends.app/Contents/LoL/lockfile</code> &#8212; inside the installed bundle, so identical on every default install</td></tr>
+          <tr><td class="f">Lockfile, Windows</td><td class="d"><code>C:\Riot Games\League of Legends\lockfile</code> &#8212; the common default only. The installer takes a drive, so <code>LEAGUECHECKER_LOCKFILE</code> is a user-facing setting here, not just a dev one</td></tr>
           <tr><td class="f">Format</td><td class="d"><code>ProcessName:PID:Port:Password:Protocol</code></td></tr>
           <tr><td class="f">Auth</td><td class="d">HTTP Basic, username <code>riot</code>, password from the lockfile</td></tr>
           <tr><td class="f">Base URL</td><td class="d"><code>https://127.0.0.1:{port}</code> &#8212; self-signed, so verification is disabled <em>for localhost only</em></td></tr>
@@ -641,9 +643,12 @@ pre .p{color:var(--stat)}
         <div><span class="k yes">Works</span><span class="v"><b>Recommendation engine, all three checks.</b> Both tag files, the two champ-select checks, the in-game one, and the amber rendering. Fifty tests, including one per check that holds every reason to containing no digit at all.</span></div>
         <div><span class="k part">Untested</span><span class="v"><b>Live Client Data layer.</b> The one HTTP read, the payload, and the gated poll loop, all unit-tested. Like the LCU layer, no build of it has met a real game.</span></div>
         <div><span class="k part">Untested</span><span class="v"><b>Suggestions in a real champ select.</b> Driven by hand and by the stand-in client, which fills all ten seats and locks the enemy in one at a time. No real game has produced one.</span></div>
+        <div><span class="k part">Untested</span><span class="v"><b>Windows build.</b> One <code>cfg</code>-gated lockfile path was the whole port &#8212; the LCU layer sits on rustls with the ring provider and touches no platform API, and the frontend has no platform assumptions at all. It compiles on a Windows runner in CI and produces an NSIS installer. <b>No build has been run on a real Windows machine</b>, so the first tester is the test. The app cannot be cross-compiled, so nothing on the developer&#8217;s Mac can tell you otherwise.</span></div>
+        <div><span class="k part">Untested</span><span class="v"><b>Memory on Windows.</b> The under-120&#8239;MB target was set against WKWebView. Windows renders in WebView2, which runs more processes, and the figure has never been measured there. Do not repeat the number for Windows until somebody has.</span></div>
+        <div><span class="k yes">Works</span><span class="v"><b>Downloadable builds.</b> Tagging <code>v*</code> builds both platforms and publishes a GitHub prerelease: a universal DMG and an NSIS installer. Every artifact is <b>unsigned</b>, so macOS quarantines it and Windows SmartScreen warns &#8212; the README carries the click-through for both. Adding the six <code>APPLE_*</code> secrets turns signing on without editing the workflow.</span></div>
         <div><span class="k yes">Works</span><span class="v"><b>Crawler.</b> Riot&#8217;s match API into <code>data/builds/</code>, on a daily schedule behind three gates. Nineteen tests on Node&#8217;s own runner, including one whole run against a stubbed Riot.</span></div>
         <div><span class="k part">Untested</span><span class="v"><b>The crawl against the live API.</b> Every response shape is stubbed from the documentation rather than from a real answer, and no run has been made with a real key. The first scheduled run is the test &#8212; which is what the key check and the output guard exist to survive.</span></div>
-        <div><span class="k no">Missing</span><span class="v"><b>Crawled data.</b> <code>data/builds/</code> stays empty until the schedule has run, so <code>RiotProvider</code> has nothing to read yet.</span></div>
+        <div><span class="k yes">Works</span><span class="v"><b>Crawled data.</b> The schedule has run: 277 files, 1.1&#8239;MB, committed under <code>data/builds/</code> and shipped inside the app as a bundle resource. <code>RiotProvider</code> has something to read.</span></div>
         <div><span class="k no">Missing</span><span class="v"><b>Matchup builds.</b> The design promises &#8220;core build vs. Syndra&#8221;, but <code>BuildRequest</code> carries champion and role with no opponent field. Needs a schema change and provider support on both sides.</span></div>
       </div>
     </section>
@@ -658,7 +663,8 @@ echo '. "$HOME/.cargo/env"' &gt;&gt; ~/.zshrc
 npm install
 npm run dev
 
-<span class="c"># ship it &#8212; .app lands in src-tauri/target/release/bundle/macos/</span>
+<span class="c"># ship it &#8212; .dmg on macOS, NSIS .exe on Windows,
+# under src-tauri/target/release/bundle/</span>
 npm run app
 
 <span class="c"># tests</span>
@@ -670,6 +676,26 @@ node scripts/fake-lcu.mjs</pre>
       <p><code>scripts/fake-lcu.mjs</code> is a stand-in League client: TLS on loopback with a self-signed certificate, the two endpoints the app reads, and the champ select event socket, in about a hundred lines of dependency-free Node. It cycles through connected, in select, locked, left and offline so every state the screen can show goes past about once a minute. It is the only way to exercise the LCU layer without a game, and it never ships &#8212; nothing in <code>src/</code> or <code>src-tauri/</code> knows it exists.</p>
 
       <p>There is no bundler. <code>tsc</code> emits <code>dist/</code>, the HTML and CSS are copied beside it, and <code>withGlobalTauri</code> means the page needs no npm package at runtime. TypeScript and the Tauri CLI are the only frontend dependencies, both build-time.</p>
+
+      <h3>Two platforms, one config</h3>
+      <p><code>npm run app</code> builds for the machine you are on: a <code>.dmg</code> on macOS, an NSIS <code>.exe</code> on Windows. One <code>bundle.targets</code> lists all three formats and Tauri emits only the ones the host can produce, so a Mac build is byte-for-byte the same act it always was.</p>
+      <p>The port itself was almost nothing. <b>Exactly one line of the Rust backend was macOS-specific</b> &#8212; the lockfile path. <code>reqwest</code>, <code>tokio-tungstenite</code> and the loopback certificate verifier all sit on <code>rustls</code> with the <code>ring</code> provider, so none of them touch a platform API, and the frontend has no platform assumptions whatsoever. What the second platform actually cost was packaging, not code: an <code>.ico</code>, an installer format, a WebView2 bootstrapper, and a CI runner.</p>
+
+      <div class="rail law">
+        <i></i>
+        <div class="rail-in">
+          <h4>The Windows build can only be made on Windows</h4>
+          <p><code>ring</code> compiles C underneath <code>rustls</code>, and there is no MSVC toolchain on a Mac, so this does not cross-compile &#8212; attempting it fails in <code>cc-rs</code> on <code>curve25519.c</code>. Nothing you can run locally will tell you whether a change broke Windows. That is why <code>release.yml</code> builds on every pull request that touches the app, and why the matrix is a requirement rather than a nicety. Do not replace it with a single runner.</p>
+        </div>
+      </div>
+
+      <h3>Where a bundled app looks for things</h3>
+      <p>An installed app has no repo around it. Launched from Finder its working directory is <code>/</code>, so any relative path that meant &#8220;in the checkout&#8221; silently means nothing once bundled. <code>data/builds</code> ships as a bundle resource, and <code>resolve_config</code> anchors a relative <code>data_root</code> to the resource directory at startup; absolute paths are somebody&#8217;s deliberate choice and are left alone, and an anchored path that does not exist is discarded so running from a checkout still behaves as it always did.</p>
+      <p>This mattered more than it looks. <code>RiotProvider</code> reports a missing directory exactly the way it reports a champion nobody crawled, so before the anchoring existed the migration to local data would have failed as <em>thin results</em> rather than as an error &#8212; on every installed copy at once, with nothing in the UI to suggest a broken path.</p>
+
+      <h3>Getting it to testers</h3>
+      <p>Tagging <code>v*</code> builds both platforms and publishes a GitHub prerelease. macOS builds universal, so there is one download rather than a choice a tester can get wrong. The tag must match the version in <code>package.json</code>, <code>tauri.conf.json</code> and <code>Cargo.toml</code>; nothing checks that for you.</p>
+      <p>Every artifact is unsigned, which is a deliberate beta trade. macOS quarantines the download and Windows shows a SmartScreen warning, so the README carries the click-through for both. Signing turns on by adding the six <code>APPLE_*</code> secrets &#8212; but note they are promoted into the environment by a step that checks first, because Tauri branches on <code>APPLE_CERTIFICATE</code> being <em>present</em> rather than non-empty, and listing them as build env makes an unconfigured repo fail in <code>security import</code>.</p>
 
       <div class="rail law">
         <i></i>
