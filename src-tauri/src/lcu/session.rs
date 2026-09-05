@@ -1,10 +1,17 @@
-//! The champ select session, reduced to the two facts we act on.
+//! The champ select session, reduced to the facts we act on.
 //!
 //! The client's session payload is large and changes shape between patches,
 //! so nothing here demands more than it needs: the local player's cell id,
-//! and the entry in `myTeam` that matches it. Everything else — bans, the
-//! action list, the other nine players — is read past. A field we do not read
-//! cannot break us when Riot renames it.
+//! the entry in `myTeam` that matches it, and the champion ids of both teams.
+//! Everything else — bans, the action list, summoner names, the whole player
+//! record behind each seat — is read past. A field we do not read cannot
+//! break us when Riot renames it.
+//!
+//! The two teams are read for the recommendation engine, which reasons about
+//! compositions rather than about one champion. `theirTeam` is frequently a
+//! row of zeroes and that is not a fault: blind pick hides the enemy until
+//! the game starts, so "we cannot see them" is an ordinary, expected answer
+//! that the engine is built to receive.
 
 use serde::{Deserialize, Serialize};
 
@@ -21,6 +28,9 @@ pub struct ChampSelectSession {
     /// is the only thing that says which row is the user.
     pub local_player_cell_id: i64,
     pub my_team: Vec<TeamMember>,
+    /// The enemy seats. Empty before picking starts, and full of zeroes in
+    /// any queue that hides the enemy team.
+    pub their_team: Vec<TeamMember>,
     pub timer: Timer,
 }
 
@@ -42,6 +52,26 @@ pub struct TeamMember {
 pub struct Timer {
     /// `PLANNING`, `BAN_PICK`, `FINALIZATION`, `GAME_STARTING`.
     pub phase: String,
+}
+
+/// Both teams as champion ids, in seat order.
+///
+/// Zero means an empty or hidden seat and is passed through rather than
+/// filtered out, because the count of seats we cannot see is what stops a
+/// check from reading two locked-in enemies as a whole composition.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Comp {
+    /// Our own five, including the local player.
+    pub ally: Vec<u32>,
+    pub enemy: Vec<u32>,
+}
+
+impl Comp {
+    /// True when there is nothing to reason about at all.
+    pub fn is_empty(&self) -> bool {
+        self.ally.iter().chain(&self.enemy).all(|id| *id == 0)
+    }
 }
 
 /// A champion locked in a seat that has a role. This is the whole output of
@@ -76,6 +106,15 @@ impl ChampSelectSession {
         self.my_team
             .iter()
             .find(|member| member.cell_id == self.local_player_cell_id)
+    }
+
+    /// Both teams, as champ select currently shows them.
+    pub fn comp(&self) -> Comp {
+        let ids = |team: &[TeamMember]| team.iter().map(|member| member.champion_id).collect();
+        Comp {
+            ally: ids(&self.my_team),
+            enemy: ids(&self.their_team),
+        }
     }
 
     /// What the user locked, once they have locked something.
@@ -179,5 +218,63 @@ mod tests {
         let selection = parsed.selection().unwrap();
         assert_eq!(selection.role(), Some(Role::Utility));
         assert_eq!(parsed.timer.phase, "A_NEW_PHASE");
+    }
+}
+
+#[cfg(test)]
+mod comp_tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn both_teams_are_read_in_seat_order() {
+        let parsed = ChampSelectSession::from_json(&json!({
+            "localPlayerCellId": 0,
+            "myTeam": [
+                { "cellId": 0, "championId": 103, "assignedPosition": "middle" },
+                { "cellId": 1, "championId": 64, "assignedPosition": "jungle" },
+            ],
+            "theirTeam": [
+                { "cellId": 5, "championId": 266, "assignedPosition": "top" },
+                { "cellId": 6, "championId": 16, "assignedPosition": "utility" },
+            ],
+        }))
+        .unwrap();
+
+        let comp = parsed.comp();
+        assert_eq!(comp.ally, vec![103, 64]);
+        assert_eq!(comp.enemy, vec![266, 16]);
+        assert!(!comp.is_empty());
+    }
+
+    #[test]
+    fn a_hidden_enemy_team_is_zeroes_rather_than_absent() {
+        // Blind pick: our side is visible to us, theirs is not.
+        let parsed = ChampSelectSession::from_json(&json!({
+            "localPlayerCellId": 0,
+            "myTeam": [{ "cellId": 0, "championId": 103, "assignedPosition": "middle" }],
+            "theirTeam": [
+                { "cellId": 5, "championId": 0 },
+                { "cellId": 6, "championId": 0 },
+            ],
+        }))
+        .unwrap();
+
+        let comp = parsed.comp();
+        assert_eq!(comp.enemy, vec![0, 0]);
+        assert_eq!(
+            comp.enemy.len(),
+            2,
+            "the seats are kept: five hidden enemies and two hidden enemies \
+             are different situations"
+        );
+    }
+
+    #[test]
+    fn a_session_with_no_teams_yet_is_empty_rather_than_an_error() {
+        let parsed = ChampSelectSession::from_json(&json!({})).unwrap();
+        let comp = parsed.comp();
+        assert!(comp.is_empty());
+        assert!(comp.ally.is_empty());
     }
 }

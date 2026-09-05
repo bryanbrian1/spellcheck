@@ -1,0 +1,887 @@
+{
+  "schemaVersion": 1,
+  "note": "Which items answer which threat. Derived from Data Dragon stats and item text, then committed so the app never needs a network call to reason about items. `damage` is the item’s offensive flavour, kept only so a suggestion never hands an ability-power item to a champion who deals physical damage.",
+  "patch": "16.17.1",
+  "items": {
+    "1001": {
+      "name": "Boots",
+      "cost": 300,
+      "answers": [],
+      "damage": null,
+      "buildsInto": [
+        3047,
+        3111
+      ],
+      "isComponent": true
+    },
+    "1006": {
+      "name": "Rejuvenation Bead",
+      "cost": 300,
+      "answers": [],
+      "damage": null,
+      "buildsInto": [
+        3109,
+        3211
+      ],
+      "isComponent": true
+    },
+    "1011": {
+      "name": "Giant's Belt",
+      "cost": 900,
+      "answers": [],
+      "damage": null,
+      "buildsInto": [
+        2525,
+        3143,
+        6609,
+        6665
+      ],
+      "isComponent": true
+    },
+    "1018": {
+      "name": "Cloak of Agility",
+      "cost": 600,
+      "answers": [],
+      "damage": "ad",
+      "buildsInto": [
+        3033
+      ],
+      "isComponent": true
+    },
+    "1026": {
+      "name": "Blasting Wand",
+      "cost": 850,
+      "answers": [],
+      "damage": "ap",
+      "buildsInto": [
+        3165
+      ],
+      "isComponent": true
+    },
+    "1027": {
+      "name": "Sapphire Crystal",
+      "cost": 300,
+      "answers": [],
+      "damage": null,
+      "buildsInto": [
+        3024
+      ],
+      "isComponent": true
+    },
+    "1028": {
+      "name": "Ruby Crystal",
+      "cost": 400,
+      "answers": [],
+      "damage": null,
+      "buildsInto": [
+        1011,
+        2021,
+        2502,
+        3053,
+        3066,
+        3067,
+        3068,
+        3075,
+        3211,
+        3742,
+        4401,
+        6660,
+        6662
+      ],
+      "isComponent": true
+    },
+    "1029": {
+      "name": "Cloth Armor",
+      "cost": 300,
+      "answers": [
+        "armor"
+      ],
+      "damage": null,
+      "buildsInto": [
+        1031,
+        2019,
+        2420,
+        2421,
+        2524,
+        3024,
+        3047,
+        3050,
+        3076,
+        3082,
+        3190
+      ],
+      "isComponent": true
+    },
+    "1031": {
+      "name": "Chain Vest",
+      "cost": 800,
+      "answers": [
+        "armor"
+      ],
+      "damage": null,
+      "buildsInto": [
+        2502,
+        3068,
+        3075,
+        3109,
+        3742,
+        6662,
+        6665
+      ],
+      "isComponent": true
+    },
+    "1033": {
+      "name": "Null-Magic Mantle",
+      "cost": 400,
+      "answers": [
+        "mr"
+      ],
+      "damage": null,
+      "buildsInto": [
+        1057,
+        2524,
+        3050,
+        3111,
+        3140,
+        3155,
+        3190,
+        3211,
+        4632
+      ],
+      "isComponent": true
+    },
+    "1036": {
+      "name": "Long Sword",
+      "cost": 350,
+      "answers": [],
+      "damage": "ad",
+      "buildsInto": [
+        1053,
+        2019,
+        2021,
+        2517,
+        3035,
+        3123,
+        3133,
+        3134,
+        3155
+      ],
+      "isComponent": true
+    },
+    "1037": {
+      "name": "Pickaxe",
+      "cost": 875,
+      "answers": [],
+      "damage": "ad",
+      "buildsInto": [
+        2517,
+        3053,
+        3139,
+        6333,
+        6695
+      ],
+      "isComponent": true
+    },
+    "1038": {
+      "name": "B. F. Sword",
+      "cost": 1300,
+      "answers": [],
+      "damage": "ad",
+      "buildsInto": [
+        3026
+      ],
+      "isComponent": true
+    },
+    "1043": {
+      "name": "Recurve Bow",
+      "cost": 700,
+      "answers": [],
+      "damage": null,
+      "buildsInto": [
+        3091
+      ],
+      "isComponent": true
+    },
+    "1052": {
+      "name": "Amplifying Tome",
+      "cost": 400,
+      "answers": [],
+      "damage": "ap",
+      "buildsInto": [
+        2420,
+        2421,
+        3916,
+        4632
+      ],
+      "isComponent": true
+    },
+    "1053": {
+      "name": "Vampiric Scepter",
+      "cost": 900,
+      "answers": [],
+      "damage": "ad",
+      "buildsInto": [
+        3139
+      ],
+      "isComponent": true
+    },
+    "1057": {
+      "name": "Negatron Cloak",
+      "cost": 850,
+      "answers": [
+        "mr"
+      ],
+      "damage": null,
+      "buildsInto": [
+        2504,
+        3091,
+        4401,
+        6665,
+        8020
+      ],
+      "isComponent": true
+    },
+    "1058": {
+      "name": "Needlessly Large Rod",
+      "cost": 1200,
+      "answers": [],
+      "damage": "ap",
+      "buildsInto": [
+        3102,
+        3157
+      ],
+      "isComponent": true
+    },
+    "1120": {
+      "name": "Doran's Helm",
+      "cost": 450,
+      "answers": [
+        "armor",
+        "mr"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "2019": {
+      "name": "Steel Sigil",
+      "cost": 1100,
+      "answers": [
+        "armor"
+      ],
+      "damage": "ad",
+      "buildsInto": [
+        3026,
+        6333
+      ],
+      "isComponent": true
+    },
+    "2021": {
+      "name": "Tunneler",
+      "cost": 1150,
+      "answers": [],
+      "damage": "ad",
+      "buildsInto": [
+        3053
+      ],
+      "isComponent": true
+    },
+    "2022": {
+      "name": "Glowing Mote",
+      "cost": 250,
+      "answers": [],
+      "damage": null,
+      "buildsInto": [
+        3024,
+        3057,
+        3067,
+        3133,
+        6660
+      ],
+      "isComponent": true
+    },
+    "2420": {
+      "name": "Seeker's Armguard",
+      "cost": 1600,
+      "answers": [
+        "armor"
+      ],
+      "damage": "ap",
+      "buildsInto": [
+        3157
+      ],
+      "isComponent": true
+    },
+    "2421": {
+      "name": "Shattered Armguard",
+      "cost": 1600,
+      "answers": [
+        "armor"
+      ],
+      "damage": "ap",
+      "buildsInto": [
+        3157
+      ],
+      "isComponent": true
+    },
+    "2502": {
+      "name": "Unending Despair",
+      "cost": 2800,
+      "answers": [
+        "armor"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "2504": {
+      "name": "Kaenic Rookern",
+      "cost": 2900,
+      "answers": [
+        "mr"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "2517": {
+      "name": "Endless Hunger",
+      "cost": 3100,
+      "answers": [
+        "tenacity"
+      ],
+      "damage": "ad",
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "2524": {
+      "name": "Bandlepipes",
+      "cost": 2300,
+      "answers": [
+        "armor",
+        "mr"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "2525": {
+      "name": "Protoplasm Harness",
+      "cost": 2600,
+      "answers": [
+        "tenacity"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3024": {
+      "name": "Glacial Buckler",
+      "cost": 900,
+      "answers": [
+        "armor"
+      ],
+      "damage": null,
+      "buildsInto": [
+        3110
+      ],
+      "isComponent": true
+    },
+    "3026": {
+      "name": "Guardian Angel",
+      "cost": 3200,
+      "answers": [
+        "armor"
+      ],
+      "damage": "ad",
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3033": {
+      "name": "Mortal Reminder",
+      "cost": 3000,
+      "answers": [
+        "antiheal"
+      ],
+      "damage": "ad",
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3035": {
+      "name": "Last Whisper",
+      "cost": 1450,
+      "answers": [],
+      "damage": "ad",
+      "buildsInto": [
+        3033
+      ],
+      "isComponent": true
+    },
+    "3047": {
+      "name": "Plated Steelcaps",
+      "cost": 1200,
+      "answers": [
+        "armor"
+      ],
+      "damage": null,
+      "buildsInto": [
+        3174
+      ],
+      "isComponent": true
+    },
+    "3050": {
+      "name": "Zeke's Convergence",
+      "cost": 2200,
+      "answers": [
+        "armor",
+        "mr"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3053": {
+      "name": "Sterak's Gage",
+      "cost": 3200,
+      "answers": [
+        "tenacity"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3057": {
+      "name": "Sheen",
+      "cost": 900,
+      "answers": [],
+      "damage": null,
+      "buildsInto": [
+        6662
+      ],
+      "isComponent": true
+    },
+    "3065": {
+      "name": "Spirit Visage",
+      "cost": 2700,
+      "answers": [
+        "mr"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3066": {
+      "name": "Winged Moonplate",
+      "cost": 800,
+      "answers": [],
+      "damage": null,
+      "buildsInto": [
+        3742,
+        4401
+      ],
+      "isComponent": true
+    },
+    "3067": {
+      "name": "Kindlegem",
+      "cost": 800,
+      "answers": [],
+      "damage": null,
+      "buildsInto": [
+        2502,
+        2524,
+        2525,
+        3050,
+        3065,
+        3109,
+        3165,
+        3190,
+        8020
+      ],
+      "isComponent": true
+    },
+    "3068": {
+      "name": "Sunfire Aegis",
+      "cost": 2800,
+      "answers": [
+        "armor"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3075": {
+      "name": "Thornmail",
+      "cost": 2450,
+      "answers": [
+        "armor",
+        "antiheal"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3076": {
+      "name": "Bramble Vest",
+      "cost": 800,
+      "answers": [
+        "armor",
+        "antiheal"
+      ],
+      "damage": null,
+      "buildsInto": [
+        3075
+      ],
+      "isComponent": true
+    },
+    "3082": {
+      "name": "Warden's Mail",
+      "cost": 1000,
+      "answers": [
+        "armor"
+      ],
+      "damage": null,
+      "buildsInto": [
+        3110,
+        3143
+      ],
+      "isComponent": true
+    },
+    "3091": {
+      "name": "Wit's End",
+      "cost": 2800,
+      "answers": [
+        "mr",
+        "tenacity"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3102": {
+      "name": "Banshee's Veil",
+      "cost": 3000,
+      "answers": [
+        "mr"
+      ],
+      "damage": "ap",
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3109": {
+      "name": "Knight's Vow",
+      "cost": 2300,
+      "answers": [
+        "armor"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3110": {
+      "name": "Frozen Heart",
+      "cost": 2500,
+      "answers": [
+        "armor"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3111": {
+      "name": "Mercury's Treads",
+      "cost": 1250,
+      "answers": [
+        "mr",
+        "tenacity"
+      ],
+      "damage": null,
+      "buildsInto": [
+        3173
+      ],
+      "isComponent": true
+    },
+    "3123": {
+      "name": "Executioner's Calling",
+      "cost": 800,
+      "answers": [
+        "antiheal"
+      ],
+      "damage": "ad",
+      "buildsInto": [
+        3033,
+        6609
+      ],
+      "isComponent": true
+    },
+    "3133": {
+      "name": "Caulfield's Warhammer",
+      "cost": 1050,
+      "answers": [],
+      "damage": "ad",
+      "buildsInto": [
+        2517,
+        3156,
+        6333,
+        6609
+      ],
+      "isComponent": true
+    },
+    "3134": {
+      "name": "Serrated Dirk",
+      "cost": 1000,
+      "answers": [],
+      "damage": "ad",
+      "buildsInto": [
+        6695
+      ],
+      "isComponent": true
+    },
+    "3139": {
+      "name": "Mercurial Scimitar",
+      "cost": 3200,
+      "answers": [
+        "mr"
+      ],
+      "damage": "ad",
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3140": {
+      "name": "Quicksilver Sash",
+      "cost": 1300,
+      "answers": [
+        "mr"
+      ],
+      "damage": null,
+      "buildsInto": [
+        3139
+      ],
+      "isComponent": true
+    },
+    "3143": {
+      "name": "Randuin's Omen",
+      "cost": 2700,
+      "answers": [
+        "armor",
+        "anti-crit"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3155": {
+      "name": "Hexdrinker",
+      "cost": 1300,
+      "answers": [
+        "mr"
+      ],
+      "damage": "ad",
+      "buildsInto": [
+        3156
+      ],
+      "isComponent": true
+    },
+    "3156": {
+      "name": "Maw of Malmortius",
+      "cost": 3100,
+      "answers": [
+        "mr"
+      ],
+      "damage": "ad",
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3157": {
+      "name": "Zhonya's Hourglass",
+      "cost": 3250,
+      "answers": [
+        "armor"
+      ],
+      "damage": "ap",
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3165": {
+      "name": "Morellonomicon",
+      "cost": 2850,
+      "answers": [
+        "antiheal"
+      ],
+      "damage": "ap",
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3173": {
+      "name": "Chainlaced Crushers",
+      "cost": 1250,
+      "answers": [
+        "mr",
+        "tenacity"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3174": {
+      "name": "Armored Advance",
+      "cost": 1200,
+      "answers": [
+        "armor"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3190": {
+      "name": "Locket of the Iron Solari",
+      "cost": 2200,
+      "answers": [
+        "armor",
+        "mr"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3211": {
+      "name": "Spectre's Cowl",
+      "cost": 1250,
+      "answers": [
+        "mr"
+      ],
+      "damage": null,
+      "buildsInto": [
+        2504,
+        3065,
+        6664
+      ],
+      "isComponent": true
+    },
+    "3742": {
+      "name": "Dead Man's Plate",
+      "cost": 2900,
+      "answers": [
+        "armor"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "3916": {
+      "name": "Oblivion Orb",
+      "cost": 800,
+      "answers": [
+        "antiheal"
+      ],
+      "damage": "ap",
+      "buildsInto": [
+        3165
+      ],
+      "isComponent": true
+    },
+    "4401": {
+      "name": "Force of Nature",
+      "cost": 2800,
+      "answers": [
+        "mr"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "4632": {
+      "name": "Verdant Barrier",
+      "cost": 1600,
+      "answers": [
+        "mr"
+      ],
+      "damage": "ap",
+      "buildsInto": [
+        3102
+      ],
+      "isComponent": true
+    },
+    "6333": {
+      "name": "Death's Dance",
+      "cost": 3300,
+      "answers": [
+        "armor"
+      ],
+      "damage": "ad",
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "6609": {
+      "name": "Chempunk Chainsword",
+      "cost": 3000,
+      "answers": [
+        "antiheal"
+      ],
+      "damage": "ad",
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "6660": {
+      "name": "Bami's Cinder",
+      "cost": 900,
+      "answers": [],
+      "damage": null,
+      "buildsInto": [
+        3068,
+        6664
+      ],
+      "isComponent": true
+    },
+    "6662": {
+      "name": "Iceborn Gauntlet",
+      "cost": 2900,
+      "answers": [
+        "armor"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "6664": {
+      "name": "Hollow Radiance",
+      "cost": 2800,
+      "answers": [
+        "mr"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "6665": {
+      "name": "Jak'Sho, The Protean",
+      "cost": 3200,
+      "answers": [
+        "armor",
+        "mr"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "6695": {
+      "name": "Serpent's Fang",
+      "cost": 2500,
+      "answers": [
+        "anti-shield"
+      ],
+      "damage": "ad",
+      "buildsInto": [],
+      "isComponent": false
+    },
+    "8020": {
+      "name": "Abyssal Mask",
+      "cost": 2650,
+      "answers": [
+        "mr"
+      ],
+      "damage": null,
+      "buildsInto": [],
+      "isComponent": false
+    }
+  }
+}
