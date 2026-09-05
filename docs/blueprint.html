@@ -240,8 +240,9 @@ pre .p{color:var(--stat)}
       <span>Vanilla <b>TypeScript</b></span>
       <span><b>200</b> tests</span>
       <span><b>11,750</b> lines</span>
-      <span>Bundle <b>15 MB</b></span>
-      <span>Download <b>4.3 MB</b></span>
+      <span>Download <b>3.2 MB</b></span>
+      <span>Installed <b>8.2 MB</b></span>
+      <span>RAM <b>65 MB</b></span>
     </div>
   </header>
 
@@ -634,7 +635,7 @@ pre .p{color:var(--stat)}
 
       <div class="status">
         <div><span class="k yes">Works</span><span class="v"><b>Build data layer.</b> Two providers behind one trait, warning-free build. 100 passing tests across the crate, plus one live check that stays out of the offline run.</span></div>
-        <div><span class="k yes">Works</span><span class="v"><b>Desktop app.</b> 420&#215;700 window, dark UI, ~35 MB resident on a debug build.</span></div>
+        <div><span class="k yes">Works</span><span class="v"><b>Desktop app.</b> 420&#215;700 window, dark UI. Measured on a release build: <b>65&#8239;MB</b> across all four processes, <b>0.00%</b> CPU at idle, 3.2&#8239;MB to download and 8.2&#8239;MB installed. Roughly half the memory budget, and a quarter of what an Electron shell would cost before rendering anything.</span></div>
         <div><span class="k yes">Works</span><span class="v"><b>Search screen.</b> Type a champion, pick a role, see a build.</span></div>
         <div><span class="k yes">Works</span><span class="v"><b>Live OP.GG requests.</b> Real builds, on the current patch, for every champion tried. The endpoint requires four arguments and answers in its own compact format rather than JSON &#8212; both of which the first real request discovered. <code>cargo test --test opgg_live -- --ignored</code> checks it still holds.</span></div>
         <div><span class="k part">Untested</span><span class="v"><b>Champ select screen.</b> Subscribes to <code>lcu:status</code>, <code>lcu:build</code> and <code>lcu:suggestions</code>, and renders the build through the same function the search box does. Every state was driven by hand, and by the stand-in client with real OP.GG builds coming back; none of them has been driven by a real game.</span></div>
@@ -696,6 +697,28 @@ node scripts/fake-lcu.mjs</pre>
       <h3>Getting it to testers</h3>
       <p>Tagging <code>v*</code> builds both platforms and publishes a GitHub prerelease. macOS builds universal, so there is one download rather than a choice a tester can get wrong. The tag must match the version in <code>package.json</code>, <code>tauri.conf.json</code> and <code>Cargo.toml</code>; nothing checks that for you.</p>
       <p>Every artifact is unsigned, which is a deliberate beta trade. macOS quarantines the download and Windows shows a SmartScreen warning, so the README carries the click-through for both. Signing turns on by adding the six <code>APPLE_*</code> secrets &#8212; but note they are promoted into the environment by a step that checks first, because Tauri branches on <code>APPLE_CERTIFICATE</code> being <em>present</em> rather than non-empty, and listing them as build env makes an unconfigured repo fail in <code>security import</code>.</p>
+
+      <h3>What it actually costs to run</h3>
+      <p>Measured on a release build, idle, with League closed &#8212; which is the state the app spends most of its life in:</p>
+      <div class="map">
+        <table>
+          <tr class="head"><td>Measure</td><td>Value</td></tr>
+          <tr><td class="f">Download</td><td class="d">3.2&#8239;MB (DMG)</td></tr>
+          <tr><td class="f">Installed</td><td class="d">8.2&#8239;MB &#8212; 7.1&#8239;MB binary, 1.1&#8239;MB build data</td></tr>
+          <tr><td class="f">Memory</td><td class="d"><b>65&#8239;MB</b> total <code>phys_footprint</code>: 27 app, 18 WebContent, 14 GPU, 6 Networking</td></tr>
+          <tr><td class="f">CPU, idle</td><td class="d">0.00% &#8212; one <code>stat</code> every five seconds, then a socket</td></tr>
+        </table>
+      </div>
+      <p>Use <code>phys_footprint</code> and not RSS. Summed RSS reads 153&#8239;MB and is wrong: it counts the shared WebKit framework pages once per process, so it appears to breach the 120&#8239;MB target when the real figure is about half of it. <code>footprint -p &lt;pid&gt;</code> gives the honest number, and it has to be summed across all four processes rather than read off the app&#8217;s own.</p>
+      <p><code>[profile.release]</code> in <code>Cargo.toml</code> is where the download size comes from &#8212; LTO, one codegen unit and stripped symbols took the binary from 14&#8239;MB to 7.1&#8239;MB. It changed memory not at all, which is the expected result: those are disk pages, not resident ones.</p>
+
+      <div class="rail law">
+        <i></i>
+        <div class="rail-in">
+          <h4>panic stays unwinding, whatever it costs</h4>
+          <p><code>panic = "abort"</code> would shave the binary further and is deliberately not set. This app sits in the background for hours; unwinding means a panic in the watcher task kills that task, while aborting kills the whole app out from under somebody mid champion select. A megabyte does not buy that.</p>
+        </div>
+      </div>
 
       <div class="rail law">
         <i></i>
