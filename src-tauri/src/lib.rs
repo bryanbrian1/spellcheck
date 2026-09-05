@@ -68,19 +68,65 @@ impl BuildService {
         self.provider.fetch_build(request).await
     }
 
-    /// Champ-select shaped entry point: the LCU hands us a champion key and an
-    /// `assignedPosition` string.
+    /// League-shaped entry point: champ select hands us a champion key and an
+    /// `assignedPosition`; the live game hands us the same two things from
+    /// its own payload. Either may leave the lane blank.
     pub async fn build_for(
         &self,
         champion_key: &str,
         assigned_position: &str,
         champion_id: Option<u32>,
-    ) -> Result<BuildLookup, ProviderError> {
-        let role = Role::parse(assigned_position)?;
+    ) -> Result<ResolvedBuild, ProviderError> {
+        let (role, inferred_role) = self.resolve_role(champion_key, assigned_position).await?;
         let mut request = BuildRequest::new(champion_key, role);
         request.champion_id = champion_id;
-        self.build(&request).await
+
+        Ok(ResolvedBuild {
+            lookup: self.build(&request).await?,
+            inferred_role,
+        })
     }
+
+    /// The lane League named, or the one this champion is usually played in.
+    ///
+    /// Practice Tool, customs, ARAM and blind pick before the assignment
+    /// lands all leave the lane blank, and a build is filed by champion *and*
+    /// lane. Refusing to answer there was the least useful thing the app
+    /// could do while already knowing the champion, so it asks the source
+    /// which lane the champion is actually played in and uses that. One extra
+    /// call, at most once per game.
+    ///
+    /// The flag travels with the answer because the difference matters to the
+    /// person reading it: a lane you were assigned and a lane we picked for
+    /// you are not the same claim, and the screen says which.
+    async fn resolve_role(
+        &self,
+        champion_key: &str,
+        assigned_position: &str,
+    ) -> Result<(Role, bool), ProviderError> {
+        if let Some(named) = Role::parse_optional(assigned_position) {
+            // Something was said and it was not a lane we know. That is a
+            // real error, not an invitation to guess.
+            return Ok((named?, false));
+        }
+
+        match self.provider.primary_role(champion_key).await? {
+            Some(role) => Ok((role, true)),
+            // The source cannot say either. Better to report that than to
+            // pick a lane and present it as an answer.
+            None => Err(ProviderError::UnknownRole(assigned_position.to_string())),
+        }
+    }
+}
+
+/// A lookup, and whether we had to work the lane out ourselves to make it.
+#[derive(Debug, Clone)]
+pub struct ResolvedBuild {
+    pub lookup: BuildLookup,
+    /// True when nothing named a lane and the champion's most-played one was
+    /// used instead. A guess must never be dressed up as the lane League
+    /// assigned you, so this reaches the UI and the UI says so.
+    pub inferred_role: bool,
 }
 
 /// Where the client's champ select state reaches the UI: `clientOffline`,
@@ -129,8 +175,12 @@ pub struct LiveBuild {
     /// The Data Dragon key, which is what art is filed under and what the UI
     /// matches against the champion it is currently showing.
     pub champion_key: String,
-    /// The position we asked for, in whichever vocabulary the source used.
+    /// The position we were given, in whichever vocabulary the source used.
+    /// Empty when League named none — see `inferred_role`.
     pub position: String,
+    /// True when the lane in `lookup` is the champion's most-played one
+    /// rather than one League assigned. The screen must say so.
+    pub inferred_role: bool,
     pub lookup: Option<BuildLookup>,
     pub error: Option<String>,
 }
@@ -528,9 +578,14 @@ fn spawn_live_game(
                     // The claim is what keeps this quiet in the usual case,
                     // where champ select already fetched it: this looks every
                     // half-minute and speaks at most once a game.
-                    if let (Some(key), Some(role)) = (state.champion_key.as_deref(), state.role) {
-                        if claim.take(key, role.as_str()).await {
-                            let build = build_for(&service, key, role.as_str(), None).await;
+                    if let Some(key) = state.champion_key.as_deref() {
+                        // No lane is not a reason to stay quiet. Practice
+                        // Tool, customs and ARAM never name one, and the
+                        // champion alone is enough to ask the source which
+                        // lane it is played in and show that build.
+                        let position = state.role.map(Role::as_str).unwrap_or("");
+                        if claim.take(key, position).await {
+                            let build = build_for(&service, key, position, None).await;
                             if build.error.is_some() {
                                 claim.release().await;
                             }
@@ -563,14 +618,16 @@ async fn build_for(
     position: &str,
     champion_id: Option<u32>,
 ) -> LiveBuild {
-    let (lookup, error) = match service.build_for(champion_key, position, champion_id).await {
-        Ok(lookup) => (Some(lookup), None),
-        Err(error) => (None, Some(error.to_string())),
-    };
+    let (lookup, inferred_role, error) =
+        match service.build_for(champion_key, position, champion_id).await {
+            Ok(resolved) => (Some(resolved.lookup), resolved.inferred_role, None),
+            Err(error) => (None, false, Some(error.to_string())),
+        };
 
     LiveBuild {
         champion_key: champion_key.to_string(),
         position: position.to_string(),
+        inferred_role,
         lookup,
         error,
     }
@@ -610,13 +667,80 @@ mod tests {
         }
     }
 
+    /// A source that can say which lane a champion is played in. Stands in
+    /// for OP.GG's summary and for a crawled champion directory alike; both
+    /// answer the same question.
+    struct Knows(Role);
+
+    #[async_trait]
+    impl BuildDataProvider for Knows {
+        fn label(&self) -> &str {
+            "knows"
+        }
+
+        async fn fetch_build(&self, request: &BuildRequest) -> Result<BuildLookup, ProviderError> {
+            Ok(BuildLookup::no_data(request, request.role.as_str()))
+        }
+
+        async fn primary_role(&self, _champion_key: &str) -> Result<Option<Role>, ProviderError> {
+            Ok(Some(self.0))
+        }
+    }
+
+    /// Practice Tool, customs and ARAM report no lane at all. Showing nothing
+    /// there is the least useful thing the app can do when it already knows
+    /// the champion.
+    #[tokio::test]
+    async fn a_game_with_no_lane_still_gets_the_champion_s_usual_build() {
+        let service = BuildService::new(Arc::new(Knows(Role::Middle)));
+        let resolved = service.build_for("Yasuo", "", None).await.unwrap();
+
+        assert!(resolved.inferred_role, "the screen would call this an assignment");
+        match resolved.lookup {
+            BuildLookup::NoData(no_data) => assert_eq!(no_data.role, Role::Middle),
+            BuildLookup::Found(_) => panic!("expected the stub's answer"),
+        }
+    }
+
+    /// The flag is the whole point: a lane we chose and a lane League handed
+    /// us are different claims, and only one of them may be shown as fact.
+    #[tokio::test]
+    async fn a_lane_league_named_is_never_reported_as_inferred() {
+        let service = BuildService::new(Arc::new(Knows(Role::Middle)));
+        let resolved = service.build_for("Yasuo", "top", None).await.unwrap();
+
+        assert!(!resolved.inferred_role);
+        match resolved.lookup {
+            BuildLookup::NoData(no_data) => assert_eq!(no_data.role, Role::Top),
+            BuildLookup::Found(_) => panic!("expected the stub's answer"),
+        }
+    }
+
+    /// A misspelling is a fault, not a blank. Guessing there would hide it.
+    #[tokio::test]
+    async fn a_lane_we_do_not_recognise_is_still_an_error() {
+        let service = BuildService::new(Arc::new(Knows(Role::Middle)));
+        let error = service.build_for("Yasuo", "midlanee", None).await.unwrap_err();
+        assert!(matches!(error, ProviderError::UnknownRole(_)));
+    }
+
+    /// And a source with nothing to say about lanes must not have one
+    /// invented for it.
+    #[tokio::test]
+    async fn a_source_that_cannot_name_a_lane_is_not_second_guessed() {
+        let service = BuildService::new(Arc::new(Stub));
+        let error = service.build_for("Yasuo", "", None).await.unwrap_err();
+        assert!(matches!(error, ProviderError::UnknownRole(_)));
+    }
+
     #[tokio::test]
     async fn routes_lcu_shaped_input_to_the_active_provider() {
         let service = BuildService::new(Arc::new(Stub));
         assert_eq!(service.source_label(), "stub");
 
-        let lookup = service.build_for("Ahri", "middle", Some(103)).await.unwrap();
-        match lookup {
+        let resolved = service.build_for("Ahri", "middle", Some(103)).await.unwrap();
+        assert!(!resolved.inferred_role, "a named lane was not taken at its word");
+        match resolved.lookup {
             BuildLookup::NoData(no_data) => {
                 assert_eq!(no_data.role, Role::Middle);
                 assert_eq!(no_data.champion_key, "Ahri");
@@ -706,11 +830,23 @@ mod tests {
         );
     }
 
+    /// Matches `LiveBuild` in main.ts: the flag is a key the UI reads on
+    /// every build, not one that appears only when it is set.
     #[tokio::test]
-    async fn an_unassigned_position_is_a_clear_error() {
-        let service = BuildService::new(Arc::new(Stub));
-        let error = service.build_for("Ahri", "", None).await.unwrap_err();
-        assert!(matches!(error, ProviderError::UnknownRole(_)));
+    async fn the_inferred_flag_is_always_on_the_payload() {
+        let service = BuildService::new(Arc::new(Knows(Role::Bottom)));
+
+        let named = build_for(&service, "Yasuo", "top", None).await;
+        let guessed = build_for(&service, "Yasuo", "", None).await;
+
+        assert_eq!(
+            serde_json::to_value(&named).unwrap()["inferredRole"],
+            serde_json::json!(false)
+        );
+        assert_eq!(
+            serde_json::to_value(&guessed).unwrap()["inferredRole"],
+            serde_json::json!(true)
+        );
     }
 }
 

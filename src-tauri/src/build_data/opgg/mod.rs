@@ -17,6 +17,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
 use super::error::ProviderError;
+use super::role::Role;
 use super::schema::{BuildLookup, BuildRequest};
 use super::{validate_champion_key, BuildDataProvider};
 use crate::build_data::schema::BuildLookup as Lookup;
@@ -158,6 +159,24 @@ impl OpggProvider {
         arguments
     }
 
+    /// Which lane this champion is played in, and how often.
+    ///
+    /// A different question from a build, and a far smaller answer — a couple
+    /// of hundred bytes against a couple of thousand.
+    const POSITION_FIELDS: &[&str] = &[
+        "data.summary.positions[].name",
+        "data.summary.positions[].stats.play",
+    ];
+
+    /// One call, mapped through the same wire handling as a build.
+    async fn call(&self, arguments: Value) -> Result<Value, ProviderError> {
+        let payload = self.client.call_tool(&self.config.tool, arguments).await?;
+        Ok(match payload.as_str() {
+            Some(text) => wire::parse(text).unwrap_or_else(|_| payload.clone()),
+            None => payload,
+        })
+    }
+
     /// The endpoint's tool list with input schemas. Not used in the lookup
     /// path — it exists so the argument names above can be checked against
     /// the live server.
@@ -197,18 +216,10 @@ impl BuildDataProvider for OpggProvider {
         // into a request we make on the user's behalf.
         validate_champion_key(&request.champion_key)?;
 
-        let payload = self
-            .client
-            .call_tool(&self.config.tool, self.arguments(request))
-            .await?;
-
         // The endpoint answers in its own compact format rather than JSON.
         // Anything that does not parse is left as text, which the mapper
         // reads as the endpoint speaking prose — usually "nothing found".
-        let payload = match payload.as_str() {
-            Some(text) => wire::parse(text).unwrap_or_else(|_| payload.clone()),
-            None => payload,
-        };
+        let payload = self.call(self.arguments(request)).await?;
 
         // Mapped and returned; never persisted.
         let mut lookup = map::build_from_payload(&payload, request, self.label());
@@ -221,6 +232,51 @@ impl BuildDataProvider for OpggProvider {
         }
 
         Ok(lookup)
+    }
+
+    /// Ask the summary which lane this champion is actually played in.
+    ///
+    /// `data.summary.positions[]` is a property of the champion, not of the
+    /// lane asked about: querying Yasuo as top still reports mid 59%, top
+    /// 23%, adc 17%. So any valid lane will do as the question, and mid is
+    /// used for no better reason than that it has to be something.
+    ///
+    /// The tool's own schema advertises `all` and `none` for this parameter
+    /// and the server rejects both — "The selected position is invalid." —
+    /// which is why this asks a real lane and reads the answer sideways
+    /// rather than simply omitting one.
+    async fn primary_role(&self, champion_key: &str) -> Result<Option<Role>, ProviderError> {
+        validate_champion_key(champion_key)?;
+
+        let payload = self
+            .call(json!({
+                "game_mode": self.config.game_mode,
+                "champion": opgg_champion(champion_key),
+                "position": Role::Middle.opgg_position(),
+                "desired_output_fields": Self::POSITION_FIELDS,
+            }))
+            .await?;
+
+        let positions = payload
+            .pointer("/data/summary/positions")
+            .and_then(Value::as_array);
+        let Some(positions) = positions else {
+            return Ok(None);
+        };
+
+        // Most played wins. The array arrives sorted that way, but ordering
+        // is the endpoint's to change and the count is right here.
+        let best = positions
+            .iter()
+            .filter_map(|entry| {
+                let name = entry.get("name")?.as_str()?;
+                let role = Role::parse_optional(name)?.ok()?;
+                let play = entry.pointer("/stats/play")?.as_u64()?;
+                Some((role, play))
+            })
+            .max_by_key(|(_, play)| *play);
+
+        Ok(best.map(|(role, _)| role))
     }
 }
 

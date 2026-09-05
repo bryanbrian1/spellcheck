@@ -98,7 +98,15 @@ type LcuStatus =
 interface LiveBuild {
   /** The Data Dragon key, matched against the champion on screen. */
   championKey: string;
+  /** The lane we were given. Empty when League named none. */
   position: string;
+  /**
+   * True when the lane in `lookup` is the champion's most-played one rather
+   * than one League assigned — Practice Tool, customs and ARAM name none.
+   * The screen has to say so: a lane we chose and a lane you were given are
+   * different claims, and only one of them is a fact about your game.
+   */
+  inferredRole: boolean;
   lookup: BuildLookup | null;
   error: string | null;
 }
@@ -923,6 +931,19 @@ let selectPill: [text: string, connected: boolean] = ["Offline", false];
  * behind, spikes when ahead — so the heading has to as well. A fixed "because
  * you are behind" was wrong every game that was going well.
  */
+/**
+ * Said above a build whose lane nobody assigned.
+ *
+ * Practice Tool, customs and ARAM name no lane, so the app asks the source
+ * which lane the champion is actually played in and shows that. This is the
+ * sentence that keeps the answer honest — without it the header's lane reads
+ * as the one you were given, which in those modes there was never any.
+ */
+const inferredNote = (lookup: FoundBuild): string =>
+  `<div class="thin"><b>No lane in this mode.</b> Showing ${escape(lookup.champion.name)} ${escape(
+    roleLabels[lookup.role] ?? lookup.role,
+  )}, the lane it is played in most.</div>`;
+
 const stateTitle = (standing: Standing | null): string => {
   switch (standing?.footing) {
     case "behind":
@@ -1089,7 +1110,8 @@ const onBuild = (payload: LiveBuild): void => {
     );
   } else {
     buildSlot =
-      buildHtml(lookup) ?? emptyHtml(`${lookup.champion.name} came back with an empty build.`);
+      (payload.inferredRole ? inferredNote(lookup) : "") +
+      (buildHtml(lookup) ?? emptyHtml(`${lookup.champion.name} came back with an empty build.`));
   }
 
   paintBody();

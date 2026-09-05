@@ -15,6 +15,7 @@ use serde::{Deserialize, Serialize};
 
 use super::config::default_build_data_root;
 use super::error::ProviderError;
+use super::role::Role;
 use super::schema::{BuildLookup, BuildRequest};
 use super::{validate_champion_key, BuildDataProvider};
 
@@ -162,6 +163,52 @@ impl BuildDataProvider for RiotProvider {
 
         Ok(BuildLookup::found(build))
     }
+
+    /// Whichever of this champion's crawled files carries the most games.
+    ///
+    /// The same question OP.GG answers from its summary, asked of what we
+    /// crawled: the five files are small and at most five exist, so this
+    /// reads them rather than keeping an index that could go stale. A
+    /// champion we have not crawled, or files with no sample recorded, give
+    /// `None` — the caller then shows nothing rather than picking a lane out
+    /// of the directory order.
+    async fn primary_role(&self, champion_key: &str) -> Result<Option<Role>, ProviderError> {
+        let champion = validate_champion_key(champion_key)?;
+        let dir = self.config.data_root.join(champion);
+
+        let mut best: Option<(Role, u64)> = None;
+        for role in Role::ALL {
+            let path = dir.join(format!("{}.json", role.file_stem()));
+            let text = match tokio::fs::read_to_string(&path).await {
+                Ok(text) => text,
+                // Most pairs are simply not crawled yet. That is the normal
+                // state of an incremental crawl, not a failure.
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+                Err(error) => {
+                    return Err(ProviderError::Io {
+                        path: path.display().to_string(),
+                        detail: error.to_string(),
+                    })
+                }
+            };
+
+            // A file that will not parse is a problem for the lookup that
+            // actually wants it, which reports it properly. Choosing a lane
+            // is not the place to fail the whole thing over one bad file.
+            let Ok(parsed) = serde_json::from_str::<BuildFile>(&text) else {
+                continue;
+            };
+            let Some(games) = parsed.stats.and_then(|stats| stats.games) else {
+                continue;
+            };
+
+            if best.map_or(true, |(_, most)| games > most) {
+                best = Some((role, games));
+            }
+        }
+
+        Ok(best.map(|(role, _)| role))
+    }
 }
 
 #[cfg(test)]
@@ -191,6 +238,50 @@ mod tests {
             std::fs::create_dir_all(&dir).unwrap();
             std::fs::write(dir.join(format!("{}.json", role.file_stem())), contents).unwrap();
         }
+    }
+
+    /// A crawled file with a sample size and nothing else that matters here.
+    fn file(games: u64) -> String {
+        format!(
+            r#"{{"schemaVersion":1,"stats":{{"games":{games}}},"items":{{"core":[]}}}}"#
+        )
+    }
+
+    /// The lane fallback, over what we crawled rather than what OP.GG knows.
+    /// Most games wins, and directory order must not.
+    #[tokio::test]
+    async fn the_most_played_crawled_lane_is_the_one_offered() {
+        let scratch = Scratch::new();
+        // Written jungle-first so passing by accident on ordering is visible.
+        scratch.write("Teemo", Role::Jungle, &file(11_120));
+        scratch.write("Teemo", Role::Top, &file(70_498));
+        scratch.write("Teemo", Role::Utility, &file(9_286));
+
+        let provider = RiotProvider::with_root(scratch.0.clone());
+
+        assert_eq!(provider.primary_role("Teemo").await.unwrap(), Some(Role::Top));
+    }
+
+    /// A champion we have not crawled has no lane to offer, and must not have
+    /// one picked for it out of an empty directory.
+    #[tokio::test]
+    async fn a_champion_we_have_not_crawled_names_no_lane() {
+        let scratch = Scratch::new();
+        let provider = RiotProvider::with_root(scratch.0.clone());
+
+        assert_eq!(provider.primary_role("Teemo").await.unwrap(), None);
+    }
+
+    /// A file with no sample recorded cannot win a comparison it is not in.
+    #[tokio::test]
+    async fn a_file_with_no_sample_does_not_win_by_default() {
+        let scratch = Scratch::new();
+        scratch.write("Teemo", Role::Jungle, r#"{"schemaVersion":1,"items":{}}"#);
+        scratch.write("Teemo", Role::Top, &file(70_498));
+
+        let provider = RiotProvider::with_root(scratch.0.clone());
+
+        assert_eq!(provider.primary_role("Teemo").await.unwrap(), Some(Role::Top));
     }
 
     impl Drop for Scratch {

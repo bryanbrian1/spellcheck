@@ -33,9 +33,12 @@ pub async fn fetch_build(
     champion: String,
     role: String,
 ) -> Result<BuildLookup, String> {
+    // The search box always names a role, so there is never a lane to work
+    // out here and the flag that comes back is always false.
     service
         .build_for(&champion, &role, None)
         .await
+        .map(|resolved| resolved.lookup)
         .map_err(|error| error.to_string())
 }
 
