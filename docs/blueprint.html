@@ -238,8 +238,8 @@ pre .p{color:var(--stat)}
       <span>Rust <b>1.98.1</b></span>
       <span>Tauri <b>v2</b></span>
       <span>Vanilla <b>TypeScript</b></span>
-      <span><b>101</b> tests</span>
-      <span><b>5,987</b> lines</span>
+      <span><b>140</b> tests</span>
+      <span><b>7,965</b> lines</span>
       <span>Bundle <b>14 MB</b></span>
     </div>
   </header>
@@ -378,7 +378,7 @@ pre .p{color:var(--stat)}
         <table>
           <tr class="head"><td>Path</td><td>What it does</td><td>Lines</td></tr>
           <tr><td class="f">src-tauri/src/<em>main.rs</em></td><td class="d">Binary entry point. Calls <code>run()</code>.</td><td class="l">6</td></tr>
-          <tr><td class="f">src-tauri/src/<em>lib.rs</em></td><td class="d"><code>BuildService</code>, the single entry point the UI talks to, plus app startup, config resolution, and the champ select task that feeds it.</td><td class="l">292</td></tr>
+          <tr><td class="f">src-tauri/src/<em>lib.rs</em></td><td class="d"><code>BuildService</code>, the single entry point the UI talks to, plus app startup, config resolution, and the champ select task that runs both checks.</td><td class="l">471</td></tr>
           <tr><td class="f">src-tauri/src/<em>commands.rs</em></td><td class="d">The frontend's entire surface: two commands, neither naming a provider.</td><td class="l">39</td></tr>
           <tr><td class="f">&#8230;/build_data/<em>mod.rs</em></td><td class="d">The <code>BuildDataProvider</code> trait, and champion-key validation that stops path traversal.</td><td class="l">91</td></tr>
           <tr><td class="f">&#8230;/build_data/<em>schema.rs</em></td><td class="d">The internal build shape every provider maps into. Change carefully; everything depends on it.</td><td class="l">412</td></tr>
@@ -392,15 +392,19 @@ pre .p{color:var(--stat)}
           <tr><td class="f">&#8230;/build_data/opgg/<em>mod.rs</em></td><td class="d">The provider itself: config, the four required arguments, role translation.</td><td class="l">328</td></tr>
           <tr><td class="f">&#8230;/build_data/riot/<em>mod.rs</em></td><td class="d">Reads our own crawled files. Refuses to escape the data root.</td><td class="l">358</td></tr>
           <tr><td class="f">&#8230;/build_data/riot/<em>file.rs</em></td><td class="d">The on-disk format, with a schema version it refuses to read past.</td><td class="l">215</td></tr>
+          <tr><td class="f">&#8230;/recommend/<em>tags.rs</em></td><td class="d">Both tag files, compiled in and parsed once. An untagged champion is a <code>None</code>, never a guess.</td><td class="l">332</td></tr>
+          <tr><td class="f">&#8230;/recommend/<em>mod.rs</em></td><td class="d">The suggestion vocabulary, the team view that counts what it cannot see, and the item ranking.</td><td class="l">332</td></tr>
+          <tr><td class="f">&#8230;/recommend/<em>threat.rs</em></td><td class="d">Check one. Damage split, antiheal and its timing, tenacity.</td><td class="l">389</td></tr>
+          <tr><td class="f">&#8230;/recommend/<em>gaps.rs</em></td><td class="d">Check two, and a header explaining why it is short.</td><td class="l">149</td></tr>
           <tr><td class="f">&#8230;/lcu/<em>mod.rs</em></td><td class="d">The layer's shape, bottom-up, and why not-running is a state.</td><td class="l">35</td></tr>
           <tr><td class="f">&#8230;/lcu/<em>lockfile.rs</em></td><td class="d">Port and password, rewritten every launch. Redacts itself in <code>Debug</code>.</td><td class="l">234</td></tr>
           <tr><td class="f">&#8230;/lcu/<em>client.rs</em></td><td class="d">The client's REST API over loopback. Two reads, no writes.</td><td class="l">199</td></tr>
-          <tr><td class="f">&#8230;/lcu/<em>session.rs</em></td><td class="d">The champ select payload, reduced to champion and role.</td><td class="l">183</td></tr>
+          <tr><td class="f">&#8230;/lcu/<em>session.rs</em></td><td class="d">The champ select payload, reduced to champion, role and both teams.</td><td class="l">280</td></tr>
           <tr><td class="f">&#8230;/lcu/<em>ws.rs</em></td><td class="d">The event socket, its frame format, and the loopback TLS verifier.</td><td class="l">305</td></tr>
-          <tr><td class="f">&#8230;/lcu/<em>watcher.rs</em></td><td class="d">The loop over all of it. Deduplicates champ select's chatter into real changes.</td><td class="l">421</td></tr>
+          <tr><td class="f">&#8230;/lcu/<em>watcher.rs</em></td><td class="d">The loop over all of it. Deduplicates champ select&#8217;s chatter into real changes, and keeps a lock apart from a lobby.</td><td class="l">496</td></tr>
           <tr><td class="f">&#8230;/lcu/<em>error.rs</em></td><td class="d">Typed client errors &#8212; with no not-running variant, on purpose.</td><td class="l">81</td></tr>
           <tr><td class="f"><em>index.html</em></td><td class="d">Three screens. Two live, one static preview.</td><td class="l">123</td></tr>
-          <tr><td class="f">src/<em>main.ts</em></td><td class="d">All UI logic. Both screens render through one function; neither inspects the source.</td><td class="l">518</td></tr>
+          <tr><td class="f">src/<em>main.ts</em></td><td class="d">All UI logic. Both screens render through one function; neither inspects the source.</td><td class="l">640</td></tr>
           <tr><td class="f">src/<em>styles.css</em></td><td class="d">The design tokens. The colour meanings live here.</td><td class="l">147</td></tr>
         </table>
       </div>
@@ -462,20 +466,30 @@ pre .p{color:var(--stat)}
 
     <section id="engine">
       <h2><span class="n">05</span>The three checks</h2>
-      <p class="sub">Designed, not built. Each check runs independently and returns zero or more suggestions.</p>
+      <p class="sub">Checks one and two are built; the third waits on live game data. Each runs independently and returns zero or more suggestions.</p>
 
-      <div class="rail gap">
+      <div class="rail">
         <i></i>
         <div class="rail-in">
           <h4>1 &#183; Enemy threat &#8212; what to build against</h4>
-          <p>Reads the enemy composition's tags and answers them: the armour/magic-resist split, antiheal and when it needs to be online, tenacity, defensive actives.</p>
+          <p>Reads the enemy composition's tags and answers them: the armour/magic-resist split, antiheal and when it needs to be online, tenacity. Dive adds no item of its own &#8212; it makes the resist a <em>rush</em> rather than a third item, which is the advice a player gives out loud.</p>
+          <p>Every rule is gated on seeing enough of the enemy to mean it. Blind pick shows nothing until the game starts, and a damage split called from one visible enemy is worse than silence.</p>
         </div>
       </div>
-      <div class="rail gap">
+      <div class="rail">
         <i></i>
         <div class="rail-in">
           <h4>2 &#183; Team gaps &#8212; what to build for</h4>
-          <p>Reads your own team's tags and finds the holes: no frontline, all-AD damage, nobody carrying antiheal, no engage.</p>
+          <p>Reads your own team, you included, and emits the one gap that is an item decision: nobody can hold a front line, so fights start on top of you and a cheap resist outbuys the same gold spent on damage.</p>
+          <p>It is thin on purpose. Most team gaps are answered by a champion pick rather than an item &#8212; an all-AD team is a real problem whose answer is armour penetration, and &#8220;nobody can engage&#8221; or &#8220;nobody has hard CC&#8221; are real readings with no item behind them at all. <code>answers</code> is a closed defensive vocabulary, so none of those three is expressible today.</p>
+        </div>
+      </div>
+
+      <div class="rail law">
+        <i></i>
+        <div class="rail-in">
+          <h4>Widen the vocabulary before you widen a check</h4>
+          <p>The temptation with check two is to add rules until it looks as full as check one. Do not. A gap with no item behind it cannot become a suggestion, because a suggestion <em>is</em> an item &#8212; the shape is fixed at <code>{ itemId, priority, reason, source }</code>. Making check two say more means adding an answer to <code>data/meta/items.json</code> first, and a rule that reaches for it second. Anything else is advice invented to fill the space.</p>
         </div>
       </div>
       <div class="rail gap">
@@ -486,7 +500,17 @@ pre .p{color:var(--stat)}
         </div>
       </div>
 
-      <p>Both of the first two checks need tag files that describe champions and items: <code>data/meta/champions.json</code> for damage type, sustain, hard CC, dive, poke, frontline and engage, and <code>data/meta/items.json</code> for what each item answers, its cost, and what it builds into. Neither file exists yet.</p>
+      <p>Both of the first two checks read the tag files. <code>data/meta/champions.json</code> is hand-authored judgement &#8212; damage type, sustain, hard CC, dive, poke, frontline, engage &#8212; and covers 170 of the 173 champions on patch 16.17.1; the other three are listed under <code>untagged</code> rather than omitted, so a new release reads as a known hole instead of silence. <code>data/meta/items.json</code> is the opposite: derived from Data Dragon's own stats and item text, then committed. Both are compiled in with <code>include_str!</code>, so a shipped binary and its tags cannot drift apart.</p>
+
+      <div class="rail law">
+        <i></i>
+        <div class="rail-in">
+          <h4>An untagged champion is a hole, never a blank</h4>
+          <p>A champion the tag file has never heard of resolves to <code>None</code> and counts as a seat we cannot see. It must never be read as a champion with every tag <em>false</em> &#8212; that turns missing knowledge into a confident claim, which is the one thing an amber block may not do.</p>
+        </div>
+      </div>
+
+      <p>Two answers have items behind them but no champion tag that could ask for them: shield reduction and crit reduction. Nothing suggests Serpent's Fang or Randuin's Omen yet, and closing that means adding a champion tag rather than an item.</p>
     </section>
 
     <section id="perf">
@@ -557,10 +581,12 @@ pre .p{color:var(--stat)}
         <div><span class="k yes">Works</span><span class="v"><b>Desktop app.</b> 420&#215;700 window, dark UI, ~35 MB resident on a debug build.</span></div>
         <div><span class="k yes">Works</span><span class="v"><b>Search screen.</b> Type a champion, pick a role, see a build.</span></div>
         <div><span class="k yes">Works</span><span class="v"><b>Live OP.GG requests.</b> Real builds, on the current patch, for every champion tried. The endpoint requires four arguments and answers in its own compact format rather than JSON &#8212; both of which the first real request discovered. <code>cargo test --test opgg_live -- --ignored</code> checks it still holds.</span></div>
-        <div><span class="k part">Untested</span><span class="v"><b>Champ select screen.</b> Subscribes to <code>lcu:status</code> and <code>lcu:build</code> and renders through the same function the search box does. Every state was driven by hand, and by the stand-in client with real OP.GG builds coming back; none of them has been driven by a real game.</span></div>
+        <div><span class="k part">Untested</span><span class="v"><b>Champ select screen.</b> Subscribes to <code>lcu:status</code>, <code>lcu:build</code> and <code>lcu:suggestions</code>, and renders the build through the same function the search box does. Every state was driven by hand, and by the stand-in client with real OP.GG builds coming back; none of them has been driven by a real game.</span></div>
         <div><span class="k part">Preview</span><span class="v"><b>In-game screen.</b> Static sample data, labelled as such in the UI.</span></div>
         <div><span class="k part">Untested</span><span class="v"><b>LCU layer.</b> Lockfile, loopback HTTP client, champ select socket and the watcher over them, all unit-tested and wired through to <code>build_for</code>. No build of it has met a running League client yet, so the first real champ select is the test.</span></div>
-        <div><span class="k no">Missing</span><span class="v"><b>Recommendation engine.</b> All three checks, plus both tag files.</span></div>
+        <div><span class="k yes">Works</span><span class="v"><b>Recommendation engine, checks one and two.</b> Both tag files, the two champ-select checks, and the amber rendering. Forty tests, including one that holds every reason to containing no digit at all.</span></div>
+        <div><span class="k part">Untested</span><span class="v"><b>Suggestions in a real champ select.</b> Driven by hand and by the stand-in client, which fills all ten seats and locks the enemy in one at a time. No real game has produced one.</span></div>
+        <div><span class="k no">Missing</span><span class="v"><b>Recommendation engine, check three.</b> Game state needs Live Client Data, which nothing reads yet.</span></div>
         <div><span class="k no">Missing</span><span class="v"><b>Crawler and CI.</b> <code>data/builds/</code> is empty, so <code>RiotProvider</code> has nothing to read.</span></div>
         <div><span class="k no">Missing</span><span class="v"><b>Matchup builds.</b> The design promises &#8220;core build vs. Syndra&#8221;, but <code>BuildRequest</code> carries champion and role with no opponent field. Needs a schema change and provider support on both sides.</span></div>
       </div>
