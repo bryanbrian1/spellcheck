@@ -8,7 +8,7 @@
 
 pub mod build_data;
 pub mod commands;
-pub mod icons;
+pub mod ddragon;
 pub mod lcu;
 pub mod live;
 pub mod recommend;
@@ -22,7 +22,7 @@ use tauri::{AppHandle, Emitter, Manager};
 use tokio::sync::mpsc;
 
 use build_data::config::CONFIG_FILE_NAME;
-use icons::IconState;
+use ddragon::DataDragonState;
 use lcu::session::Comp;
 use lcu::{ChampSelectEvent, LockedChampion, WatcherConfig};
 use live::{GameEvent, GameSnapshot, LiveWatcherConfig};
@@ -276,14 +276,14 @@ pub fn run() {
             // Fetched lazily on the first render that wants an icon, then
             // kept. Nothing is requested if the window is never opened on a
             // build.
-            app.manage(Arc::new(IconState::new()));
+            app.manage(Arc::new(DataDragonState::new()));
             spawn_champ_select(app.handle(), service);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             commands::source_label,
             commands::fetch_build,
-            commands::icon_catalog,
+            commands::data_dragon,
         ])
         .run(tauri::generate_context!())
         .expect("leaguechecker failed to start");

@@ -150,17 +150,27 @@ interface InGameState {
 
 type InGameUpdate = { event: "noGame" } | ({ event: "playing" } & InGameState);
 
+/** A champion, by the name a player types and the key a provider wants. */
+interface Champion {
+  /** `MonkeyKing` — what a build is filed under. */
+  key: string;
+  /** `Wukong` — what anyone would actually type. */
+  name: string;
+}
+
 /**
- * `icon_catalog` — where Data Dragon keeps its art.
+ * `data_dragon` — Riot's static data.
  *
- * Items and champions are addressable from an id and a key we already hold.
- * Summoner spells are named rather than numbered, and runes carry their own
- * unversioned path, so those two need a lookup the backend fetches for us —
- * the page may display Data Dragon images but may not call it.
+ * The champion list for the search box, and the two art tables the UI cannot
+ * derive on its own. Items and champion art come from an id and a key we
+ * already hold; summoner spells are named rather than numbered, and runes
+ * carry their own unversioned path. The page may display Data Dragon images
+ * but may not call it, so the backend fetches this.
  */
-interface IconCatalog {
+interface DataDragon {
   /** The full build, `16.17.1`. Not the `16.17` a build file is labelled with. */
   version: string;
+  champions: Champion[];
   spells: Record<string, string>;
   perks: Record<string, string>;
 }
@@ -249,7 +259,7 @@ type IconKind = "item" | "champ" | "spell" | "perk";
 
 /** Null until the catalogue arrives, and after a failure. Every tile renders
  *  its text label regardless, so this only ever adds. */
-let icons: IconCatalog | null = null;
+let icons: DataDragon | null = null;
 
 const iconUrl = (kind: IconKind, key: string): string | null => {
   if (!icons) return null;
@@ -588,19 +598,78 @@ const render = (lookup: BuildLookup): void => {
 
 /* ---------- interaction ---------- */
 
+/* ---------- champion matching ---------- */
+
+/** Filled once Data Dragon answers. Until then the box behaves as it always
+ *  did: whatever you typed is sent as-is. */
+let champions: Champion[] = [];
+
+/** Apostrophes, spaces and full stops are things a player types and a key
+ *  never contains — `Kai'Sa` is filed as `Kaisa`, `Dr. Mundo` as `DrMundo`. */
+const normalise = (raw: string): string => raw.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+/** First letters of each word, so "mf" finds Miss Fortune. */
+const initials = (name: string): string =>
+  name
+    .split(/[^A-Za-z0-9]+/)
+    .filter(Boolean)
+    .map((word) => word[0]?.toLowerCase() ?? "")
+    .join("");
+
+/**
+ * Champions matching what has been typed, best first.
+ *
+ * Ranked rather than filtered, because "ah" should reach Ahri before Ahri is
+ * buried under everything containing those letters. An exact match wins
+ * outright: someone who typed a whole name meant it.
+ */
+const matchChampions = (query: string, limit = 8): Champion[] => {
+  const q = normalise(query);
+  if (!q) return [];
+
+  const scored: Array<{ champion: Champion; score: number }> = [];
+  for (const champion of champions) {
+    const name = normalise(champion.name);
+    const key = normalise(champion.key);
+    let score: number;
+    if (name === q || key === q) score = 0;
+    else if (name.startsWith(q)) score = 1;
+    else if (key.startsWith(q)) score = 2;
+    else if (q.length >= 2 && initials(champion.name).startsWith(q)) score = 3;
+    else if (name.includes(q) || key.includes(q)) score = 4;
+    else continue;
+    scored.push({ champion, score });
+  }
+
+  scored.sort((a, b) => a.score - b.score || a.champion.name.localeCompare(b.champion.name));
+  return scored.slice(0, limit).map((entry) => entry.champion);
+};
+
 const champInput = el<HTMLInputElement>("champ");
 let role: Role = "middle";
 let inFlight = 0;
 
+/** The champion the user actually chose, if they chose one. */
+let picked: Champion | null = null;
+
 const lookup = async (): Promise<void> => {
-  const champion = champInput.value.trim();
-  if (!champion) {
+  const typed = champInput.value.trim();
+  if (!typed) {
     message("Type a champion and pick a role.");
     return;
   }
 
+  // A provider is asked for the key, and a player types the name. Resolve
+  // here rather than sending raw text, which is why "Wukong" used to fail:
+  // the build is filed under MonkeyKing. An unrecognised string is still
+  // passed through, so an exact key typed by hand keeps working and a real
+  // mistake still produces a real error.
+  const resolved = picked ?? matchChampions(typed, 1)[0] ?? null;
+  const champion = resolved?.key ?? typed;
+  const shown = resolved?.name ?? typed;
+
   const ticket = ++inFlight;
-  message(`Looking up ${champion}…`);
+  message(`Looking up ${shown}…`);
   try {
     const result = await invoke<BuildLookup>("fetch_build", { champion, role });
     if (ticket !== inFlight) return; // a newer query already won
@@ -611,16 +680,116 @@ const lookup = async (): Promise<void> => {
   }
 };
 
+/* ---------- the suggestion list ---------- */
+
+const suggest = el<HTMLUListElement>("suggest");
+let matches: Champion[] = [];
+let highlighted = -1;
+
+const closeSuggestions = (): void => {
+  matches = [];
+  highlighted = -1;
+  suggest.hidden = true;
+  suggest.innerHTML = "";
+  champInput.setAttribute("aria-expanded", "false");
+};
+
+const drawSuggestions = (): void => {
+  if (matches.length === 0) {
+    closeSuggestions();
+    return;
+  }
+  suggest.innerHTML = matches
+    .map((champion, index) => {
+      // The key is worth showing only where it differs from the name, which
+      // is exactly the case a player cannot guess.
+      const key =
+        champion.key.toLowerCase() === champion.name.toLowerCase().replace(/[^a-z0-9]/g, "")
+          ? ""
+          : `<span class="sug-key">${escape(champion.key)}</span>`;
+      return `<li role="option" data-key="${escape(champion.key)}" aria-selected="${index === highlighted}">
+        <span class="sug-portrait" data-icon="champ:${escape(champion.key)}"></span>
+        <span>${escape(champion.name)}</span>${key}
+      </li>`;
+    })
+    .join("");
+  suggest.hidden = false;
+  champInput.setAttribute("aria-expanded", "true");
+  paintIcons();
+};
+
+const move = (delta: number): void => {
+  if (matches.length === 0) return;
+  highlighted = (highlighted + delta + matches.length) % matches.length;
+  [...suggest.children].forEach((li, index) =>
+    li.setAttribute("aria-selected", String(index === highlighted)),
+  );
+  suggest.children[highlighted]?.scrollIntoView({ block: "nearest" });
+};
+
+/** Commit to a champion: the box shows its name, the lookup uses its key. */
+const choose = (champion: Champion): void => {
+  picked = champion;
+  champInput.value = champion.name;
+  closeSuggestions();
+  window.clearTimeout(debounce);
+  void lookup();
+};
+
 let debounce = 0;
 champInput.addEventListener("input", () => {
+  // Anything typed replaces an earlier choice, so Enter takes the best match
+  // rather than whatever was picked three keystrokes ago.
+  picked = null;
+  matches = matchChampions(champInput.value);
+  highlighted = matches.length > 0 ? 0 : -1;
+  drawSuggestions();
+
+  // One letter matches a dozen champions, so guessing from it would spend a
+  // request on whichever happens to sort first. Enter still works at any
+  // length: that is the user saying they meant it.
   window.clearTimeout(debounce);
-  debounce = window.setTimeout(lookup, 350);
-});
-champInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    window.clearTimeout(debounce);
-    void lookup();
+  if (normalise(champInput.value).length >= 2) {
+    debounce = window.setTimeout(lookup, 350);
   }
+});
+
+champInput.addEventListener("keydown", (event) => {
+  switch (event.key) {
+    case "ArrowDown":
+      event.preventDefault();
+      move(1);
+      break;
+    case "ArrowUp":
+      event.preventDefault();
+      move(-1);
+      break;
+    case "Enter": {
+      event.preventDefault();
+      const chosen = matches[highlighted] ?? matches[0];
+      if (chosen) choose(chosen);
+      else {
+        window.clearTimeout(debounce);
+        void lookup();
+      }
+      break;
+    }
+    case "Escape":
+      closeSuggestions();
+      break;
+  }
+});
+
+suggest.addEventListener("click", (event) => {
+  const item = (event.target as HTMLElement).closest<HTMLLIElement>("li[data-key]");
+  if (!item) return;
+  const chosen = matches.find((champion) => champion.key === item.dataset.key);
+  if (chosen) choose(chosen);
+});
+
+// Clicking away puts the list down; it must not sit over the build.
+document.addEventListener("click", (event) => {
+  if (!(event.target as HTMLElement).closest(".search-wrap")) closeSuggestions();
 });
 
 el<HTMLDivElement>("roles").addEventListener("click", (event) => {
@@ -879,9 +1048,10 @@ listen<InGameUpdate>("game:state", onGameState);
 /* Icons are an enhancement, never a requirement: every tile has already drawn
    its text label by the time this resolves, and a failure leaves those in
    place. Fetched once, then applied to whatever is on screen. */
-void invoke<IconCatalog>("icon_catalog")
+void invoke<DataDragon>("data_dragon")
   .then((catalog) => {
     icons = catalog;
+    champions = catalog.champions;
     paintIcons();
   })
   .catch(() => {
