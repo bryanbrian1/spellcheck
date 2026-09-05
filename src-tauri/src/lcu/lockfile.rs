@@ -16,8 +16,25 @@ use super::error::LcuError;
 
 /// Where the macOS client keeps it. The path is inside the installed app
 /// bundle, so it is the same on every Mac with a default install.
+#[cfg(target_os = "macos")]
 pub const DEFAULT_LOCKFILE_PATH: &str =
     "/Applications/League of Legends.app/Contents/LoL/lockfile";
+
+/// Where the Windows client keeps it, with a weaker guarantee than the macOS
+/// path above. The Windows installer lets you choose a drive, and regional
+/// builds land somewhere else again, so this is the common default rather
+/// than the only answer. That difference is why [`LOCKFILE_ENV_VAR`] is a
+/// user-facing setting here and only a development convenience on macOS.
+#[cfg(target_os = "windows")]
+pub const DEFAULT_LOCKFILE_PATH: &str = r"C:\Riot Games\League of Legends\lockfile";
+
+/// Anywhere else there is no client to find. A path that cannot exist is the
+/// honest default: every lookup reports the state the app is designed to
+/// spend most of its life in, the client is closed, and nothing above here
+/// needs to know the platform is unsupported. The override still works, which
+/// is what keeps the fake client usable on any machine.
+#[cfg(not(any(target_os = "macos", target_os = "windows")))]
+pub const DEFAULT_LOCKFILE_PATH: &str = "/nonexistent/league-client/lockfile";
 
 /// Points the app at a lockfile somewhere else — a non-default install, or a
 /// captured file for development on a machine with no client.
@@ -207,6 +224,52 @@ mod tests {
     fn a_missing_lockfile_means_the_client_is_closed() {
         let missing = PathBuf::from("/nonexistent/League of Legends.app/lockfile");
         assert!(Lockfile::read(&missing).unwrap().is_none());
+    }
+
+    #[test]
+    fn the_default_path_points_at_this_platform_s_client() {
+        let path = PathBuf::from(DEFAULT_LOCKFILE_PATH);
+        assert_eq!(path.file_name().unwrap(), "lockfile");
+
+        #[cfg(target_os = "macos")]
+        assert!(
+            path.starts_with("/Applications/League of Legends.app"),
+            "{path:?}"
+        );
+
+        // The Windows path is backslash-separated, which `Path` does not split
+        // on when the tests are cross-checked from another OS, so match the
+        // string rather than the components.
+        #[cfg(target_os = "windows")]
+        assert!(
+            DEFAULT_LOCKFILE_PATH.contains(r"Riot Games\League of Legends"),
+            "{DEFAULT_LOCKFILE_PATH}"
+        );
+    }
+
+    #[test]
+    fn the_override_beats_the_platform_default() {
+        // Windows installs land wherever the installer was pointed, so this
+        // override is the supported way out and not only a test seam.
+        std::env::set_var(LOCKFILE_ENV_VAR, "/tmp/somewhere-else/lockfile");
+        assert_eq!(
+            default_lockfile_path(),
+            PathBuf::from("/tmp/somewhere-else/lockfile")
+        );
+
+        // Blank is not a choice — it falls back rather than pointing the
+        // watcher at the current directory.
+        std::env::set_var(LOCKFILE_ENV_VAR, "   ");
+        assert_eq!(
+            default_lockfile_path(),
+            PathBuf::from(DEFAULT_LOCKFILE_PATH)
+        );
+
+        std::env::remove_var(LOCKFILE_ENV_VAR);
+        assert_eq!(
+            default_lockfile_path(),
+            PathBuf::from(DEFAULT_LOCKFILE_PATH)
+        );
     }
 
     #[test]
