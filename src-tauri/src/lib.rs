@@ -1,10 +1,13 @@
 //! leaguechecker core.
 //!
-//! The build data layer, the LCU layer that watches the League client, and
-//! the Tauri shell that hosts both. The two meet in exactly one place:
-//! [`BuildService::build_for`], which the search box calls when the user
-//! types a champion and [`spawn_champ_select`] calls when the client says one
-//! was locked. Neither route knows about the other.
+//! The build data layer, the two layers that watch the League client and the
+//! game it launches, and the Tauri shell that hosts them. They meet at
+//! [`BuildService::build_for`], which three routes now call: the search box
+//! when the user types a champion, [`spawn_champ_select`] when the client
+//! says one was locked, and [`spawn_live_game`] when a game turns out to be
+//! running that we never saw the champ select for. None of the three knows
+//! about the others; a [`BuildClaim`] is all that keeps the last two from
+//! asking for the same build twice.
 
 pub mod build_data;
 pub mod commands;
@@ -24,7 +27,7 @@ use tokio::sync::mpsc;
 use build_data::config::CONFIG_FILE_NAME;
 use ddragon::DataDragonState;
 use lcu::session::Comp;
-use lcu::{ChampSelectEvent, LockedChampion, WatcherConfig};
+use lcu::{ChampSelectEvent, WatcherConfig};
 use live::{GameEvent, GameSnapshot, LiveWatcherConfig};
 use recommend::{
     enemy_threat, game_state, standing, team_gaps, Standing, Suggestion, Tags, TeamView,
@@ -84,8 +87,14 @@ impl BuildService {
 /// `clientConnected`, `entered`, `locked`, `left`.
 pub const CHAMP_SELECT_STATUS_EVENT: &str = "lcu:status";
 
-/// Where the build for a locked champion reaches the UI.
-pub const CHAMP_SELECT_BUILD_EVENT: &str = "lcu:build";
+/// Where the build for the champion we are on reaches the UI.
+///
+/// Deliberately not champ-select specific. The same event carries a build
+/// fetched because the client said we locked in and one fetched because a
+/// game turned out to be running, because the screen that draws them is one
+/// screen. Which route found it is not something the UI can act on, so it is
+/// not something the UI is told.
+pub const LIVE_BUILD_EVENT: &str = "live:build";
 
 /// Where the rule-based checks reach the UI.
 ///
@@ -99,17 +108,29 @@ pub const CHAMP_SELECT_SUGGESTIONS_EVENT: &str = "lcu:suggestions";
 /// Where the state of a game in progress reaches the UI.
 ///
 /// A separate stream from the champ select ones, fed by a separate watcher,
-/// because the two are never live at the same time.
+/// and the two are never live at the same time — which is exactly why they
+/// draw to the same screen. Champ select hands over to this the moment the
+/// game loads, and this hands back when it ends.
 pub const GAME_STATE_EVENT: &str = "game:state";
 
-/// A build looked up because the client said so rather than because the user
-/// typed something. `lookup` and `error` are exclusive, and "this source has
-/// nothing for that pair" lives inside `lookup` as
-/// [`BuildLookup::NoData`] — not here.
+/// A build looked up because League said so rather than because the user
+/// typed something.
+///
+/// It names the pair it was asked for and nothing else. Champ select knows a
+/// champion id and the game does not; the game knows a game clock and champ
+/// select does not; neither belongs here, because the screen matches a build
+/// to what it is showing on the champion key alone.
+///
+/// `lookup` and `error` are exclusive, and "this source has nothing for that
+/// pair" lives inside `lookup` as [`BuildLookup::NoData`] — not here.
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ChampSelectBuild {
-    pub champion: LockedChampion,
+pub struct LiveBuild {
+    /// The Data Dragon key, which is what art is filed under and what the UI
+    /// matches against the champion it is currently showing.
+    pub champion_key: String,
+    /// The position we asked for, in whichever vocabulary the source used.
+    pub position: String,
     pub lookup: Option<BuildLookup>,
     pub error: Option<String>,
 }
@@ -188,6 +209,11 @@ pub struct InGameState {
     /// The same champion's Data Dragon key, which is what icon art is filed
     /// under. `None` when the champion has no tags to look it up through.
     pub champion_key: Option<String>,
+    /// Our lane. `None` in a mode that assigns none, or while spectating.
+    ///
+    /// The one thing champ select and the game both name, which is what makes
+    /// it possible to ask for the same build from either side.
+    pub role: Option<Role>,
     pub level: u32,
     /// Seconds since the game started.
     pub game_time: f64,
@@ -254,12 +280,47 @@ fn in_game_state(snapshot: &GameSnapshot) -> InGameState {
         champion_key: us
             .and_then(|player| tags.champion_key_by_name(&player.champion_name))
             .map(str::to_string),
+        role: us.and_then(|player| player.position),
         level: us.map(|player| player.level).unwrap_or(0),
         game_time: snapshot.game_time,
         standing: standing(snapshot),
         threat,
         state,
         item_names,
+    }
+}
+
+/// The champion-role pair the live screen already holds a build for.
+///
+/// Two routes can now ask for a build — champ select when you lock in, and
+/// the game itself when the app was opened after champ select had ended — and
+/// in the ordinary run they would both ask for the same one. This is the
+/// whole of the coordination between them: whoever gets there first takes the
+/// slot, and the other sees the pair is already answered and stays quiet.
+///
+/// A failed lookup hands the slot back rather than keeping it. That is what
+/// turns the in-game poll into a retry for champ select, and it is why a
+/// queue that assigns no position still ends up with a build: champ select
+/// cannot name a lane there, but the game always can.
+#[derive(Clone, Default)]
+struct BuildClaim(Arc<tokio::sync::Mutex<Option<(String, String)>>>);
+
+impl BuildClaim {
+    /// Take the slot for this pair. `false` when it already holds it, which
+    /// is the caller's cue to say nothing.
+    async fn take(&self, champion_key: &str, position: &str) -> bool {
+        let mut held = self.0.lock().await;
+        let pair = (champion_key.to_string(), position.to_string());
+        if held.as_ref() == Some(&pair) {
+            return false;
+        }
+        *held = Some(pair);
+        true
+    }
+
+    /// Hand the slot back, so the next route to look asks again.
+    async fn release(&self) {
+        *self.0.lock().await = None;
     }
 }
 
@@ -322,7 +383,8 @@ fn spawn_champ_select(handle: &AppHandle, service: Arc<BuildService>) {
     // which is what makes an in-game poll loop affordable at all. The LCU
     // layer already knows whether League is open, so nothing else has to look.
     let (launcher_running, launcher_gate) = tokio::sync::watch::channel(false);
-    spawn_live_game(&handle, launcher_gate);
+    let claim = BuildClaim::default();
+    spawn_live_game(&handle, Arc::clone(&service), claim.clone(), launcher_gate);
 
     tauri::async_runtime::spawn(async move {
         // The two halves of a suggestion arrive separately and in either
@@ -346,8 +408,29 @@ fn spawn_champ_select(handle: &AppHandle, service: Arc<BuildService>) {
             let recheck = match event {
                 ChampSelectEvent::Locked(champion) => {
                     locked = Some(champion.champion_id);
-                    let build = build_for_locked(&service, champion).await;
-                    let _ = handle.emit(CHAMP_SELECT_BUILD_EVENT, build);
+
+                    // Taking the slot unconditionally: the watcher already
+                    // drops every repeat, so a `Locked` reaching this line is
+                    // always news, and it must win over whatever the game
+                    // route may have claimed for the game before this one.
+                    claim
+                        .take(&champion.champion_key, &champion.assigned_position)
+                        .await;
+
+                    let build = build_for(
+                        &service,
+                        &champion.champion_key,
+                        &champion.assigned_position,
+                        Some(champion.champion_id),
+                    )
+                    .await;
+                    // Nothing to hold the slot for. Letting it go means the
+                    // game route will try the pair again once the match
+                    // starts, which is the only retry this app has.
+                    if build.error.is_some() {
+                        claim.release().await;
+                    }
+                    let _ = handle.emit(LIVE_BUILD_EVENT, build);
                     true
                 }
                 ChampSelectEvent::CompChanged(changed) => {
@@ -357,9 +440,25 @@ fn spawn_champ_select(handle: &AppHandle, service: Arc<BuildService>) {
                 // Champ select ended, or the client did. Whatever we were
                 // reasoning about is gone, and holding it would let the next
                 // champ select open against the last one's enemy team.
-                ChampSelectEvent::Left | ChampSelectEvent::ClientOffline => {
+                ChampSelectEvent::Left => {
                     locked = None;
                     comp = None;
+                    false
+                }
+                // The client went away, so the build on screen belongs to
+                // nothing we can still see. `Left` deliberately does not do
+                // this: champ select ending is how a game *starts*, and the
+                // pair we just looked up is the pair about to be played.
+                ChampSelectEvent::ClientOffline => {
+                    locked = None;
+                    comp = None;
+                    claim.release().await;
+                    false
+                }
+                // A fresh champ select. Whatever was claimed belongs to the
+                // last game.
+                ChampSelectEvent::Entered => {
+                    claim.release().await;
                     false
                 }
                 _ => false,
@@ -386,7 +485,12 @@ fn spawn_champ_select(handle: &AppHandle, service: Arc<BuildService>) {
 /// Gated on `launcher_running`: this task does nothing at all until League is
 /// open. See [`live::watcher`] for why that gate is the whole reason an
 /// in-game poll loop is affordable.
-fn spawn_live_game(handle: &AppHandle, launcher_running: tokio::sync::watch::Receiver<bool>) {
+fn spawn_live_game(
+    handle: &AppHandle,
+    service: Arc<BuildService>,
+    claim: BuildClaim,
+    launcher_running: tokio::sync::watch::Receiver<bool>,
+) {
     // A reading every half-minute at most. A buffer this size is already
     // generous; a full one would mean the UI thread had stopped entirely.
     let (sender, mut receiver) = mpsc::channel(8);
@@ -413,7 +517,28 @@ fn spawn_live_game(handle: &AppHandle, launcher_running: tokio::sync::watch::Rec
             let update = match event {
                 GameEvent::NoGame => InGameUpdate::NoGame,
                 GameEvent::Snapshot(snapshot) => {
-                    InGameUpdate::Playing(Box::new(in_game_state(&snapshot)))
+                    let state = in_game_state(&snapshot);
+
+                    // Opening the app after champ select is over is an
+                    // ordinary way to use it, and until now it meant playing
+                    // the whole game with no build on screen. The game names
+                    // the same two things champ select does — which champion,
+                    // which lane — so it can ask for exactly the same build.
+                    //
+                    // The claim is what keeps this quiet in the usual case,
+                    // where champ select already fetched it: this looks every
+                    // half-minute and speaks at most once a game.
+                    if let (Some(key), Some(role)) = (state.champion_key.as_deref(), state.role) {
+                        if claim.take(key, role.as_str()).await {
+                            let build = build_for(&service, key, role.as_str(), None).await;
+                            if build.error.is_some() {
+                                claim.release().await;
+                            }
+                            let _ = handle.emit(LIVE_BUILD_EVENT, build);
+                        }
+                    }
+
+                    InGameUpdate::Playing(Box::new(state))
                 }
             };
 
@@ -422,27 +547,32 @@ fn spawn_live_game(handle: &AppHandle, launcher_running: tokio::sync::watch::Rec
     });
 }
 
-/// The handoff itself, kept out of the Tauri task so it can be tested without
-/// an app handle.
-async fn build_for_locked(service: &BuildService, champion: LockedChampion) -> ChampSelectBuild {
-    match service
-        .build_for(
-            &champion.champion_key,
-            &champion.assigned_position,
-            Some(champion.champion_id),
-        )
-        .await
-    {
-        Ok(lookup) => ChampSelectBuild {
-            champion,
-            lookup: Some(lookup),
-            error: None,
-        },
-        Err(error) => ChampSelectBuild {
-            champion,
-            lookup: None,
-            error: Some(error.to_string()),
-        },
+/// The handoff itself, kept out of the Tauri tasks so it can be tested
+/// without an app handle.
+///
+/// Both routes into the live screen come through here, which is what makes
+/// them indistinguishable downstream: the payload records the pair that was
+/// asked for and says nothing about who asked.
+///
+/// `champion_id` is passed through to the provider when the route has one —
+/// champ select does, the live game does not — and only ever enriches the
+/// answer. No source needs it to find a build.
+async fn build_for(
+    service: &BuildService,
+    champion_key: &str,
+    position: &str,
+    champion_id: Option<u32>,
+) -> LiveBuild {
+    let (lookup, error) = match service.build_for(champion_key, position, champion_id).await {
+        Ok(lookup) => (Some(lookup), None),
+        Err(error) => (None, Some(error.to_string())),
+    };
+
+    LiveBuild {
+        champion_key: champion_key.to_string(),
+        position: position.to_string(),
+        lookup,
+        error,
     }
 }
 
@@ -498,40 +628,40 @@ mod tests {
     #[tokio::test]
     async fn a_locked_champion_goes_straight_to_the_active_provider() {
         let service = BuildService::new(Arc::new(Stub));
-        let build = build_for_locked(
-            &service,
-            LockedChampion {
-                champion_id: 103,
-                champion_key: "Ahri".to_string(),
-                assigned_position: "middle".to_string(),
-            },
-        )
-        .await;
+        let build = build_for(&service, "Ahri", "middle", Some(103)).await;
 
         assert!(build.error.is_none());
         assert!(matches!(build.lookup, Some(BuildLookup::NoData(_))));
-        assert_eq!(build.champion.champion_key, "Ahri");
+        assert_eq!(build.champion_key, "Ahri");
     }
 
-    /// Matches `ChampSelectBuild` in main.ts. `lookup` and `error` are both
-    /// present as keys and exactly one of them is null, because the UI branches
-    /// on which.
+    /// The live screen is fed by two routes and must not be able to tell them
+    /// apart. A build the client asked for and a build the running game asked
+    /// for are byte-for-byte the same payload.
+    #[tokio::test]
+    async fn both_routes_produce_the_same_payload() {
+        let service = BuildService::new(Arc::new(Stub));
+
+        let from_champ_select = build_for(&service, "Ahri", "middle", Some(103)).await;
+        let from_the_game = build_for(&service, "Ahri", "middle", None).await;
+
+        assert_eq!(
+            serde_json::to_value(&from_champ_select).unwrap(),
+            serde_json::to_value(&from_the_game).unwrap(),
+        );
+    }
+
+    /// Matches `LiveBuild` in main.ts. `lookup` and `error` are both present
+    /// as keys and exactly one of them is null, because the UI branches on
+    /// which; `championKey` is what it matches against the champion on screen.
     #[tokio::test]
     async fn the_build_payload_the_ui_reads_is_fixed() {
         let service = BuildService::new(Arc::new(Stub));
-        let build = build_for_locked(
-            &service,
-            LockedChampion {
-                champion_id: 103,
-                champion_key: "Ahri".to_string(),
-                assigned_position: "middle".to_string(),
-            },
-        )
-        .await;
+        let build = build_for(&service, "Ahri", "middle", Some(103)).await;
 
         let json = serde_json::to_value(&build).unwrap();
-        assert_eq!(json["champion"]["championKey"], "Ahri");
-        assert_eq!(json["champion"]["assignedPosition"], "middle");
+        assert_eq!(json["championKey"], "Ahri");
+        assert_eq!(json["position"], "middle");
         assert_eq!(json["lookup"]["status"], "noData");
         assert_eq!(json["error"], serde_json::Value::Null);
     }
@@ -539,19 +669,41 @@ mod tests {
     #[tokio::test]
     async fn a_failed_lookup_reaches_the_ui_as_a_message() {
         let service = BuildService::new(Arc::new(Stub));
-        let build = build_for_locked(
-            &service,
-            LockedChampion {
-                champion_id: 103,
-                champion_key: "Ahri".to_string(),
-                // Champ select in a queue that assigns no position.
-                assigned_position: String::new(),
-            },
-        )
-        .await;
+        // Champ select in a queue that assigns no position.
+        let build = build_for(&service, "Ahri", "", Some(103)).await;
 
         assert!(build.lookup.is_none());
         assert!(build.error.unwrap().contains("unknown role"));
+    }
+
+    /// The claim is the only thing standing between the two routes and a
+    /// duplicate lookup every game.
+    #[tokio::test]
+    async fn the_second_route_to_ask_for_a_pair_is_told_to_stay_quiet() {
+        let claim = BuildClaim::default();
+
+        assert!(claim.take("Ahri", "middle").await, "nobody had asked yet");
+        assert!(
+            !claim.take("Ahri", "middle").await,
+            "the game re-fetched a build champ select already had"
+        );
+        // A different pair is a different question.
+        assert!(claim.take("Ahri", "top").await);
+    }
+
+    /// A queue that assigns no position cannot be looked up in champ select,
+    /// and the game can. Releasing the slot after a failure is what lets the
+    /// second route try.
+    #[tokio::test]
+    async fn a_released_claim_lets_the_other_route_try() {
+        let claim = BuildClaim::default();
+
+        assert!(claim.take("Ahri", "").await);
+        claim.release().await;
+        assert!(
+            claim.take("Ahri", "middle").await,
+            "champ select's failure locked the game out of asking"
+        );
     }
 
     #[tokio::test]
@@ -675,6 +827,15 @@ mod in_game_tests {
         assert_eq!(state.level, 11);
     }
 
+    /// The lane is what makes the game a second route to a build. Without it
+    /// there is a champion and no question to ask about it.
+    #[test]
+    fn the_game_names_the_pair_a_build_is_filed_under() {
+        let state = in_game_state(&game(3000, 8000));
+        assert_eq!(state.champion_key.as_deref(), Some("Ahri"));
+        assert_eq!(state.role, Some(Role::Middle));
+    }
+
     #[test]
     fn being_behind_is_measured_and_the_advice_beside_it_is_not() {
         let state = in_game_state(&game(3000, 8000));
@@ -733,6 +894,8 @@ mod in_game_tests {
 
         let state = in_game_state(&spectated);
         assert!(state.champion.is_none());
+        // Nothing to look a build up by either, so the game route stays quiet.
+        assert!(state.role.is_none());
         assert!(state.standing.is_none());
         assert!(state.threat.is_empty());
         assert!(state.state.is_empty());

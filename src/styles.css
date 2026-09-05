@@ -33,8 +33,9 @@ body{
 }
 #app{display:flex;flex-direction:column;height:100%}
 
-/* state switcher — champ select switches itself, but Search must work with no
-   client running and In game is still a preview */
+/* state switcher — the live screen switches itself on, both when champ select
+   opens and when a game starts. The strip is here because Search must work
+   with no client running at all. */
 .modes{display:flex;gap:5px;padding:8px 10px;border-bottom:1px solid var(--line);flex-shrink:0;background:#12161b}
 .modes button{
   flex:1;background:#151a20;color:#8b98a6;border:1px solid #232b34;
