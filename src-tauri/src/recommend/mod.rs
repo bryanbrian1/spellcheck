@@ -138,6 +138,25 @@ fn list(names: &[&str]) -> String {
     }
 }
 
+/// The floor for what counts as an item you *finish*.
+///
+/// Doran's Helm carries armour and builds into nothing, which makes it the
+/// cheapest finished armour item in the file and terrible advice: it is a
+/// starting item, not the thing a resist plan ends at. Anything under this is
+/// something you open with.
+const FINISHED_ITEM_FLOOR: u32 = 1_000;
+
+/// "both" for two, "all" for more. A sentence that says "Darius and Warwick
+/// all heal" reads as a machine wrote it, which undermines the one thing an
+/// amber block has going for it — that it argues in words.
+fn all_or_both(n: usize) -> &'static str {
+    if n == 2 {
+        "both"
+    } else {
+        "all"
+    }
+}
+
 /// Counts as words. Amber blocks carry no digits, so a check that wants to
 /// say how many enemies heal has to spell it.
 fn count_word(n: usize) -> &'static str {
@@ -168,23 +187,34 @@ fn suits(item: &ItemTags, ours: DamageType) -> bool {
 /// the advice actionable on the next back, and the finished item is where it
 /// ends up. Naming all twenty-six armour items would be a list, not advice.
 ///
-/// Cost decides, but a tie goes to the item that also carries the champion's
-/// own damage. Three components apply Grievous Wounds for eight hundred gold;
-/// handing the armour one to a mage facing an all-magic team is technically an
-/// answer and practically a wasted back.
+/// The two slots are ranked differently, because they answer different
+/// questions.
+///
+/// The component answers "what can I buy on this back?", so cost leads and a
+/// tie goes to the item that also carries your damage. The finished item
+/// answers "what am I holding at the end?", so carrying your damage leads and
+/// cost only breaks ties — Thornmail is the cheapest completed answer to
+/// healing, but a mage who buys it has spent a slot on armour they cannot
+/// use, and Morellonomicon is worth the extra four hundred gold.
 fn pick(tags: &Tags, answer: Answer, ours: DamageType) -> Vec<(u32, &ItemTags)> {
-    let mut candidates: Vec<(u32, &ItemTags)> = tags
+    let candidates: Vec<(u32, &ItemTags)> = tags
         .items_answering(answer)
         .into_iter()
         .filter(|(_, item)| suits(item, ours))
         .collect();
-    candidates.sort_by_key(|(id, item)| {
-        let carries_our_damage = item.damage.is_some_and(|damage| damage == ours);
-        (item.cost, !carries_our_damage, *id)
-    });
 
-    let component = candidates.iter().find(|(_, item)| item.is_component);
-    let finished = candidates.iter().find(|(_, item)| !item.is_component);
+    let carries_our_damage =
+        |item: &ItemTags| item.damage.is_some_and(|damage| damage == ours);
+
+    let component = candidates
+        .iter()
+        .filter(|(_, item)| item.is_component)
+        .min_by_key(|(id, item)| (item.cost, !carries_our_damage(item), *id));
+
+    let finished = candidates
+        .iter()
+        .filter(|(_, item)| !item.is_component && item.cost >= FINISHED_ITEM_FLOOR)
+        .min_by_key(|(id, item)| (!carries_our_damage(item), item.cost, *id));
 
     let mut picked = Vec::new();
     if let Some(entry) = component {
@@ -255,5 +285,48 @@ mod tests {
         assert!(picked[0].1.is_component, "the first is buyable early");
         assert!(!picked[1].1.is_component);
         assert!(picked.iter().all(|(_, item)| suits(item, DamageType::Ad)));
+    }
+
+    #[test]
+    fn a_starting_item_is_not_offered_as_the_item_you_finish() {
+        let tags = Tags::get();
+        // Doran's Helm carries armour, builds into nothing, and costs less
+        // than every real defensive item. Naming it as the end of an armour
+        // path would be worse than naming nothing.
+        let picked = pick(tags, Answer::Armor, DamageType::Ad);
+        let dorans = tags.item(1120).expect("Doran's Helm");
+        assert!(dorans.answers.contains(&Answer::Armor));
+        assert!(
+            !picked.iter().any(|(id, _)| *id == 1120),
+            "a starting item was offered as a finished one"
+        );
+        assert!(picked
+            .iter()
+            .any(|(_, item)| !item.is_component && item.cost >= FINISHED_ITEM_FLOOR));
+    }
+
+    #[test]
+    fn a_mage_finishes_the_ability_power_antiheal_even_though_it_costs_more() {
+        let tags = Tags::get();
+
+        let ap = pick(tags, Answer::Antiheal, DamageType::Ap);
+        let (_, finished) = ap.last().expect("something finishes the path");
+        assert_eq!(finished.name, "Morellonomicon");
+
+        let ad = pick(tags, Answer::Antiheal, DamageType::Ad);
+        let (_, finished) = ad.last().expect("something finishes the path");
+        assert_eq!(finished.damage, Some(DamageType::Ad));
+
+        // The component is still whatever is cheapest and usable, because it
+        // is bought on a back rather than kept for the game.
+        let (_, component) = ap.first().unwrap();
+        assert_eq!(component.cost, 800);
+    }
+
+    #[test]
+    fn two_are_both_and_more_are_all() {
+        assert_eq!(all_or_both(2), "both");
+        assert_eq!(all_or_both(3), "all");
+        assert_eq!(all_or_both(5), "all");
     }
 }

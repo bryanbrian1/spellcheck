@@ -10,7 +10,7 @@
 //! reasons from one visible enemy is worse than a check that says nothing.
 
 use super::tags::{Answer, DamageType, Tags};
-use super::{count_word, list, pick, Priority, Suggestion, TeamView};
+use super::{all_or_both, count_word, list, pick, Priority, Suggestion, TeamView};
 
 /// Below this many visible enemies, the damage split is not a reading of the
 /// enemy team — it is a reading of whoever happened to lock in first.
@@ -150,10 +150,11 @@ fn antiheal(tags: &Tags, enemy: &TeamView<'_>, ours: DamageType) -> Vec<Suggesti
         .map(|(id, item)| {
             let reason = if hurry {
                 format!(
-                    "{} all heal. With {} of them, antiheal is not a late \
+                    "{} {} heal. With {} of them, antiheal is not a late \
                      purchase — the component pays for itself the first time a \
                      fight goes long.",
                     list(&healers),
+                    all_or_both(healers.len()),
                     count_word(healers.len())
                 )
             } else {
@@ -191,10 +192,11 @@ fn tenacity(tags: &Tags, enemy: &TeamView<'_>, ours: DamageType) -> Vec<Suggesti
                 id,
                 Priority::Situational,
                 format!(
-                    "{} all bring hard crowd control. Tenacity shortens every one \
+                    "{} {} bring hard crowd control. Tenacity shortens every one \
                      of those, which matters more than the resist when the thing \
                      killing you is being unable to move.",
-                    list(&controllers)
+                    list(&controllers),
+                    all_or_both(controllers.len())
                 ),
             )
         })
