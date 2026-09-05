@@ -23,7 +23,10 @@ use tokio::sync::mpsc;
 use build_data::config::CONFIG_FILE_NAME;
 use lcu::session::Comp;
 use lcu::{ChampSelectEvent, LockedChampion, WatcherConfig};
-use recommend::{enemy_threat, team_gaps, Suggestion, Tags, TeamView};
+use live::{GameEvent, GameSnapshot, LiveWatcherConfig};
+use recommend::{
+    enemy_threat, game_state, standing, team_gaps, Standing, Suggestion, Tags, TeamView,
+};
 
 pub use build_data::{
     BuildDataProvider, BuildLookup, BuildRequest, ChampionBuild, ProviderConfig, ProviderError,
@@ -90,6 +93,12 @@ pub const CHAMP_SELECT_BUILD_EVENT: &str = "lcu:build";
 /// either re-fetching the build nine times or holding the suggestions back
 /// until they were stale.
 pub const CHAMP_SELECT_SUGGESTIONS_EVENT: &str = "lcu:suggestions";
+
+/// Where the state of a game in progress reaches the UI.
+///
+/// A separate stream from the champ select ones, fed by a separate watcher,
+/// because the two are never live at the same time.
+pub const GAME_STATE_EVENT: &str = "game:state";
 
 /// A build looked up because the client said so rather than because the user
 /// typed something. `lookup` and `error` are exclusive, and "this source has
@@ -164,6 +173,88 @@ fn suggestions_for(champion_id: u32, comp: &Comp) -> Option<ChampSelectSuggestio
     })
 }
 
+/// What the third check made of a game in progress.
+///
+/// `standing` is measured and carries its numbers; the two suggestion lists
+/// are rules and carry none. They travel in one payload because the screen
+/// draws them together, not because they are the same kind of claim.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InGameState {
+    /// Our champion, by display name — the only name the live API knows.
+    pub champion: Option<String>,
+    pub level: u32,
+    /// Seconds since the game started.
+    pub game_time: f64,
+    /// `None` in a mode that assigns no lanes, or while spectating.
+    pub standing: Option<Standing>,
+    /// Check one, re-run against an enemy team that is now fully visible.
+    pub threat: Vec<Suggestion>,
+    /// Check three.
+    pub state: Vec<Suggestion>,
+    pub item_names: HashMap<u32, String>,
+}
+
+/// What the live watcher's news looks like by the time it reaches the UI.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(tag = "event", rename_all = "camelCase")]
+pub enum InGameUpdate {
+    /// No game is running. The ordinary state, and the one the screen opens on.
+    NoGame,
+    Playing(Box<InGameState>),
+}
+
+/// Run the checks that a game in progress makes answerable.
+///
+/// Check one runs again here, and it is worth saying why: in champ select the
+/// enemy team may be hidden entirely, so the damage split often could not be
+/// called. In game every champion is visible, so the same check finally has
+/// the whole picture. Check two is not re-run — your own team's shape was
+/// settled at champ select and no item changes it.
+fn in_game_state(snapshot: &GameSnapshot) -> InGameState {
+    let tags = Tags::get();
+
+    let us = snapshot.local_player();
+    let ours = us.and_then(|player| tags.champion_by_name(&player.champion_name));
+
+    let threat = match ours {
+        Some(ours) => enemy_threat(
+            tags,
+            &TeamView::new(
+                snapshot
+                    .enemies()
+                    .iter()
+                    .map(|player| tags.champion_by_name(&player.champion_name)),
+            ),
+            ours.damage_type,
+        ),
+        // No tags for our own champion means no damage type to filter items
+        // by, and nothing honest to say.
+        None => Vec::new(),
+    };
+
+    let state = game_state(tags, snapshot);
+
+    let item_names = threat
+        .iter()
+        .chain(&state)
+        .filter_map(|suggestion| {
+            let item = tags.item(suggestion.item_id)?;
+            Some((suggestion.item_id, item.name.clone()))
+        })
+        .collect();
+
+    InGameState {
+        champion: us.map(|player| player.champion_name.clone()),
+        level: us.map(|player| player.level).unwrap_or(0),
+        game_time: snapshot.game_time,
+        standing: standing(snapshot),
+        threat,
+        state,
+        item_names,
+    }
+}
+
 /// Boot the desktop app.
 ///
 /// One window, one piece of managed state. The provider is chosen from config
@@ -212,6 +303,14 @@ fn spawn_champ_select(handle: &AppHandle, service: Arc<BuildService>) {
     let handle = handle.clone();
 
     tauri::async_runtime::spawn(lcu::watch(WatcherConfig::default(), sender));
+
+    // The live watcher is gated on this. While it holds false that task does
+    // no work whatsoever — it is asleep on the channel, not polling slowly —
+    // which is what makes an in-game poll loop affordable at all. The LCU
+    // layer already knows whether League is open, so nothing else has to look.
+    let (launcher_running, launcher_gate) = tokio::sync::watch::channel(false);
+    spawn_live_game(&handle, launcher_gate);
+
     tauri::async_runtime::spawn(async move {
         // The two halves of a suggestion arrive separately and in either
         // order: you can lock in before the enemy team is visible, or after.
@@ -224,6 +323,12 @@ fn spawn_champ_select(handle: &AppHandle, service: Arc<BuildService>) {
             // The UI shows "League isn't running" from this, so every state
             // goes out, not just the interesting one.
             let _ = handle.emit(CHAMP_SELECT_STATUS_EVENT, &event);
+
+            // Every state the watcher reports also answers "is League open?",
+            // which is the gate the live task waits on. Read before the match
+            // below consumes the event. A send failure means that task is
+            // gone, which is not fatal to this one.
+            let _ = launcher_running.send(!matches!(&event, ChampSelectEvent::ClientOffline));
 
             let recheck = match event {
                 ChampSelectEvent::Locked(champion) => {
@@ -259,6 +364,47 @@ fn spawn_champ_select(handle: &AppHandle, service: Arc<BuildService>) {
                     let _ = handle.emit(CHAMP_SELECT_SUGGESTIONS_EVENT, suggestions);
                 }
             }
+        }
+    });
+}
+
+/// Watch the game itself, and run the third check over what it says.
+///
+/// Gated on `launcher_running`: this task does nothing at all until League is
+/// open. See [`live::watcher`] for why that gate is the whole reason an
+/// in-game poll loop is affordable.
+fn spawn_live_game(handle: &AppHandle, launcher_running: tokio::sync::watch::Receiver<bool>) {
+    // A reading every half-minute at most. A buffer this size is already
+    // generous; a full one would mean the UI thread had stopped entirely.
+    let (sender, mut receiver) = mpsc::channel(8);
+    let handle = handle.clone();
+
+    tauri::async_runtime::spawn(live::watch(
+        LiveWatcherConfig::default(),
+        launcher_running,
+        sender,
+    ));
+
+    tauri::async_runtime::spawn(async move {
+        // Every reading goes out. Deduplicating here would not work: the game
+        // clock moves on every poll, so no two payloads are ever equal, and
+        // stripping the clock out to compare would mean showing a time that
+        // stopped updating.
+        //
+        // The two halves of this payload change at completely different
+        // rates — the clock every half-minute, the advice a handful of times
+        // a game — so they are deduplicated where they are drawn rather than
+        // here. The screen updates its header every time and rewrites the
+        // suggestion blocks only when they actually differ.
+        while let Some(event) = receiver.recv().await {
+            let update = match event {
+                GameEvent::NoGame => InGameUpdate::NoGame,
+                GameEvent::Snapshot(snapshot) => {
+                    InGameUpdate::Playing(Box::new(in_game_state(&snapshot)))
+                }
+            };
+
+            let _ = handle.emit(GAME_STATE_EVENT, &update);
         }
     });
 }
@@ -468,5 +614,114 @@ mod suggestion_tests {
             assert_ne!(item.damage, Some(DamageType::Ap), "{}", item.name);
             assert_eq!(suggestion.source, SuggestionSource::Rule);
         }
+    }
+}
+
+#[cfg(test)]
+mod in_game_tests {
+    use super::*;
+    use recommend::{Footing, SuggestionSource};
+    use serde_json::json;
+
+    /// Ahri mid against a fully visible, entirely physical enemy team — the
+    /// situation champ select could not read in a blind pick queue.
+    fn game(our_gold: u32, their_gold: u32) -> GameSnapshot {
+        let player = |name: &str, team: &str, position: &str, gold: u32| {
+            json!({
+                "championName": name, "team": team, "position": position,
+                "riotId": format!("{name}#EUW"), "level": 11, "isDead": false,
+                "items": [{ "itemID": 1, "price": gold, "count": 1 }],
+                "scores": { "kills": 2, "deaths": 4, "assists": 1, "creepScore": 90 },
+            })
+        };
+        GameSnapshot::from_json(&json!({
+            "activePlayer": { "riotId": "Ahri#EUW", "currentGold": 1340.0 },
+            "allPlayers": [
+                player("Ahri", "ORDER", "MIDDLE", our_gold),
+                player("Leona", "ORDER", "UTILITY", 2000),
+                player("Zed", "CHAOS", "MIDDLE", their_gold),
+                player("Darius", "CHAOS", "TOP", 5000),
+                player("Draven", "CHAOS", "BOTTOM", 5000),
+            ],
+            "gameData": { "gameTime": 1104.5, "gameMode": "CLASSIC" },
+        }))
+        .unwrap()
+    }
+
+    #[test]
+    fn the_enemy_check_finally_sees_the_whole_team() {
+        let state = in_game_state(&game(3000, 8000));
+
+        // In champ select this team may have been five hidden seats. In game
+        // it never is, so the damage split can actually be called.
+        assert!(
+            !state.threat.is_empty(),
+            "three physical-damage enemies in plain sight and nothing to say"
+        );
+        assert_eq!(state.champion.as_deref(), Some("Ahri"));
+        assert_eq!(state.level, 11);
+    }
+
+    #[test]
+    fn being_behind_is_measured_and_the_advice_beside_it_is_not() {
+        let state = in_game_state(&game(3000, 8000));
+
+        let standing = state.standing.expect("Zed is in our lane");
+        assert_eq!(standing.footing, Footing::Behind);
+        assert_eq!(standing.opponent, "Zed");
+        assert_eq!(standing.gold_delta, -5000);
+        assert_eq!(standing.gold_in_hand, 1340);
+
+        assert!(!state.state.is_empty(), "five thousand down and no advice");
+        for suggestion in state.threat.iter().chain(&state.state) {
+            assert_eq!(suggestion.source, SuggestionSource::Rule);
+            assert!(
+                !suggestion.reason.chars().any(|c| c.is_ascii_digit()),
+                "the standing carries the number, not the sentence: {}",
+                suggestion.reason
+            );
+        }
+    }
+
+    #[test]
+    fn an_even_game_still_answers_the_enemy_team() {
+        let state = in_game_state(&game(5000, 5200));
+
+        assert_eq!(state.standing.unwrap().footing, Footing::Even);
+        assert!(state.state.is_empty(), "an even game changed what to buy");
+        assert!(
+            !state.threat.is_empty(),
+            "the enemy composition is worth answering however the game is going"
+        );
+    }
+
+    #[test]
+    fn every_suggestion_can_be_labelled() {
+        let state = in_game_state(&game(3000, 8000));
+        for suggestion in state.threat.iter().chain(&state.state) {
+            assert!(
+                state.item_names.contains_key(&suggestion.item_id),
+                "item {} reaches the UI with no name to render",
+                suggestion.item_id
+            );
+        }
+    }
+
+    #[test]
+    fn spectating_produces_a_payload_with_nothing_claimed_in_it() {
+        let spectated = GameSnapshot::from_json(&json!({
+            "allPlayers": [{
+                "championName": "Ahri", "team": "ORDER", "position": "MIDDLE",
+                "items": [], "scores": {},
+            }],
+            "gameData": { "gameTime": 300.0 },
+        }))
+        .unwrap();
+
+        let state = in_game_state(&spectated);
+        assert!(state.champion.is_none());
+        assert!(state.standing.is_none());
+        assert!(state.threat.is_empty());
+        assert!(state.state.is_empty());
     }
 }

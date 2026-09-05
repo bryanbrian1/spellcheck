@@ -68,53 +68,19 @@
   <!-- ============ IN GAME — preview, phase 3 ============ -->
   <section class="screen" id="s-game">
     <div class="hdr">
-      <div class="portrait">AH</div>
+      <div class="portrait" id="game-portrait">&mdash;</div>
       <div class="hdr-main">
-        <div class="hdr-name">Ahri</div>
-        <div class="hdr-sub">18:24 · level 11</div>
+        <div class="hdr-name" id="game-name">In game</div>
+        <div class="hdr-sub" id="game-sub">Waiting for a game</div>
       </div>
-      <span class="pill preview">Preview</span>
+      <span class="pill off" id="game-pill">No game</span>
     </div>
 
-    <div class="body">
-      <p class="note">Sample data. Needs the Live Client Data API, which is phase 3.</p>
+    <div class="body" id="game-body"></div>
 
-      <div class="state behind">
-        <span class="state-n">−1,850g</span>
-        <span class="state-t"><b>Behind Syndra</b> by a level and an item. Build for components you can finish.</span>
-      </div>
-
-      <div class="block">
-        <div class="rail rule"></div>
-        <div class="block-in">
-          <div class="block-hd"><span class="block-t">Buy now</span><span class="meta">1,340g available</span></div>
-          <div class="sug">
-            <div class="tile rule">Fiend</div>
-            <div class="sug-txt"><b>Fiendish Codex + Boots</b>
-              <span class="sug-why">Finishable this trip. Saving for Shadowflame leaves you holding gold for six more minutes.</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="block">
-        <div class="rail mid"></div>
-        <div class="block-in">
-          <div class="block-hd"><span class="block-t">Adjusted path</span><span class="meta">revised from behind</span></div>
-          <div class="seq">
-            <div class="seq-i"><span class="seq-n">1</span><div class="tile ghost">✓</div><span class="seq-lbl">Malignance</span></div>
-            <div class="seq-i"><span class="seq-n">2</span><div class="tile">Sorc</div><span class="seq-lbl">Sorcerer's</span></div>
-            <div class="seq-i"><span class="seq-n">3</span><div class="tile rule">Morell</div><span class="seq-lbl">Morello</span></div>
-            <div class="seq-i"><span class="seq-n">4</span><div class="tile">Shadow</div><span class="seq-lbl">Shadowflame</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="thin">
-        <b>Thin data example.</b> When a matchup has fewer than 100 games, the aggregate build shows instead, labelled as such — never a win rate off 31 games presented as fact.
-      </div>
+    <div class="foot">
+      <button class="btn" id="game-import-items" disabled>Import items</button>
     </div>
-
-    <div class="foot"><button class="btn" disabled>Import items</button></div>
   </section>
 
 </div>

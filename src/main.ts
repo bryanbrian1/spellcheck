@@ -117,6 +117,37 @@ interface ChampSelectSuggestions {
   itemNames: Record<string, string>;
 }
 
+/**
+ * `game:state` — the third check, over a game in progress.
+ *
+ * `standing` is measured and carries its numbers; the two suggestion lists
+ * are rules and carry none. That split is why the banner has its own style
+ * rather than either rail: it is neither a statistic drawn from thousands of
+ * games nor an argument made in words.
+ */
+interface Standing {
+  footing: "behind" | "even" | "ahead";
+  opponent: string;
+  /** Your spent gold minus theirs. Negative means they are ahead. */
+  goldDelta: number;
+  levelDelta: number;
+  goldInHand: number;
+}
+
+interface InGameState {
+  champion: string | null;
+  level: number;
+  gameTime: number;
+  standing: Standing | null;
+  /** Check one, re-run now the whole enemy team is visible. */
+  threat: Suggestion[];
+  /** Check three. */
+  state: Suggestion[];
+  itemNames: Record<string, string>;
+}
+
+type InGameUpdate = { event: "noGame" } | ({ event: "playing" } & InGameState);
+
 /** `withGlobalTauri` puts the bridge on window, so we need no npm package. */
 declare global {
   interface Window {
@@ -186,6 +217,12 @@ const railFor = (stats?: BuildStats): string => {
 const escape = (raw: string): string =>
   raw.replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string);
+
+/** Game clock as the scoreboard shows it. */
+const clock = (seconds: number): string => {
+  const whole = Math.max(0, Math.floor(seconds));
+  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
+};
 
 /** Providers may or may not resolve names; ids are the guaranteed field. */
 const tileLabel = (id: number, name?: string): string =>
@@ -266,6 +303,34 @@ const suggestionBlock = (
   }
 
   return block(title, "reasoning", groups.map((g) => sugRow(g, names)).join(""), "rail rule");
+};
+
+/**
+ * The standing banner.
+ *
+ * This one *may* carry a number, and is the only thing in the app besides a
+ * statistic that does. It is a measurement of the game being played rather
+ * than a sample drawn from many, so it wears neither rail and gets its own
+ * style — and "even" is deliberately not the colour that means ahead, because
+ * level with your opponent is not good news.
+ */
+const standingBlock = (standing: Standing): string => {
+  const { footing, opponent, goldDelta, levelDelta } = standing;
+  const gold =
+    footing === "even"
+      ? "even"
+      : `${goldDelta < 0 ? "\u2212" : "+"}${Math.abs(goldDelta).toLocaleString()}g`;
+
+  const lead = { behind: "Behind", even: "Level with", ahead: "Ahead of" }[footing];
+  const levels =
+    levelDelta === 0
+      ? ""
+      : ` \u00b7 ${Math.abs(levelDelta)} level${Math.abs(levelDelta) === 1 ? "" : "s"} ${levelDelta < 0 ? "down" : "up"}`;
+
+  return `<div class="state ${escape(footing)}">
+    <span class="state-n">${escape(gold)}</span>
+    <span class="state-t"><b>${escape(lead)} ${escape(opponent)}</b>${escape(levels)}</span>
+  </div>`;
 };
 
 const runeBlock = (page: RunePage): string => {
@@ -623,9 +688,61 @@ const onSuggestions = (payload: ChampSelectSuggestions): void => {
   paintSelect();
 };
 
+/* ---------- in game ---------- */
+
+const gamePortrait = el<HTMLDivElement>("game-portrait");
+const gameName = el<HTMLDivElement>("game-name");
+const gameSub = el<HTMLDivElement>("game-sub");
+const gamePill = el<HTMLSpanElement>("game-pill");
+const gameBody = el<HTMLDivElement>("game-body");
+
+/* The header moves every time we look; the advice moves a handful of times a
+   game. Rewriting the blocks on every reading would redraw the screen every
+   thirty seconds for nothing, so the last rendering is kept and compared. */
+let lastGameBlocks = "";
+
+const paintGameBody = (html: string): void => {
+  if (html === lastGameBlocks) return;
+  lastGameBlocks = html;
+  gameBody.innerHTML = html;
+};
+
+const onGameState = (update: InGameUpdate): void => {
+  if (update.event === "noGame") {
+    gamePortrait.textContent = "\u2014";
+    gameName.textContent = "In game";
+    gameSub.textContent = "No game running";
+    gamePill.textContent = "No game";
+    gamePill.className = "pill off";
+    paintGameBody(emptyHtml("This screen fills itself once a game starts."));
+    return;
+  }
+
+  const champion = update.champion;
+  gamePortrait.textContent = champion ? champion.slice(0, 2).toUpperCase() : "\u2014";
+  gameName.textContent = champion ?? "In game";
+  gameSub.textContent = `${clock(update.gameTime)}${update.level ? ` \u00b7 level ${update.level}` : ""}`;
+  gamePill.textContent = "Live";
+  gamePill.className = "pill";
+
+  const blocks = [
+    update.standing ? standingBlock(update.standing) : "",
+    suggestionBlock("Because you are behind", update.state, update.itemNames),
+    suggestionBlock("Against this team", update.threat, update.itemNames),
+  ]
+    .filter(Boolean)
+    .join("");
+
+  // Spectating, or a mode with no lanes and a champion we have no tags for.
+  paintGameBody(
+    blocks || emptyHtml("Nothing to say about this game yet."),
+  );
+};
+
 listen<LcuStatus>("lcu:status", onStatus);
 listen<ChampSelectBuild>("lcu:build", onBuild);
 listen<ChampSelectSuggestions>("lcu:suggestions", onSuggestions);
+listen<InGameUpdate>("game:state", onGameState);
 
 // Attribution for whichever source is live. Rendered verbatim, never branched on.
 void invoke<string>("source_label")
