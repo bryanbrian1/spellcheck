@@ -318,8 +318,9 @@ const tile = (
   name: string | undefined,
   cls = "tile",
   kind: IconKind = "item",
+  title?: string,
 ): string =>
-  `<div class="${cls}" data-icon="${kind}:${id}" title="${escape(name ?? String(id))}">${tileLabel(id, name)}</div>`;
+  `<div class="${cls}" data-icon="${kind}:${id}" title="${escape(title ?? name ?? String(id))}">${tileLabel(id, name)}</div>`;
 
 /* ---------- blocks ---------- */
 
@@ -471,11 +472,43 @@ const coreBlock = (group: ItemGroup): string => {
   );
 };
 
+/** A tile's tooltip when it is one of several alternatives: its own name and
+ *  its own sample, since the header can no longer speak for it. */
+const itemTitle = (item: ItemRef, stats?: BuildStats): string => {
+  const name = item.name ?? `#${item.id}`;
+  const wr = percent(stats?.winRate);
+  const games = count(stats?.games);
+  const tail = [wr, games && `${games} games`].filter(Boolean).join(" · ");
+  return tail ? `${name} · ${tail}` : name;
+};
+
+/**
+ * A row of items.
+ *
+ * Two different shapes arrive here and they need opposite treatment.
+ * "Starting items" is one group holding several items you buy together.
+ * "Boots" and "Situational" are several groups of *one item each* — a menu of
+ * alternatives — and rendering only the first turned a menu into a single
+ * suggestion, throwing away everything the provider offered.
+ */
 const itemRowBlock = (title: string, groups: ItemGroup[]): string => {
   const first = groups[0];
   if (!first) return "";
-  const row = first.items.map((item) => tile(item.id, item.name)).join("");
-  return block(title, statLine(first.stats), `<div class="row">${row}</div>`, railFor(first.stats));
+
+  const single = groups.length === 1;
+  const shown = single
+    ? first.items.map((item) => ({ item, stats: first.stats }))
+    : groups.flatMap((group) => group.items.map((item) => ({ item, stats: group.stats })));
+
+  const row = shown
+    .map(({ item, stats }) => tile(item.id, item.name, "tile", "item", itemTitle(item, stats)))
+    .join("");
+
+  // One win rate in the header would read as covering every item beside it,
+  // which is exactly the kind of borrowed authority the colour law forbids.
+  // With alternatives, the header counts them and each tile carries its own.
+  const meta = single ? statLine(first.stats) : `${shown.length} options`;
+  return block(title, meta, `<div class="row">${row}</div>`, railFor(first.stats));
 };
 
 const skillBlock = (skills: SkillPlan): string => {
