@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Nidalee",
+    "name": "Nidalee",
+    "id": 76
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 7,
+    "winRate": 0.4286
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 7,
+        "winRate": 0.4286
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 4,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 2,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6655
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          6620,
+          6617,
+          3107
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6655,
+          6620,
+          3190
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8100,
+      "primary": [
+        8214,
+        8226,
+        8210,
+        8237
+      ],
+      "secondary": [
+        8143,
+        8135
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 3,
+      "winRate": 0.3333
+    },
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8300,
+      "primary": [
+        8214,
+        8226,
+        8210,
+        8237
+      ],
+      "secondary": [
+        8304,
+        8347
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 2,
+      "winRate": 0
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        7
+      ],
+      "games": 7,
+      "winRate": 0.4286
+    }
+  ],
+  "skills": {
+    "priority": [
+      "E",
+      "Q",
+      "W"
+    ],
+    "order": [
+      "W",
+      "E",
+      "Q",
+      "E",
+      "E"
+    ]
+  }
+}

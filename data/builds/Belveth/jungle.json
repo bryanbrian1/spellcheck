@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Belveth",
+    "name": "Bel'Veth",
+    "id": 200
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 29,
+    "winRate": 0.4483
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1102
+        ],
+        "games": 23,
+        "winRate": 0.4348
+      },
+      {
+        "items": [
+          1102,
+          2003
+        ],
+        "games": 4,
+        "winRate": 0.5
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 17,
+        "winRate": 0.4118
+      },
+      {
+        "items": [
+          3111
+        ],
+        "games": 4,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 3,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6672,
+          3153,
+          6333
+        ],
+        "games": 4,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6672,
+          3124,
+          6333
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          6672,
+          3153
+        ],
+        "games": 3,
+        "winRate": 0
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          6333
+        ],
+        "games": 4,
+        "winRate": 0.75
+      },
+      {
+        "items": [
+          3026
+        ],
+        "games": 3,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3036
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3153
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3302
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6675
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8010,
+        9111,
+        9104,
+        8299
+      ],
+      "secondary": [
+        8321,
+        8347
+      ],
+      "shards": [
+        5008,
+        5010,
+        5001
+      ],
+      "games": 5,
+      "winRate": 0.8
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8100,
+      "primary": [
+        8005,
+        9111,
+        9103,
+        8014
+      ],
+      "secondary": [
+        8143,
+        8105
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 4,
+      "winRate": 0.25
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 29,
+      "winRate": 0.4483
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

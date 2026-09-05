@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Nami",
+    "name": "Nami",
+    "id": 267
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 89,
+    "winRate": 0.4719
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 88,
+        "winRate": 0.4773
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 35,
+        "winRate": 0.4
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 25,
+        "winRate": 0.44
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 24,
+        "winRate": 0.5833
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6620,
+          6616
+        ],
+        "games": 10,
+        "winRate": 0.7
+      },
+      {
+        "items": [
+          6616,
+          6620
+        ],
+        "games": 10,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          6620,
+          6617
+        ],
+        "games": 9,
+        "winRate": 0.3333
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3102
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          2065
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          6617
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8300,
+      "primary": [
+        8214,
+        8226,
+        8234,
+        8236
+      ],
+      "secondary": [
+        8304,
+        8316
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 16,
+      "winRate": 0.5
+    },
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8214,
+        8226,
+        8210,
+        8237
+      ],
+      "secondary": [
+        9105,
+        8017
+      ],
+      "shards": [
+        5007,
+        5008,
+        5011
+      ],
+      "games": 8,
+      "winRate": 0.625
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        7
+      ],
+      "games": 77,
+      "winRate": 0.4675
+    },
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 12,
+      "winRate": 0.5
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "E",
+      "Q"
+    ],
+    "order": [
+      "W",
+      "E",
+      "Q",
+      "W",
+      "W"
+    ]
+  }
+}

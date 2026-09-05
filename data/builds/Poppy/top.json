@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Poppy",
+    "name": "Poppy",
+    "id": 78
+  },
+  "role": "top",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 14,
+    "winRate": 0.4286
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1054,
+          2003
+        ],
+        "games": 7,
+        "winRate": 0.4286
+      },
+      {
+        "items": [
+          1120,
+          2003
+        ],
+        "games": 6,
+        "winRate": 0.3333
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 13,
+        "winRate": 0.3846
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3068,
+          4401,
+          2525
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3068,
+          6665,
+          2525
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3161,
+          6662,
+          3065
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          6665
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8200,
+      "primary": [
+        8437,
+        8401,
+        8444,
+        8242
+      ],
+      "secondary": [
+        8226,
+        8210
+      ],
+      "shards": [
+        5008,
+        5008,
+        5013
+      ],
+      "games": 1,
+      "winRate": 1
+    },
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8200,
+      "primary": [
+        8437,
+        8401,
+        8444,
+        8242
+      ],
+      "secondary": [
+        8237,
+        8226
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 12,
+      "winRate": 0.4167
+    },
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 2,
+      "winRate": 0.5
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

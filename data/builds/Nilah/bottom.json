@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Nilah",
+    "name": "Nilah",
+    "id": 895
+  },
+  "role": "bottom",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 13,
+    "winRate": 0.7692
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1086,
+          2003
+        ],
+        "games": 9,
+        "winRate": 0.8889
+      },
+      {
+        "items": [
+          1055,
+          2003
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 13,
+        "winRate": 0.7692
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6676,
+          3031
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          3032,
+          3031,
+          3036
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6676,
+          6673,
+          3031
+        ],
+        "games": 2,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          2517
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3031
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3033
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6673
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8400,
+      "primary": [
+        8010,
+        9111,
+        9103,
+        8017
+      ],
+      "secondary": [
+        8453,
+        8473
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 2,
+      "winRate": 0.5
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8010,
+        9111,
+        9104,
+        8299
+      ],
+      "secondary": [
+        8321,
+        8347
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 2,
+      "winRate": 0.5
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 5,
+      "winRate": 0.8
+    },
+    {
+      "spells": [
+        4,
+        21
+      ],
+      "games": 5,
+      "winRate": 0.8
+    }
+  ],
+  "skills": {
+    "priority": [
+      "E",
+      "Q",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "E",
+      "E"
+    ]
+  }
+}

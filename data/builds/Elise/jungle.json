@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Elise",
+    "name": "Elise",
+    "id": 60
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 6,
+    "winRate": 0.1667
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1102
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          1101
+        ],
+        "games": 2,
+        "winRate": 0
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 6,
+        "winRate": 0.1667
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3100,
+          4645
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3100,
+          3089
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3100,
+          3089,
+          3157
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3089
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3135
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8230,
+        8275,
+        8210,
+        8232
+      ],
+      "secondary": [
+        8017,
+        9104
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 2,
+      "winRate": 0
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8200,
+      "primary": [
+        8112,
+        8126,
+        8140,
+        8105
+      ],
+      "secondary": [
+        8275,
+        8232
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 6,
+      "winRate": 0.1667
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "W",
+      "Q",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

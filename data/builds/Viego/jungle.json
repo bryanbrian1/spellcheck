@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Viego",
+    "name": "Viego",
+    "id": 234
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 45,
+    "winRate": 0.5333
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1103
+        ],
+        "games": 29,
+        "winRate": 0.4828
+      },
+      {
+        "items": [
+          1102
+        ],
+        "games": 8,
+        "winRate": 0.875
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 35,
+        "winRate": 0.5429
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 5,
+        "winRate": 0.4
+      },
+      {
+        "items": [
+          3008
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          2520,
+          6676,
+          3036
+        ],
+        "games": 8,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          6672,
+          6676,
+          6673
+        ],
+        "games": 7,
+        "winRate": 0.4286
+      },
+      {
+        "items": [
+          2520,
+          6676
+        ],
+        "games": 4,
+        "winRate": 0.5
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3031
+        ],
+        "games": 10,
+        "winRate": 0.7
+      },
+      {
+        "items": [
+          3036
+        ],
+        "games": 9,
+        "winRate": 0.5556
+      },
+      {
+        "items": [
+          6673
+        ],
+        "games": 5,
+        "winRate": 0.8
+      },
+      {
+        "items": [
+          3026
+        ],
+        "games": 2,
+        "winRate": 0.5
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8000,
+      "primary": [
+        9923,
+        8143,
+        8137,
+        8135
+      ],
+      "secondary": [
+        9111,
+        9104
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 11,
+      "winRate": 0.4545
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8000,
+      "primary": [
+        9923,
+        8143,
+        8137,
+        8135
+      ],
+      "secondary": [
+        9104,
+        9111
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 10,
+      "winRate": 0.2
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 45,
+      "winRate": 0.5333
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "W",
+      "Q",
+      "E",
+      "Q"
+    ]
+  }
+}

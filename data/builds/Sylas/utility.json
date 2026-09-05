@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Sylas",
+    "name": "Sylas",
+    "id": 517
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 15,
+    "winRate": 0.6667
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 15,
+        "winRate": 0.6667
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 15,
+        "winRate": 0.6667
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3152,
+          3157
+        ],
+        "games": 6,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          3152
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3152,
+          4645
+        ],
+        "games": 2,
+        "winRate": 0.5
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8000,
+      "primary": [
+        8112,
+        8143,
+        8141,
+        8105
+      ],
+      "secondary": [
+        9111,
+        8017
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 3,
+      "winRate": 0.6667
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8400,
+      "primary": [
+        8112,
+        8143,
+        8141,
+        8135
+      ],
+      "secondary": [
+        8473,
+        8451
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 2,
+      "winRate": 0.5
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 14,
+      "winRate": 0.6429
+    },
+    {
+      "spells": [
+        4,
+        7
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "E",
+      "Q"
+    ],
+    "order": [
+      "E",
+      "W",
+      "Q",
+      "W",
+      "W"
+    ]
+  }
+}

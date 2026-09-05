@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Blitzcrank",
+    "name": "Blitzcrank",
+    "id": 53
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 38,
+    "winRate": 0.6316
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 37,
+        "winRate": 0.6216
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 37,
+        "winRate": 0.6486
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3190
+        ],
+        "games": 6,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          3190,
+          3107
+        ],
+        "games": 4,
+        "winRate": 0.75
+      },
+      {
+        "items": [
+          3190,
+          3109
+        ],
+        "games": 4,
+        "winRate": 0.75
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          2524
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8300,
+      "secondaryStyle": 8200,
+      "primary": [
+        8351,
+        8306,
+        8345,
+        8347
+      ],
+      "secondary": [
+        8234,
+        8275
+      ],
+      "shards": [
+        5007,
+        5010,
+        5011
+      ],
+      "games": 14,
+      "winRate": 0.7143
+    },
+    {
+      "primaryStyle": 8300,
+      "secondaryStyle": 8200,
+      "primary": [
+        8351,
+        8306,
+        8345,
+        8347
+      ],
+      "secondary": [
+        8275,
+        8234
+      ],
+      "shards": [
+        5007,
+        5010,
+        5011
+      ],
+      "games": 5,
+      "winRate": 0.8
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        7
+      ],
+      "games": 20,
+      "winRate": 0.65
+    },
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 17,
+      "winRate": 0.5882
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

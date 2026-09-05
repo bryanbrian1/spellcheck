@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Yone",
+    "name": "Yone",
+    "id": 777
+  },
+  "role": "bottom",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 21,
+    "winRate": 0.1905
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1086,
+          2003
+        ],
+        "games": 16,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          1054,
+          2003
+        ],
+        "games": 3,
+        "winRate": 0
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 13,
+        "winRate": 0.2308
+      },
+      {
+        "items": [
+          3006
+        ],
+        "games": 8,
+        "winRate": 0.125
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3032,
+          6673,
+          6333
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3153,
+          6673
+        ],
+        "games": 3,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3032,
+          3031,
+          6333
+        ],
+        "games": 2,
+        "winRate": 0
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3026
+        ],
+        "games": 2,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3143
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3036
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3072
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3156
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3742
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8400,
+      "primary": [
+        8008,
+        9101,
+        9103,
+        8299
+      ],
+      "secondary": [
+        8451,
+        8444
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 2,
+      "winRate": 0.5
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8400,
+      "primary": [
+        8008,
+        9111,
+        9104,
+        8299
+      ],
+      "secondary": [
+        8444,
+        8242
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 2,
+      "winRate": 0.5
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 17,
+      "winRate": 0.2353
+    },
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 3,
+      "winRate": 0
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "W",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

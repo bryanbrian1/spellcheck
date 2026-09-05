@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Yasuo",
+    "name": "Yasuo",
+    "id": 157
+  },
+  "role": "top",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 32,
+    "winRate": 0.5
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1086,
+          2003
+        ],
+        "games": 30,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          1055,
+          2003
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          3006
+        ],
+        "games": 21,
+        "winRate": 0.5238
+      },
+      {
+        "items": [
+          1001
+        ],
+        "games": 11,
+        "winRate": 0.4545
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3153,
+          6673,
+          3033
+        ],
+        "games": 7,
+        "winRate": 0.4286
+      },
+      {
+        "items": [
+          3153,
+          6673,
+          3036
+        ],
+        "games": 5,
+        "winRate": 0.8
+      },
+      {
+        "items": [
+          3153,
+          6673
+        ],
+        "games": 5,
+        "winRate": 0.4
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          6333
+        ],
+        "games": 4,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3026
+        ],
+        "games": 2,
+        "winRate": 0
+      },
+      {
+        "items": [
+          2504
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3033
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8400,
+      "primary": [
+        8008,
+        9111,
+        9104,
+        8299
+      ],
+      "secondary": [
+        8401,
+        8473
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 10,
+      "winRate": 0.7
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8400,
+      "primary": [
+        8008,
+        9111,
+        9104,
+        8017
+      ],
+      "secondary": [
+        8401,
+        8473
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 6,
+      "winRate": 0.5
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        21
+      ],
+      "games": 14,
+      "winRate": 0.6429
+    },
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 14,
+      "winRate": 0.3571
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "Q",
+      "W",
+      "Q"
+    ]
+  }
+}

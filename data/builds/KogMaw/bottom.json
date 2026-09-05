@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "KogMaw",
+    "name": "Kog'Maw",
+    "id": 96
+  },
+  "role": "bottom",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 51,
+    "winRate": 0.6275
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 24,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          1086,
+          2003
+        ],
+        "games": 24,
+        "winRate": 0.5833
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 39,
+        "winRate": 0.641
+      },
+      {
+        "items": [
+          3020
+        ],
+        "games": 6,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 4,
+        "winRate": 0.75
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          2510,
+          4645,
+          4646
+        ],
+        "games": 4,
+        "winRate": 0.75
+      },
+      {
+        "items": [
+          2510,
+          4645,
+          3157
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          6672
+        ],
+        "games": 3,
+        "winRate": 0
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3089
+        ],
+        "games": 4,
+        "winRate": 0.75
+      },
+      {
+        "items": [
+          2510
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          3102
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          3087
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3153
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6665
+        ],
+        "games": 2,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8200,
+      "primary": [
+        8005,
+        8009,
+        9104,
+        8014
+      ],
+      "secondary": [
+        8236,
+        8226
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 13,
+      "winRate": 0.7692
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8200,
+      "primary": [
+        8008,
+        9111,
+        9103,
+        8299
+      ],
+      "secondary": [
+        8234,
+        8236
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 7,
+      "winRate": 0.8571
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        6
+      ],
+      "games": 19,
+      "winRate": 0.6316
+    },
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 13,
+      "winRate": 0.6923
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "Q",
+      "E"
+    ],
+    "order": [
+      "W",
+      "E",
+      "Q",
+      "W",
+      "W"
+    ]
+  }
+}

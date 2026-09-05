@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Annie",
+    "name": "Annie",
+    "id": 1
+  },
+  "role": "middle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 14,
+    "winRate": 0.6429
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 14,
+        "winRate": 0.6429
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 11,
+        "winRate": 0.6364
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3118,
+          4646,
+          4645
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3118
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3118,
+          3152
+        ],
+        "games": 2,
+        "winRate": 0.5
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3089
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3135
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8200,
+      "primary": [
+        8112,
+        8139,
+        8140,
+        8106
+      ],
+      "secondary": [
+        8226,
+        8237
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 2,
+      "winRate": 1
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8200,
+      "primary": [
+        8112,
+        8126,
+        8140,
+        8105
+      ],
+      "secondary": [
+        8224,
+        8234
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 9,
+      "winRate": 0.4444
+    },
+    {
+      "spells": [
+        4,
+        6
+      ],
+      "games": 3,
+      "winRate": 1
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "Q",
+      "E"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "Q",
+      "W",
+      "Q"
+    ]
+  }
+}

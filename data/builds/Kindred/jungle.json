@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Kindred",
+    "name": "Kindred",
+    "id": 203
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 30,
+    "winRate": 0.3667
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1101
+        ],
+        "games": 16,
+        "winRate": 0.375
+      },
+      {
+        "items": [
+          1101,
+          2003
+        ],
+        "games": 13,
+        "winRate": 0.3846
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          3047
+        ],
+        "games": 10,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          1001
+        ],
+        "games": 7,
+        "winRate": 0.2857
+      },
+      {
+        "items": [
+          3111
+        ],
+        "games": 5,
+        "winRate": 0.4
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3078,
+          6676,
+          3036
+        ],
+        "games": 7,
+        "winRate": 0.2857
+      },
+      {
+        "items": [
+          3078,
+          6676
+        ],
+        "games": 4,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          6672,
+          6676,
+          3033
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3031
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          2523
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3036
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8005,
+        9111,
+        9104,
+        8014
+      ],
+      "secondary": [
+        8304,
+        8347
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 8,
+      "winRate": 0.375
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8005,
+        9111,
+        9103,
+        8014
+      ],
+      "secondary": [
+        8304,
+        8347
+      ],
+      "shards": [
+        5005,
+        5008,
+        5013
+      ],
+      "games": 3,
+      "winRate": 0.6667
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 30,
+      "winRate": 0.3667
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "W",
+      "Q",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

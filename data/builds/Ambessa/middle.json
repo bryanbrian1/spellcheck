@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Ambessa",
+    "name": "Ambessa",
+    "id": 799
+  },
+  "role": "middle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 16,
+    "winRate": 0.375
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1054,
+          2003
+        ],
+        "games": 6,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          1120,
+          2003
+        ],
+        "games": 5,
+        "winRate": 0.6
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 13,
+        "winRate": 0.3077
+      },
+      {
+        "items": [
+          3008
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6692
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          6692,
+          6699,
+          6333
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6698,
+          3033,
+          6333
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3156
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          6694
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8400,
+      "primary": [
+        8112,
+        8143,
+        8137,
+        8135
+      ],
+      "secondary": [
+        8444,
+        8401
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 3,
+      "winRate": 0.3333
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8400,
+      "primary": [
+        8112,
+        8143,
+        8140,
+        8106
+      ],
+      "secondary": [
+        8401,
+        8444
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 2,
+      "winRate": 0
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 10,
+      "winRate": 0.3
+    },
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 6,
+      "winRate": 0.5
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "W",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

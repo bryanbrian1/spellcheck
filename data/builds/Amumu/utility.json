@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Amumu",
+    "name": "Amumu",
+    "id": 32
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 5,
+    "winRate": 0.4
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 5,
+        "winRate": 0.4
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 5,
+        "winRate": 0.4
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3050,
+          8020
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3190,
+          3109,
+          2525
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          4005
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8100,
+      "primary": [
+        8439,
+        8463,
+        8473,
+        8242
+      ],
+      "secondary": [
+        8126,
+        8106
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 2,
+      "winRate": 0.5
+    },
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8100,
+      "primary": [
+        8439,
+        8463,
+        8473,
+        8242
+      ],
+      "secondary": [
+        8106,
+        8141
+      ],
+      "shards": [
+        5007,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 3,
+      "winRate": 0
+    },
+    {
+      "spells": [
+        4,
+        7
+      ],
+      "games": 2,
+      "winRate": 1
+    }
+  ],
+  "skills": {
+    "priority": [
+      "E",
+      "Q",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "E",
+      "E"
+    ]
+  }
+}

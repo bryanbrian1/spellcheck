@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Zed",
+    "name": "Zed",
+    "id": 238
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 10,
+    "winRate": 0.3
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1101
+        ],
+        "games": 5,
+        "winRate": 0.6
+      },
+      {
+        "items": [
+          1102
+        ],
+        "games": 3,
+        "winRate": 0
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 9,
+        "winRate": 0.2222
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6699,
+          6696
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6699,
+          6696,
+          6694
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6699,
+          6698,
+          6694
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          6333
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6695
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          2517
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3814
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          6694
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          6696
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8300,
+      "secondaryStyle": 8000,
+      "primary": [
+        8369,
+        8321,
+        8313,
+        8347
+      ],
+      "secondary": [
+        9105,
+        8017
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 2,
+      "winRate": 0
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8000,
+      "primary": [
+        8112,
+        8143,
+        8137,
+        8135
+      ],
+      "secondary": [
+        9111,
+        8014
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 10,
+      "winRate": 0.3
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

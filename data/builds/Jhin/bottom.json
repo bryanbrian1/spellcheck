@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Jhin",
+    "name": "Jhin",
+    "id": 202
+  },
+  "role": "bottom",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 106,
+    "winRate": 0.4434
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1120,
+          2003
+        ],
+        "games": 56,
+        "winRate": 0.3571
+      },
+      {
+        "items": [
+          1055,
+          2003
+        ],
+        "games": 27,
+        "winRate": 0.5556
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 91,
+        "winRate": 0.4286
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 10,
+        "winRate": 0.7
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 3,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6697,
+          3046,
+          3031
+        ],
+        "games": 13,
+        "winRate": 0.3077
+      },
+      {
+        "items": [
+          6697
+        ],
+        "games": 10,
+        "winRate": 0.7
+      },
+      {
+        "items": [
+          6697,
+          6676,
+          3031
+        ],
+        "games": 9,
+        "winRate": 0.5556
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3036
+        ],
+        "games": 19,
+        "winRate": 0.5263
+      },
+      {
+        "items": [
+          3094
+        ],
+        "games": 15,
+        "winRate": 0.5333
+      },
+      {
+        "items": [
+          3031
+        ],
+        "games": 14,
+        "winRate": 0.4286
+      },
+      {
+        "items": [
+          3033
+        ],
+        "games": 6,
+        "winRate": 0.1667
+      },
+      {
+        "items": [
+          3026
+        ],
+        "games": 4,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          6694
+        ],
+        "games": 2,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8021,
+        8009,
+        9103,
+        8017
+      ],
+      "secondary": [
+        8321,
+        8313
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 8,
+      "winRate": 0.125
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8021,
+        8009,
+        9103,
+        8017
+      ],
+      "secondary": [
+        8321,
+        8347
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 7,
+      "winRate": 0.4286
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        21
+      ],
+      "games": 70,
+      "winRate": 0.4857
+    },
+    {
+      "spells": [
+        1,
+        4
+      ],
+      "games": 14,
+      "winRate": 0.4286
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "Q",
+      "W",
+      "Q",
+      "E",
+      "Q"
+    ]
+  }
+}

@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "RekSai",
+    "name": "Rek'Sai",
+    "id": 421
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 24,
+    "winRate": 0.5
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1101
+        ],
+        "games": 14,
+        "winRate": 0.6429
+      },
+      {
+        "items": [
+          1103,
+          2003
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 13,
+        "winRate": 0.3846
+      },
+      {
+        "items": [
+          3111
+        ],
+        "games": 5,
+        "winRate": 0.6
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 4,
+        "winRate": 0.75
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3748,
+          3161,
+          6333
+        ],
+        "games": 6,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          3748,
+          3161
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3748
+        ],
+        "games": 2,
+        "winRate": 0.5
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          2525
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3026
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6333
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          8020
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          2501
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3156
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8010,
+        9111,
+        9104,
+        8014
+      ],
+      "secondary": [
+        8347,
+        8304
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 4,
+      "winRate": 0.5
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8000,
+      "primary": [
+        9923,
+        8143,
+        8137,
+        8135
+      ],
+      "secondary": [
+        9111,
+        9104
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 3,
+      "winRate": 0
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 24,
+      "winRate": 0.5
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "W",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

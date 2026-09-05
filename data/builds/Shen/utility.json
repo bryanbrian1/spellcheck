@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Shen",
+    "name": "Shen",
+    "id": 98
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 23,
+    "winRate": 0.3478
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 23,
+        "winRate": 0.3478
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 15,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 4,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 2,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3190
+        ],
+        "games": 6,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          2525
+        ],
+        "games": 4,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          3190,
+          3109
+        ],
+        "games": 4,
+        "winRate": 0.25
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8300,
+      "primary": [
+        8439,
+        8401,
+        8473,
+        8242
+      ],
+      "secondary": [
+        8306,
+        8347
+      ],
+      "shards": [
+        5005,
+        5010,
+        5011
+      ],
+      "games": 7,
+      "winRate": 0.5714
+    },
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8300,
+      "primary": [
+        8439,
+        8401,
+        8473,
+        8242
+      ],
+      "secondary": [
+        8304,
+        8347
+      ],
+      "shards": [
+        5005,
+        5010,
+        5011
+      ],
+      "games": 4,
+      "winRate": 0.5
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 10,
+      "winRate": 0.4
+    },
+    {
+      "spells": [
+        4,
+        7
+      ],
+      "games": 7,
+      "winRate": 0.1429
+    }
+  ],
+  "skills": {
+    "priority": [
+      "E",
+      "Q",
+      "W"
+    ],
+    "order": [
+      "E",
+      "Q",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

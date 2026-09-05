@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Lulu",
+    "name": "Lulu",
+    "id": 117
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 70,
+    "winRate": 0.5
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 68,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          2003,
+          2055
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          3158
+        ],
+        "games": 36,
+        "winRate": 0.6111
+      },
+      {
+        "items": [
+          1001
+        ],
+        "games": 31,
+        "winRate": 0.3871
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3504
+        ],
+        "games": 10,
+        "winRate": 0.4
+      },
+      {
+        "items": [
+          3504,
+          3222
+        ],
+        "games": 8,
+        "winRate": 0.625
+      },
+      {
+        "items": [
+          3504,
+          2065
+        ],
+        "games": 5,
+        "winRate": 0.8
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          6617
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3107
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3222
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6616
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3109
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3190
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8400,
+      "primary": [
+        8214,
+        8226,
+        8210,
+        8237
+      ],
+      "secondary": [
+        8473,
+        8453
+      ],
+      "shards": [
+        5007,
+        5008,
+        5001
+      ],
+      "games": 7,
+      "winRate": 0.2857
+    },
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8300,
+      "primary": [
+        8214,
+        8275,
+        8210,
+        8237
+      ],
+      "secondary": [
+        8347,
+        8304
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 4,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        7
+      ],
+      "games": 66,
+      "winRate": 0.5
+    },
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 3,
+      "winRate": 0.6667
+    }
+  ],
+  "skills": {
+    "priority": [
+      "E",
+      "W",
+      "Q"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "E",
+      "E"
+    ]
+  }
+}

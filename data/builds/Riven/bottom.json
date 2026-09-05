@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Riven",
+    "name": "Riven",
+    "id": 92
+  },
+  "role": "bottom",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 7,
+    "winRate": 0.4286
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1055,
+          2003
+        ],
+        "games": 7,
+        "winRate": 0.4286
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 7,
+        "winRate": 0.4286
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6696,
+          2517,
+          6333
+        ],
+        "games": 5,
+        "winRate": 0.6
+      },
+      {
+        "items": [
+          3156,
+          2517,
+          6333
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          6696
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3156
+        ],
+        "games": 4,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3139
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3036
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3143
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8010,
+        9111,
+        9105,
+        8299
+      ],
+      "secondary": [
+        8321,
+        8316
+      ],
+      "shards": [
+        5007,
+        5008,
+        5001
+      ],
+      "games": 7,
+      "winRate": 0.4286
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 3,
+      "winRate": 0.3333
+    },
+    {
+      "spells": [
+        4,
+        6
+      ],
+      "games": 2,
+      "winRate": 1
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "W",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

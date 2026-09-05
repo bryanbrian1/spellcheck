@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Leblanc",
+    "name": "LeBlanc",
+    "id": 7
+  },
+  "role": "middle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 49,
+    "winRate": 0.3469
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 48,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          1055,
+          2003
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 44,
+        "winRate": 0.3636
+      },
+      {
+        "items": [
+          3020
+        ],
+        "games": 4,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6655
+        ],
+        "games": 7,
+        "winRate": 0.1429
+      },
+      {
+        "items": [
+          6655,
+          4645
+        ],
+        "games": 6,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          6655,
+          4645,
+          4646
+        ],
+        "games": 4,
+        "winRate": 0.25
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3089
+        ],
+        "games": 4,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3135
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8200,
+      "primary": [
+        8112,
+        8143,
+        8137,
+        8106
+      ],
+      "secondary": [
+        8226,
+        8237
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 7,
+      "winRate": 0.2857
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8200,
+      "primary": [
+        8112,
+        8143,
+        8140,
+        8105
+      ],
+      "secondary": [
+        8226,
+        8237
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 6,
+      "winRate": 0.3333
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 42,
+      "winRate": 0.3571
+    },
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 6,
+      "winRate": 0.1667
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "Q",
+      "E"
+    ],
+    "order": [
+      "W",
+      "Q",
+      "E",
+      "W",
+      "W"
+    ]
+  }
+}

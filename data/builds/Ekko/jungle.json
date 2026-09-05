@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Ekko",
+    "name": "Ekko",
+    "id": 245
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 9,
+    "winRate": 0.4444
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1101,
+          2003
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          1102
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          3020
+        ],
+        "games": 5,
+        "winRate": 0.2
+      },
+      {
+        "items": [
+          3111
+        ],
+        "games": 2,
+        "winRate": 0.5
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          2510,
+          3089
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          2510
+        ],
+        "games": 2,
+        "winRate": 0
+      },
+      {
+        "items": [
+          2510,
+          4645
+        ],
+        "games": 2,
+        "winRate": 0
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8300,
+      "primary": [
+        8128,
+        8143,
+        8140,
+        8135
+      ],
+      "secondary": [
+        8304,
+        8313
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 2,
+      "winRate": 0.5
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8300,
+      "primary": [
+        8128,
+        8143,
+        8137,
+        8105
+      ],
+      "secondary": [
+        8347,
+        8304
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 9,
+      "winRate": 0.4444
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "W",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

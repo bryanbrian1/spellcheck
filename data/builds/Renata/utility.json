@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Renata",
+    "name": "Renata Glasc",
+    "id": 888
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 13,
+    "winRate": 0.5385
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 13,
+        "winRate": 0.5385
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 10,
+        "winRate": 0.6
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3190
+        ],
+        "games": 5,
+        "winRate": 0.6
+      },
+      {
+        "items": [
+          3222,
+          2524
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3190,
+          3222
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8300,
+      "primary": [
+        8465,
+        8401,
+        8473,
+        8453
+      ],
+      "secondary": [
+        8345,
+        8347
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 4,
+      "winRate": 0.75
+    },
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8100,
+      "primary": [
+        8465,
+        8401,
+        8473,
+        8453
+      ],
+      "secondary": [
+        8106,
+        8141
+      ],
+      "shards": [
+        5005,
+        5010,
+        5011
+      ],
+      "games": 2,
+      "winRate": 0
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        7
+      ],
+      "games": 12,
+      "winRate": 0.5833
+    },
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 1,
+      "winRate": 0
+    }
+  ],
+  "skills": {
+    "priority": [
+      "E",
+      "W",
+      "Q"
+    ],
+    "order": [
+      "E",
+      "Q",
+      "W",
+      "E",
+      "E"
+    ]
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Rammus",
+    "name": "Rammus",
+    "id": 33
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 6,
+    "winRate": 0.5
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1102
+        ],
+        "games": 2,
+        "winRate": 0
+      },
+      {
+        "items": [
+          1102,
+          2003
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 5,
+        "winRate": 0.4
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3075,
+          6665,
+          2525
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3075
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3075,
+          6665,
+          2504
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3742
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          8010
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8200,
+      "primary": [
+        8439,
+        8446,
+        8429,
+        8242
+      ],
+      "secondary": [
+        8234,
+        8275
+      ],
+      "shards": [
+        5005,
+        5010,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    },
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8000,
+      "primary": [
+        8439,
+        8463,
+        8429,
+        8451
+      ],
+      "secondary": [
+        9104,
+        9111
+      ],
+      "shards": [
+        5005,
+        5010,
+        5013
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 4,
+      "winRate": 0.25
+    },
+    {
+      "spells": [
+        6,
+        11
+      ],
+      "games": 2,
+      "winRate": 1
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "W",
+      "Q",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

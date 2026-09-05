@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Illaoi",
+    "name": "Illaoi",
+    "id": 420
+  },
+  "role": "top",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 7,
+    "winRate": 0.2857
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1055,
+          2003
+        ],
+        "games": 5,
+        "winRate": 0.2
+      },
+      {
+        "items": [
+          1054,
+          2003
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 7,
+        "winRate": 0.2857
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3071,
+          3053,
+          3065
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6631,
+          3071,
+          3143
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3071
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8230,
+        8275,
+        8210,
+        8237
+      ],
+      "secondary": [
+        8299,
+        9105
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 2,
+      "winRate": 0.5
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8400,
+      "primary": [
+        8010,
+        8009,
+        9105,
+        8299
+      ],
+      "secondary": [
+        8444,
+        8242
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 2,
+      "winRate": 0.5
+    },
+    {
+      "spells": [
+        4,
+        21
+      ],
+      "games": 2,
+      "winRate": 0.5
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "W",
+      "E",
+      "Q",
+      "Q",
+      "Q"
+    ]
+  }
+}

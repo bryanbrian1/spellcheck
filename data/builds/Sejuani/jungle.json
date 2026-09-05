@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Sejuani",
+    "name": "Sejuani",
+    "id": 113
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 9,
+    "winRate": 0.4444
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1101,
+          2003
+        ],
+        "games": 8,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          1103
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 8,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3068,
+          3143,
+          3075
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3084,
+          2502,
+          6665
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3084,
+          3083,
+          6665
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3083
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3075
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3143
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8000,
+      "primary": [
+        8439,
+        8463,
+        8429,
+        8451
+      ],
+      "secondary": [
+        9111,
+        9104
+      ],
+      "shards": [
+        5005,
+        5001,
+        5001
+      ],
+      "games": 6,
+      "winRate": 0.6667
+    },
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8100,
+      "primary": [
+        8439,
+        8463,
+        8429,
+        8451
+      ],
+      "secondary": [
+        8126,
+        8106
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 2,
+      "winRate": 0
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 9,
+      "winRate": 0.4444
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "Q",
+      "E"
+    ],
+    "order": [
+      "E",
+      "W",
+      "Q",
+      "W",
+      "W"
+    ]
+  }
+}

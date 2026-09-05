@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Zyra",
+    "name": "Zyra",
+    "id": 143
+  },
+  "role": "bottom",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 23,
+    "winRate": 0.6087
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 23,
+        "winRate": 0.6087
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 22,
+        "winRate": 0.5909
+      },
+      {
+        "items": [
+          3020
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6653,
+          2503,
+          3135
+        ],
+        "games": 9,
+        "winRate": 0.7778
+      },
+      {
+        "items": [
+          6653,
+          2503
+        ],
+        "games": 4,
+        "winRate": 0.75
+      },
+      {
+        "items": [
+          2503,
+          6653,
+          3116
+        ],
+        "games": 2,
+        "winRate": 0.5
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          4645
+        ],
+        "games": 4,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3116
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3135
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3137
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3165
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          8010
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8992,
+        8226,
+        8210,
+        8237
+      ],
+      "secondary": [
+        8009,
+        8017
+      ],
+      "shards": [
+        5007,
+        5010,
+        5001
+      ],
+      "games": 10,
+      "winRate": 0.7
+    },
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8229,
+        8226,
+        8210,
+        8237
+      ],
+      "secondary": [
+        8009,
+        8017
+      ],
+      "shards": [
+        5007,
+        5010,
+        5001
+      ],
+      "games": 3,
+      "winRate": 0.6667
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 22,
+      "winRate": 0.6364
+    },
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 1,
+      "winRate": 0
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "Q",
+      "W",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

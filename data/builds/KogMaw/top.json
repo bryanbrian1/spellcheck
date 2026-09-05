@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "KogMaw",
+    "name": "Kog'Maw",
+    "id": 96
+  },
+  "role": "top",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 8,
+    "winRate": 0.25
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 8,
+        "winRate": 0.25
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 7,
+        "winRate": 0.2857
+      },
+      {
+        "items": [
+          3020
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          2510
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          2510,
+          4646
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          2510,
+          4645
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3157
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8200,
+      "primary": [
+        8005,
+        8009,
+        9104,
+        8014
+      ],
+      "secondary": [
+        8236,
+        8226
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 7,
+      "winRate": 0.2857
+    },
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8230,
+        8226,
+        8233,
+        8236
+      ],
+      "secondary": [
+        8017,
+        8009
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 1,
+      "winRate": 0
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 7,
+      "winRate": 0.2857
+    },
+    {
+      "spells": [
+        4,
+        6
+      ],
+      "games": 1,
+      "winRate": 0
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "Q",
+      "E"
+    ],
+    "order": [
+      "E",
+      "W",
+      "Q",
+      "E",
+      "E"
+    ]
+  }
+}

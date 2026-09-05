@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Rell",
+    "name": "Rell",
+    "id": 526
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 83,
+    "winRate": 0.5422
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 83,
+        "winRate": 0.5422
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 65,
+        "winRate": 0.5385
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 10,
+        "winRate": 0.7
+      },
+      {
+        "items": [
+          3111
+        ],
+        "games": 6,
+        "winRate": 0.5
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3190,
+          3109
+        ],
+        "games": 14,
+        "winRate": 0.6429
+      },
+      {
+        "items": [
+          3190
+        ],
+        "games": 8,
+        "winRate": 0.375
+      },
+      {
+        "items": [
+          3050
+        ],
+        "games": 7,
+        "winRate": 0.4286
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          2524
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3110
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          4005
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8300,
+      "primary": [
+        8439,
+        8401,
+        8473,
+        8242
+      ],
+      "secondary": [
+        8347,
+        8306
+      ],
+      "shards": [
+        5007,
+        5010,
+        5011
+      ],
+      "games": 24,
+      "winRate": 0.625
+    },
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8300,
+      "primary": [
+        8439,
+        8401,
+        8473,
+        8242
+      ],
+      "secondary": [
+        8306,
+        8347
+      ],
+      "shards": [
+        5007,
+        5010,
+        5011
+      ],
+      "games": 9,
+      "winRate": 0.4444
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        7
+      ],
+      "games": 58,
+      "winRate": 0.5517
+    },
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 20,
+      "winRate": 0.6
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "E",
+      "Q"
+    ],
+    "order": [
+      "W",
+      "Q",
+      "E",
+      "W",
+      "W"
+    ]
+  }
+}

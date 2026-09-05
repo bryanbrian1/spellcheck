@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Alistar",
+    "name": "Alistar",
+    "id": 12
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 120,
+    "winRate": 0.5167
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 120,
+        "winRate": 0.5167
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 108,
+        "winRate": 0.5093
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 7,
+        "winRate": 0.4286
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 4,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          2065,
+          3050
+        ],
+        "games": 16,
+        "winRate": 0.625
+      },
+      {
+        "items": [
+          3050,
+          3109
+        ],
+        "games": 12,
+        "winRate": 0.4167
+      },
+      {
+        "items": [
+          3050,
+          3190
+        ],
+        "games": 12,
+        "winRate": 0.3333
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3109
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          2524
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3110
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3190
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8300,
+      "primary": [
+        8112,
+        8143,
+        8140,
+        8106
+      ],
+      "secondary": [
+        8306,
+        8347
+      ],
+      "shards": [
+        5007,
+        5010,
+        5011
+      ],
+      "games": 22,
+      "winRate": 0.5
+    },
+    {
+      "primaryStyle": 8300,
+      "secondaryStyle": 8200,
+      "primary": [
+        8360,
+        8306,
+        8345,
+        8347
+      ],
+      "secondary": [
+        8275,
+        8234
+      ],
+      "shards": [
+        5007,
+        5010,
+        5011
+      ],
+      "games": 19,
+      "winRate": 0.4211
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        7
+      ],
+      "games": 59,
+      "winRate": 0.5085
+    },
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 54,
+      "winRate": 0.5556
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "W",
+      "Q",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

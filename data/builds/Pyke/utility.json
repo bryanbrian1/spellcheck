@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Pyke",
+    "name": "Pyke",
+    "id": 555
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 53,
+    "winRate": 0.3774
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 53,
+        "winRate": 0.3774
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 44,
+        "winRate": 0.4318
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 4,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 2,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3179
+        ],
+        "games": 12,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3179,
+          3142
+        ],
+        "games": 7,
+        "winRate": 0.4286
+      },
+      {
+        "items": [
+          3179,
+          3814
+        ],
+        "games": 7,
+        "winRate": 0.4286
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3814
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8400,
+      "primary": [
+        9923,
+        8143,
+        8141,
+        8105
+      ],
+      "secondary": [
+        8242,
+        8444
+      ],
+      "shards": [
+        5008,
+        5008,
+        5013
+      ],
+      "games": 8,
+      "winRate": 0.5
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8400,
+      "primary": [
+        9923,
+        8143,
+        8141,
+        8105
+      ],
+      "secondary": [
+        8473,
+        8242
+      ],
+      "shards": [
+        5008,
+        5008,
+        5013
+      ],
+      "games": 8,
+      "winRate": 0.125
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 49,
+      "winRate": 0.3878
+    },
+    {
+      "spells": [
+        4,
+        7
+      ],
+      "games": 3,
+      "winRate": 0.3333
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

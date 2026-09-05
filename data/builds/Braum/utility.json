@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Braum",
+    "name": "Braum",
+    "id": 201
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 41,
+    "winRate": 0.4634
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 41,
+        "winRate": 0.4634
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 24,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 7,
+        "winRate": 0.7143
+      },
+      {
+        "items": [
+          3111
+        ],
+        "games": 3,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3190
+        ],
+        "games": 11,
+        "winRate": 0.1818
+      },
+      {
+        "items": [
+          3190,
+          3109
+        ],
+        "games": 10,
+        "winRate": 0.8
+      },
+      {
+        "items": [
+          3109,
+          3190
+        ],
+        "games": 5,
+        "winRate": 0.4
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8300,
+      "primary": [
+        8465,
+        8463,
+        8473,
+        8242
+      ],
+      "secondary": [
+        8345,
+        8347
+      ],
+      "shards": [
+        5005,
+        5001,
+        5001
+      ],
+      "games": 9,
+      "winRate": 0.2222
+    },
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8300,
+      "primary": [
+        8465,
+        8463,
+        8473,
+        8242
+      ],
+      "secondary": [
+        8347,
+        8304
+      ],
+      "shards": [
+        5005,
+        5010,
+        5011
+      ],
+      "games": 6,
+      "winRate": 0.3333
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        7
+      ],
+      "games": 32,
+      "winRate": 0.4688
+    },
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 7,
+      "winRate": 0.4286
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

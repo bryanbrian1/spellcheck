@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Karthus",
+    "name": "Karthus",
+    "id": 30
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 20,
+    "winRate": 0.55
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1102,
+          2003
+        ],
+        "games": 12,
+        "winRate": 0.5833
+      },
+      {
+        "items": [
+          1101
+        ],
+        "games": 6,
+        "winRate": 0.5
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 14,
+        "winRate": 0.4286
+      },
+      {
+        "items": [
+          3020
+        ],
+        "games": 6,
+        "winRate": 0.8333
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          2503,
+          4645,
+          3135
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          2503
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          2503,
+          4645,
+          3089
+        ],
+        "games": 2,
+        "winRate": 0.5
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3157
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          3089
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3135
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          4645
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3118
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3165
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8992,
+        8224,
+        8210,
+        8236
+      ],
+      "secondary": [
+        9111,
+        8299
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 6,
+      "winRate": 0.3333
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8000,
+      "primary": [
+        8128,
+        8126,
+        8137,
+        8106
+      ],
+      "secondary": [
+        9111,
+        8299
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 2,
+      "winRate": 0.5
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 16,
+      "winRate": 0.5
+    },
+    {
+      "spells": [
+        3,
+        11
+      ],
+      "games": 3,
+      "winRate": 0.6667
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "Q",
+      "W",
+      "Q"
+    ]
+  }
+}

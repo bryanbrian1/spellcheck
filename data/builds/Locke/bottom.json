@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Locke",
+    "name": "Locke",
+    "id": 805
+  },
+  "role": "bottom",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 21,
+    "winRate": 0.4286
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 21,
+        "winRate": 0.4286
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 18,
+        "winRate": 0.3889
+      },
+      {
+        "items": [
+          3020
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3100
+        ],
+        "games": 8,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3100,
+          4645,
+          3157
+        ],
+        "games": 4,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          3100,
+          4645
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3157
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3135
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8200,
+      "primary": [
+        8112,
+        8143,
+        8140,
+        8106
+      ],
+      "secondary": [
+        8224,
+        8233
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 5,
+      "winRate": 0.2
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8100,
+      "primary": [
+        8010,
+        8009,
+        9105,
+        8017
+      ],
+      "secondary": [
+        8143,
+        8135
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 4,
+      "winRate": 0.75
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 9,
+      "winRate": 0.2222
+    },
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 5,
+      "winRate": 0.8
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Graves",
+    "name": "Graves",
+    "id": 104
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 122,
+    "winRate": 0.5492
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1101
+        ],
+        "games": 43,
+        "winRate": 0.6279
+      },
+      {
+        "items": [
+          1102,
+          2003
+        ],
+        "games": 39,
+        "winRate": 0.5385
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 63,
+        "winRate": 0.4921
+      },
+      {
+        "items": [
+          3111
+        ],
+        "games": 17,
+        "winRate": 0.6471
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 16,
+        "winRate": 0.5
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6697,
+          6676,
+          3036
+        ],
+        "games": 32,
+        "winRate": 0.7188
+      },
+      {
+        "items": [
+          6697,
+          6676,
+          3033
+        ],
+        "games": 22,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          6697,
+          6676
+        ],
+        "games": 16,
+        "winRate": 0.3125
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          6673
+        ],
+        "games": 34,
+        "winRate": 0.6176
+      },
+      {
+        "items": [
+          3031
+        ],
+        "games": 20,
+        "winRate": 0.8
+      },
+      {
+        "items": [
+          3026
+        ],
+        "games": 11,
+        "winRate": 0.4545
+      },
+      {
+        "items": [
+          3072
+        ],
+        "games": 4,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          3036
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          6665
+        ],
+        "games": 2,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8021,
+        9111,
+        9104,
+        8014
+      ],
+      "secondary": [
+        8347,
+        8304
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 13,
+      "winRate": 0.5385
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8021,
+        9111,
+        9104,
+        8014
+      ],
+      "secondary": [
+        8304,
+        8347
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 11,
+      "winRate": 0.5455
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 122,
+      "winRate": 0.5492
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "E",
+      "Q",
+      "Q",
+      "W",
+      "Q"
+    ]
+  }
+}

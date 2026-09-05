@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Gangplank",
+    "name": "Gangplank",
+    "id": 41
+  },
+  "role": "top",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 50,
+    "winRate": 0.4
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1055,
+          2003
+        ],
+        "games": 33,
+        "winRate": 0.3636
+      },
+      {
+        "items": [
+          1086,
+          2003
+        ],
+        "games": 7,
+        "winRate": 0.7143
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 45,
+        "winRate": 0.3778
+      },
+      {
+        "items": [
+          3008
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 2,
+        "winRate": 0.5
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3508
+        ],
+        "games": 8,
+        "winRate": 0.375
+      },
+      {
+        "items": [
+          3508,
+          6676,
+          3036
+        ],
+        "games": 4,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3508,
+          6673,
+          3033
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3031
+        ],
+        "games": 9,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          6673
+        ],
+        "games": 3,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3033
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3036
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6333
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          2517
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8992,
+        8275,
+        8210,
+        8237
+      ],
+      "secondary": [
+        8017,
+        9104
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 7,
+      "winRate": 0
+    },
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8400,
+      "primary": [
+        8992,
+        8275,
+        8233,
+        8237
+      ],
+      "secondary": [
+        8473,
+        8242
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 5,
+      "winRate": 0.6
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 41,
+      "winRate": 0.4146
+    },
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 9,
+      "winRate": 0.3333
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "E",
+      "Q",
+      "Q",
+      "W",
+      "Q"
+    ]
+  }
+}

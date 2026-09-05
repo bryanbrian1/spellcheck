@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Aatrox",
+    "name": "Aatrox",
+    "id": 266
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 30,
+    "winRate": 0.4
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1101
+        ],
+        "games": 14,
+        "winRate": 0.4286
+      },
+      {
+        "items": [
+          1101,
+          2003
+        ],
+        "games": 9,
+        "winRate": 0.3333
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          3047
+        ],
+        "games": 14,
+        "winRate": 0.3571
+      },
+      {
+        "items": [
+          3111
+        ],
+        "games": 9,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          1001
+        ],
+        "games": 2,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6698,
+          3814,
+          6333
+        ],
+        "games": 4,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          6698,
+          3814
+        ],
+        "games": 4,
+        "winRate": 0
+      },
+      {
+        "items": [
+          6698,
+          6695,
+          6333
+        ],
+        "games": 3,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3156
+        ],
+        "games": 5,
+        "winRate": 1
+      },
+      {
+        "items": [
+          2517
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3033
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3071
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8010,
+        9111,
+        9104,
+        8299
+      ],
+      "secondary": [
+        8304,
+        8347
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 6,
+      "winRate": 0.3333
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8010,
+        9111,
+        9104,
+        8299
+      ],
+      "secondary": [
+        8304,
+        8347
+      ],
+      "shards": [
+        5008,
+        5008,
+        5013
+      ],
+      "games": 5,
+      "winRate": 0.6
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 30,
+      "winRate": 0.4
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "Q",
+      "W",
+      "Q"
+    ]
+  }
+}

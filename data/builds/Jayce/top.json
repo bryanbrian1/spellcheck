@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Jayce",
+    "name": "Jayce",
+    "id": 126
+  },
+  "role": "top",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 80,
+    "winRate": 0.5375
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1055,
+          2003
+        ],
+        "games": 80,
+        "winRate": 0.5375
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 60,
+        "winRate": 0.5333
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 6,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 5,
+        "winRate": 0.8
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3142,
+          3004,
+          6694
+        ],
+        "games": 11,
+        "winRate": 0.4545
+      },
+      {
+        "items": [
+          3142,
+          3004,
+          6699
+        ],
+        "games": 8,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3142
+        ],
+        "games": 7,
+        "winRate": 0.4286
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          6694
+        ],
+        "games": 11,
+        "winRate": 0.6364
+      },
+      {
+        "items": [
+          3814
+        ],
+        "games": 8,
+        "winRate": 0.75
+      },
+      {
+        "items": [
+          6695
+        ],
+        "games": 7,
+        "winRate": 0.7143
+      },
+      {
+        "items": [
+          3026
+        ],
+        "games": 4,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          6699
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3156
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8300,
+      "primary": [
+        8437,
+        8446,
+        8473,
+        8242
+      ],
+      "secondary": [
+        8347,
+        8313
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 7,
+      "winRate": 0.4286
+    },
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8300,
+      "primary": [
+        8437,
+        8446,
+        8473,
+        8451
+      ],
+      "secondary": [
+        8347,
+        8313
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 6,
+      "winRate": 0.6667
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 60,
+      "winRate": 0.5167
+    },
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 17,
+      "winRate": 0.5882
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "Q",
+      "W",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Zyra",
+    "name": "Zyra",
+    "id": 143
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 8,
+    "winRate": 0.625
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 8,
+        "winRate": 0.625
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 8,
+        "winRate": 0.625
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6653,
+          3116
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          6653
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          2503
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8229,
+        8226,
+        8210,
+        8237
+      ],
+      "secondary": [
+        8009,
+        8017
+      ],
+      "shards": [
+        5007,
+        5008,
+        5001
+      ],
+      "games": 1,
+      "winRate": 1
+    },
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8229,
+        8226,
+        8210,
+        8237
+      ],
+      "secondary": [
+        8009,
+        8017
+      ],
+      "shards": [
+        5007,
+        5010,
+        5001
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 4,
+      "winRate": 0.75
+    },
+    {
+      "spells": [
+        4,
+        7
+      ],
+      "games": 4,
+      "winRate": 0.5
+    }
+  ],
+  "skills": {
+    "priority": [
+      "E",
+      "Q",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "W",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

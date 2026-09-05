@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "LeeSin",
+    "name": "Lee Sin",
+    "id": 64
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 139,
+    "winRate": 0.4748
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1101,
+          2003
+        ],
+        "games": 69,
+        "winRate": 0.4203
+      },
+      {
+        "items": [
+          1101
+        ],
+        "games": 30,
+        "winRate": 0.5667
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          3111
+        ],
+        "games": 58,
+        "winRate": 0.4483
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 49,
+        "winRate": 0.449
+      },
+      {
+        "items": [
+          1001
+        ],
+        "games": 6,
+        "winRate": 0.6667
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6692,
+          6610
+        ],
+        "games": 22,
+        "winRate": 0.3636
+      },
+      {
+        "items": [
+          6692,
+          6610,
+          6333
+        ],
+        "games": 18,
+        "winRate": 0.6111
+      },
+      {
+        "items": [
+          6692,
+          3071,
+          6333
+        ],
+        "games": 17,
+        "winRate": 0.7059
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3026
+        ],
+        "games": 14,
+        "winRate": 0.6429
+      },
+      {
+        "items": [
+          6333
+        ],
+        "games": 4,
+        "winRate": 0
+      },
+      {
+        "items": [
+          2517
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          3156
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          3071
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6694
+        ],
+        "games": 2,
+        "winRate": 0.5
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8010,
+        9111,
+        9104,
+        8014
+      ],
+      "secondary": [
+        8347,
+        8304
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 28,
+      "winRate": 0.5714
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8010,
+        9111,
+        9104,
+        8014
+      ],
+      "secondary": [
+        8304,
+        8347
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 21,
+      "winRate": 0.4762
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 139,
+      "winRate": 0.4748
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "E",
+      "Q",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

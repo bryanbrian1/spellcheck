@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Chogath",
+    "name": "Cho'Gath",
+    "id": 31
+  },
+  "role": "middle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 8,
+    "winRate": 0.75
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 7,
+        "winRate": 0.7143
+      },
+      {
+        "items": [
+          1054,
+          2003
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 7,
+        "winRate": 0.7143
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3152
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3152,
+          3742
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3152,
+          3742,
+          2504
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3143
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          4401
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8200,
+      "primary": [
+        9923,
+        8126,
+        8140,
+        8106
+      ],
+      "secondary": [
+        8224,
+        8234
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 4,
+      "winRate": 1
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8200,
+      "primary": [
+        9923,
+        8126,
+        8140,
+        8106
+      ],
+      "secondary": [
+        8224,
+        8234
+      ],
+      "shards": [
+        5008,
+        5010,
+        5001
+      ],
+      "games": 3,
+      "winRate": 0.3333
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 7,
+      "winRate": 0.7143
+    },
+    {
+      "spells": [
+        4,
+        6
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "skills": {
+    "priority": [
+      "E",
+      "W",
+      "Q"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "Q",
+      "W",
+      "E"
+    ]
+  }
+}

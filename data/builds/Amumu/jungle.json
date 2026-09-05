@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Amumu",
+    "name": "Amumu",
+    "id": 32
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 5,
+    "winRate": 0.4
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1101
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          1103,
+          2003
+        ],
+        "games": 2,
+        "winRate": 0.5
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          3047
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          1001
+        ],
+        "games": 2,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3111
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3068,
+          8020,
+          3050
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6653,
+          8020,
+          3075
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3068,
+          8020
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8010,
+        9111,
+        9105,
+        8299
+      ],
+      "secondary": [
+        8304,
+        8347
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8010,
+        9111,
+        9105,
+        8299
+      ],
+      "secondary": [
+        8304,
+        8347
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 5,
+      "winRate": 0.4
+    }
+  ],
+  "skills": {
+    "priority": [
+      "E",
+      "Q",
+      "W"
+    ],
+    "order": [
+      "E",
+      "W",
+      "Q",
+      "E",
+      "E"
+    ]
+  }
+}

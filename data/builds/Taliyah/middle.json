@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Taliyah",
+    "name": "Taliyah",
+    "id": 163
+  },
+  "role": "middle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 16,
+    "winRate": 0.6875
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 16,
+        "winRate": 0.6875
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 12,
+        "winRate": 0.5833
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3020
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          2503
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          2503,
+          3003
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          2503,
+          3116
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3135
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3137
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8230,
+        8226,
+        8210,
+        8237
+      ],
+      "secondary": [
+        9105,
+        8009
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 3,
+      "winRate": 1
+    },
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8214,
+        8226,
+        8234,
+        8237
+      ],
+      "secondary": [
+        8017,
+        9105
+      ],
+      "shards": [
+        5005,
+        5010,
+        5011
+      ],
+      "games": 2,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 11,
+      "winRate": 0.6364
+    },
+    {
+      "spells": [
+        4,
+        6
+      ],
+      "games": 4,
+      "winRate": 0.75
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

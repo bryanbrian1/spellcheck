@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Talon",
+    "name": "Talon",
+    "id": 91
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 85,
+    "winRate": 0.4824
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1102
+        ],
+        "games": 47,
+        "winRate": 0.5106
+      },
+      {
+        "items": [
+          1101
+        ],
+        "games": 24,
+        "winRate": 0.3333
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 31,
+        "winRate": 0.5806
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 29,
+        "winRate": 0.4138
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 8,
+        "winRate": 0.625
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3179,
+          2520,
+          6699
+        ],
+        "games": 31,
+        "winRate": 0.5806
+      },
+      {
+        "items": [
+          3179,
+          6699,
+          6695
+        ],
+        "games": 7,
+        "winRate": 0.1429
+      },
+      {
+        "items": [
+          3179,
+          2520
+        ],
+        "games": 6,
+        "winRate": 0.3333
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3036
+        ],
+        "games": 18,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3814
+        ],
+        "games": 15,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          6694
+        ],
+        "games": 11,
+        "winRate": 0.7273
+      },
+      {
+        "items": [
+          6695
+        ],
+        "games": 9,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3142
+        ],
+        "games": 7,
+        "winRate": 0.5714
+      },
+      {
+        "items": [
+          3033
+        ],
+        "games": 7,
+        "winRate": 0.4286
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8021,
+        9111,
+        9104,
+        8014
+      ],
+      "secondary": [
+        8304,
+        8347
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 32,
+      "winRate": 0.5
+    },
+    {
+      "primaryStyle": 8300,
+      "secondaryStyle": 8100,
+      "primary": [
+        8369,
+        8321,
+        8313,
+        8347
+      ],
+      "secondary": [
+        8143,
+        8135
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 10,
+      "winRate": 0.5
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 82,
+      "winRate": 0.5
+    },
+    {
+      "spells": [
+        11,
+        14
+      ],
+      "games": 3,
+      "winRate": 0
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "Q",
+      "E"
+    ],
+    "order": [
+      "W",
+      "Q",
+      "E",
+      "W",
+      "W"
+    ]
+  }
+}

@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "TwistedFate",
+    "name": "Twisted Fate",
+    "id": 4
+  },
+  "role": "middle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 38,
+    "winRate": 0.5263
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 35,
+        "winRate": 0.5429
+      },
+      {
+        "items": [
+          1082,
+          2031
+        ],
+        "games": 2,
+        "winRate": 0.5
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 31,
+        "winRate": 0.4839
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 6,
+        "winRate": 0.8333
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6657,
+          3100,
+          3094
+        ],
+        "games": 18,
+        "winRate": 0.5556
+      },
+      {
+        "items": [
+          3152,
+          3100,
+          3094
+        ],
+        "games": 5,
+        "winRate": 0.4
+      },
+      {
+        "items": [
+          6657,
+          3100
+        ],
+        "games": 5,
+        "winRate": 0.4
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3157
+        ],
+        "games": 7,
+        "winRate": 0.4286
+      },
+      {
+        "items": [
+          3089
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          4005
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3031
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8400,
+      "primary": [
+        8229,
+        8226,
+        8234,
+        8237
+      ],
+      "secondary": [
+        8473,
+        8242
+      ],
+      "shards": [
+        5005,
+        5010,
+        5011
+      ],
+      "games": 6,
+      "winRate": 0.6667
+    },
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8400,
+      "primary": [
+        8229,
+        8226,
+        8234,
+        8237
+      ],
+      "secondary": [
+        8473,
+        8451
+      ],
+      "shards": [
+        5005,
+        5010,
+        5001
+      ],
+      "games": 4,
+      "winRate": 0.5
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 24,
+      "winRate": 0.4583
+    },
+    {
+      "spells": [
+        4,
+        6
+      ],
+      "games": 9,
+      "winRate": 0.5556
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "W",
+      "E",
+      "Q",
+      "Q",
+      "Q"
+    ]
+  }
+}

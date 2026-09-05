@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Camille",
+    "name": "Camille",
+    "id": 164
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 25,
+    "winRate": 0.6
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 24,
+        "winRate": 0.625
+      },
+      {
+        "items": [
+          2055
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 25,
+        "winRate": 0.6
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6610
+        ],
+        "games": 8,
+        "winRate": 0.375
+      },
+      {
+        "items": [
+          6610,
+          3053
+        ],
+        "games": 7,
+        "winRate": 0.8571
+      },
+      {
+        "items": [
+          6692,
+          3053
+        ],
+        "games": 2,
+        "winRate": 0.5
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8400,
+      "primary": [
+        9923,
+        8143,
+        8141,
+        8135
+      ],
+      "secondary": [
+        8473,
+        8401
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 9,
+      "winRate": 0.5556
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8400,
+      "primary": [
+        9923,
+        8143,
+        8141,
+        8135
+      ],
+      "secondary": [
+        8401,
+        8473
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 7,
+      "winRate": 0.4286
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 25,
+      "winRate": 0.6
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "E",
+      "Q",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

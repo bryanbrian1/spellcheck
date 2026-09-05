@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Qiyana",
+    "name": "Qiyana",
+    "id": 246
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 80,
+    "winRate": 0.5125
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1102,
+          2003
+        ],
+        "games": 18,
+        "winRate": 0.7222
+      },
+      {
+        "items": [
+          1102
+        ],
+        "games": 17,
+        "winRate": 0.4118
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 58,
+        "winRate": 0.5517
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 13,
+        "winRate": 0.4615
+      },
+      {
+        "items": [
+          3111
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6699,
+          2520,
+          6694
+        ],
+        "games": 9,
+        "winRate": 0.5556
+      },
+      {
+        "items": [
+          6699,
+          2520
+        ],
+        "games": 5,
+        "winRate": 0.6
+      },
+      {
+        "items": [
+          3179,
+          6699,
+          6695
+        ],
+        "games": 4,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          6694
+        ],
+        "games": 18,
+        "winRate": 0.5556
+      },
+      {
+        "items": [
+          3814
+        ],
+        "games": 9,
+        "winRate": 0.8889
+      },
+      {
+        "items": [
+          6333
+        ],
+        "games": 7,
+        "winRate": 0.5714
+      },
+      {
+        "items": [
+          6695
+        ],
+        "games": 6,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3026
+        ],
+        "games": 4,
+        "winRate": 0.75
+      },
+      {
+        "items": [
+          6699
+        ],
+        "games": 3,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8021,
+        9111,
+        9104,
+        8014
+      ],
+      "secondary": [
+        8321,
+        8347
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 15,
+      "winRate": 0.6
+    },
+    {
+      "primaryStyle": 8300,
+      "secondaryStyle": 8100,
+      "primary": [
+        8369,
+        8304,
+        8313,
+        8347
+      ],
+      "secondary": [
+        8143,
+        8106
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 11,
+      "winRate": 0.5455
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 80,
+      "winRate": 0.5125
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "Q",
+      "W",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

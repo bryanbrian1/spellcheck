@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Senna",
+    "name": "Senna",
+    "id": 235
+  },
+  "role": "bottom",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 9,
+    "winRate": 0.4444
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1055,
+          2003
+        ],
+        "games": 6,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          1120,
+          2003
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 5,
+        "winRate": 0.6
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3111
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3071,
+          3084
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3087,
+          3071,
+          2523
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3087,
+          3071,
+          3031
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3026
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3094
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6695
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8400,
+      "primary": [
+        8008,
+        8009,
+        9104,
+        8017
+      ],
+      "secondary": [
+        8429,
+        8451
+      ],
+      "shards": [
+        5005,
+        5010,
+        5001
+      ],
+      "games": 4,
+      "winRate": 0.25
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8200,
+      "primary": [
+        8008,
+        8009,
+        9104,
+        8017
+      ],
+      "secondary": [
+        8275,
+        8234
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 3,
+      "winRate": 0.3333
+    },
+    {
+      "spells": [
+        4,
+        21
+      ],
+      "games": 2,
+      "winRate": 1
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "Q",
+      "W",
+      "Q",
+      "E",
+      "Q"
+    ]
+  }
+}

@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Urgot",
+    "name": "Urgot",
+    "id": 6
+  },
+  "role": "top",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 61,
+    "winRate": 0.4426
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1055,
+          2003
+        ],
+        "games": 53,
+        "winRate": 0.434
+      },
+      {
+        "items": [
+          1120,
+          2003
+        ],
+        "games": 4,
+        "winRate": 0.5
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 37,
+        "winRate": 0.5405
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 12,
+        "winRate": 0.1667
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 7,
+        "winRate": 0.2857
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3071,
+          3053
+        ],
+        "games": 14,
+        "winRate": 0.2143
+      },
+      {
+        "items": [
+          3071,
+          3053,
+          6665
+        ],
+        "games": 7,
+        "winRate": 0.7143
+      },
+      {
+        "items": [
+          3071,
+          3053,
+          2501
+        ],
+        "games": 6,
+        "winRate": 0.5
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          2501
+        ],
+        "games": 4,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          6665
+        ],
+        "games": 3,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3742
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          2504
+        ],
+        "games": 2,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3053
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3075
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8005,
+        9111,
+        9103,
+        8017
+      ],
+      "secondary": [
+        8313,
+        8347
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 6,
+      "winRate": 0.6667
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8005,
+        9111,
+        9103,
+        8017
+      ],
+      "secondary": [
+        8313,
+        8410
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 6,
+      "winRate": 0.5
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 41,
+      "winRate": 0.4878
+    },
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 16,
+      "winRate": 0.375
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "Q",
+      "E"
+    ],
+    "order": [
+      "E",
+      "Q",
+      "W",
+      "Q",
+      "W"
+    ]
+  }
+}

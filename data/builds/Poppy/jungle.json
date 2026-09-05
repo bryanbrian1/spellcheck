@@ -1,0 +1,189 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Poppy",
+    "name": "Poppy",
+    "id": 78
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 12,
+    "winRate": 0.9167
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1102,
+          2003
+        ],
+        "games": 6,
+        "winRate": 1
+      },
+      {
+        "items": [
+          1102
+        ],
+        "games": 5,
+        "winRate": 0.8
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 6,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 5,
+        "winRate": 0.8
+      },
+      {
+        "items": [
+          3111
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3068,
+          3190
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3068,
+          3742
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3078
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          2525
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3065
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          4401
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6609
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6665
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8200,
+      "primary": [
+        8128,
+        8126,
+        8137,
+        8105
+      ],
+      "secondary": [
+        8234,
+        8232
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 5,
+      "winRate": 1
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8300,
+      "primary": [
+        8112,
+        8143,
+        8137,
+        8105
+      ],
+      "secondary": [
+        8304,
+        8347
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 5,
+      "winRate": 0.8
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 12,
+      "winRate": 0.9167
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

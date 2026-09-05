@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Volibear",
+    "name": "Volibear",
+    "id": 106
+  },
+  "role": "top",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 18,
+    "winRate": 0.3333
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 9,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          1120,
+          2003
+        ],
+        "games": 5,
+        "winRate": 0.4
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 16,
+        "winRate": 0.375
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3119,
+          2502,
+          3065
+        ],
+        "games": 5,
+        "winRate": 0.8
+      },
+      {
+        "items": [
+          3119
+        ],
+        "games": 2,
+        "winRate": 0
+      },
+      {
+        "items": [
+          2510,
+          3065,
+          3143
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3053
+        ],
+        "games": 4,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          2504
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          4633
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6333
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8000,
+      "primary": [
+        8437,
+        8401,
+        8473,
+        8242
+      ],
+      "secondary": [
+        8299,
+        9105
+      ],
+      "shards": [
+        5007,
+        5001,
+        5001
+      ],
+      "games": 5,
+      "winRate": 0.4
+    },
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8000,
+      "primary": [
+        8437,
+        8401,
+        8473,
+        8453
+      ],
+      "secondary": [
+        8299,
+        9105
+      ],
+      "shards": [
+        5007,
+        5001,
+        5001
+      ],
+      "games": 3,
+      "winRate": 0.3333
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 7,
+      "winRate": 0.2857
+    },
+    {
+      "spells": [
+        4,
+        6
+      ],
+      "games": 6,
+      "winRate": 0.3333
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "Q",
+      "E"
+    ],
+    "order": [
+      "E",
+      "Q",
+      "W",
+      "W",
+      "W"
+    ]
+  }
+}

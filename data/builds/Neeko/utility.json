@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Neeko",
+    "name": "Neeko",
+    "id": 518
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 26,
+    "winRate": 0.4615
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 26,
+        "winRate": 0.4615
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          3158
+        ],
+        "games": 17,
+        "winRate": 0.4706
+      },
+      {
+        "items": [
+          1001
+        ],
+        "games": 9,
+        "winRate": 0.4444
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3152
+        ],
+        "games": 9,
+        "winRate": 0.4444
+      },
+      {
+        "items": [
+          3152,
+          2065
+        ],
+        "games": 4,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          3152,
+          4005,
+          2065
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8300,
+      "primary": [
+        8229,
+        8275,
+        8234,
+        8237
+      ],
+      "secondary": [
+        8304,
+        8347
+      ],
+      "shards": [
+        5008,
+        5010,
+        5011
+      ],
+      "games": 12,
+      "winRate": 0.3333
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8100,
+      "primary": [
+        8021,
+        9111,
+        9104,
+        8014
+      ],
+      "secondary": [
+        8143,
+        8105
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 3,
+      "winRate": 0.3333
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        7
+      ],
+      "games": 22,
+      "winRate": 0.4545
+    },
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 4,
+      "winRate": 0.5
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Khazix",
+    "name": "Kha'Zix",
+    "id": 121
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 72,
+    "winRate": 0.4306
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1101
+        ],
+        "games": 45,
+        "winRate": 0.3556
+      },
+      {
+        "items": [
+          1102,
+          2003
+        ],
+        "games": 11,
+        "winRate": 0.7273
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 47,
+        "winRate": 0.4255
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 15,
+        "winRate": 0.5333
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3179,
+          6699,
+          2520
+        ],
+        "games": 12,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          3179,
+          6699
+        ],
+        "games": 9,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3179,
+          6699,
+          3814
+        ],
+        "games": 8,
+        "winRate": 0.625
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          6694
+        ],
+        "games": 17,
+        "winRate": 0.4706
+      },
+      {
+        "items": [
+          2517
+        ],
+        "games": 12,
+        "winRate": 0.5833
+      },
+      {
+        "items": [
+          3814
+        ],
+        "games": 6,
+        "winRate": 0
+      },
+      {
+        "items": [
+          2520
+        ],
+        "games": 3,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3026
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3033
+        ],
+        "games": 2,
+        "winRate": 0.5
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8300,
+      "secondaryStyle": 8100,
+      "primary": [
+        8369,
+        8321,
+        8313,
+        8347
+      ],
+      "secondary": [
+        8143,
+        8135
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 10,
+      "winRate": 0.6
+    },
+    {
+      "primaryStyle": 8300,
+      "secondaryStyle": 8200,
+      "primary": [
+        8369,
+        8321,
+        8313,
+        8347
+      ],
+      "secondary": [
+        8233,
+        8236
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 7,
+      "winRate": 0.5714
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 62,
+      "winRate": 0.4677
+    },
+    {
+      "spells": [
+        6,
+        11
+      ],
+      "games": 9,
+      "winRate": 0.2222
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "Q",
+      "W",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Maokai",
+    "name": "Maokai",
+    "id": 57
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "stats": {
+    "games": 12,
+    "winRate": 0.1667
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 12,
+        "winRate": 0.1667
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 12,
+        "winRate": 0.1667
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3190
+        ],
+        "games": 3,
+        "winRate": 0
+      },
+      {
+        "items": [
+          2524
+        ],
+        "games": 2,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3190,
+          2524
+        ],
+        "games": 2,
+        "winRate": 0
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8000,
+      "primary": [
+        8439,
+        8463,
+        8429,
+        8451
+      ],
+      "secondary": [
+        9105,
+        9111
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 2,
+      "winRate": 0.5
+    },
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8300,
+      "primary": [
+        8439,
+        8463,
+        8473,
+        8451
+      ],
+      "secondary": [
+        8306,
+        8345
+      ],
+      "shards": [
+        5008,
+        5001,
+        5001
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        7
+      ],
+      "games": 6,
+      "winRate": 0
+    },
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 5,
+      "winRate": 0.4
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "W",
+      "Q",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}
