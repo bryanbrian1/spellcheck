@@ -117,6 +117,39 @@ impl ChampSelectSession {
         }
     }
 
+    /// Phases in which the client has certainly already sent a team. Named
+    /// rather than matched loosely: an unknown phase is not evidence of
+    /// anything, and guessing would turn every new phase Riot adds into a
+    /// false alarm.
+    const READABLE_PHASES: [&'static str; 3] = ["PLANNING", "BAN_PICK", "FINALIZATION"];
+
+    /// Why this payload cannot be read, when it contradicts itself.
+    ///
+    /// The tolerance in this module has a cost that is easy to miss. Every
+    /// field defaults, so a field Riot *renames* arrives as `0`, `""` or an
+    /// empty vector rather than as an error — which makes "you have not
+    /// picked yet" and "we can no longer find where your pick is" the same
+    /// answer. The first is the commonest state in champ select. The second
+    /// is a bug, and it would sit behind the first indefinitely, looking like
+    /// a user who simply had not locked in.
+    ///
+    /// Both cases below are impossible in a healthy session, and both require
+    /// positive evidence that a session is running rather than inferring
+    /// trouble from silence. That asymmetry is the point: a missed shape
+    /// change costs a confusing patch day, and a false alarm costs the user's
+    /// trust in every screen this app draws.
+    pub fn unreadable(&self) -> Option<&'static str> {
+        if Self::READABLE_PHASES.contains(&self.timer.phase.as_str()) && self.my_team.is_empty() {
+            return Some("champ select is running but the client sent no team");
+        }
+
+        if !self.my_team.is_empty() && self.local_player().is_none() {
+            return Some("the client sent a team with no row for this player");
+        }
+
+        None
+    }
+
     /// What the user locked, once they have locked something.
     ///
     /// `None` covers the ordinary in-between states: the session exists but
@@ -157,6 +190,76 @@ mod tests {
             "actions": [[{ "id": 1, "type": "pick" }]],
         }))
         .unwrap()
+    }
+
+    #[test]
+    fn a_renamed_team_field_is_not_mistaken_for_an_empty_lobby() {
+        // What a patch that renames `myTeam` actually delivers: every field
+        // defaults, so the payload parses and looks like a lobby nobody has
+        // joined. The phase is what gives it away.
+        let parsed = ChampSelectSession::from_json(&json!({
+            "localPlayerCellId": 2,
+            "myTeamV2": [{ "cellId": 2, "championId": 103, "assignedPosition": "middle" }],
+            "timer": { "phase": "BAN_PICK" },
+        }))
+        .unwrap();
+
+        assert_eq!(parsed.selection(), None);
+        assert_eq!(
+            parsed.unreadable(),
+            Some("champ select is running but the client sent no team")
+        );
+    }
+
+    #[test]
+    fn a_team_with_no_row_for_us_is_unreadable() {
+        // Either `localPlayerCellId` or `cellId` moved. The same list goes to
+        // all ten players, so a team that contains nobody with our cell id
+        // cannot be a state we are legitimately in.
+        let parsed = session(
+            7,
+            json!([{ "cellId": 2, "championId": 103, "assignedPosition": "middle" }]),
+        );
+
+        assert_eq!(parsed.selection(), None);
+        assert_eq!(
+            parsed.unreadable(),
+            Some("the client sent a team with no row for this player")
+        );
+    }
+
+    #[test]
+    fn the_ordinary_states_are_never_called_unreadable() {
+        // The whole risk of this check is cost, not coverage: a false alarm
+        // here tells a user their app is broken during a normal champ select.
+
+        // Hovering, not locked. The commonest state there is.
+        let hovering = session(
+            2,
+            json!([{ "cellId": 2, "championId": 0, "assignedPosition": "middle" }]),
+        );
+        assert_eq!(hovering.selection(), None);
+        assert_eq!(hovering.unreadable(), None);
+
+        // A queue that assigns no position — ARAM, customs, Practice Tool.
+        let no_lane = session(
+            2,
+            json!([{ "cellId": 2, "championId": 103, "assignedPosition": "" }]),
+        );
+        assert!(no_lane.selection().is_some());
+        assert_eq!(no_lane.unreadable(), None);
+
+        // Between sessions: an empty payload with no phase claims nothing,
+        // so there is nothing to contradict.
+        let empty = ChampSelectSession::from_json(&json!({})).unwrap();
+        assert_eq!(empty.unreadable(), None);
+
+        // A phase we have never seen is not evidence either way.
+        let unknown_phase = ChampSelectSession::from_json(&json!({
+            "timer": { "phase": "SOME_FUTURE_PHASE" },
+        }))
+        .unwrap();
+        assert_eq!(unknown_phase.unreadable(), None);
     }
 
     #[test]

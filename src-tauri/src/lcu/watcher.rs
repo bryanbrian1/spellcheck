@@ -85,6 +85,14 @@ pub enum ChampSelectEvent {
     /// engine reads, and reasoning over it costs nothing but a few map
     /// lookups.
     CompChanged(Comp),
+    /// Champ select is running and the payload no longer makes sense.
+    ///
+    /// Its own state rather than a variant of "nothing locked yet", because
+    /// the two are indistinguishable from the outside and only one of them
+    /// is the user's fault. The LCU is an internal client API with no
+    /// versioning promise, so this is what a patch that renames a field
+    /// looks like from in here.
+    Unreadable { reason: &'static str },
     /// Champ select ended — dodged, declined, or the game started.
     Left,
 }
@@ -203,6 +211,13 @@ async fn emit(
     for change in state.observe(session) {
         let event = match change {
             Change::Entered => ChampSelectEvent::Entered,
+            Change::Unreadable(reason) => {
+                // Logged as well as sent: the screen tells the user their app
+                // is confused, and the terminal tells whoever is debugging
+                // which of the two shapes broke.
+                eprintln!("leaguechecker: unreadable champ select — {reason}");
+                ChampSelectEvent::Unreadable { reason }
+            }
             // No id to resolve and no lookup to make: the ids go out as they
             // arrived and the engine reads them against its own tag file.
             Change::CompChanged(comp) => ChampSelectEvent::CompChanged(comp),
@@ -245,6 +260,7 @@ async fn emit(
 #[derive(Debug, PartialEq, Eq)]
 enum Change {
     Entered,
+    Unreadable(&'static str),
     Locked(Selection),
     CompChanged(Comp),
 }
@@ -256,6 +272,9 @@ enum Change {
 #[derive(Debug, Default)]
 struct ChampSelectState {
     entered: bool,
+    /// Reported once per champ select. The client resends the session on
+    /// every hover and every tick, and a broken shape stays broken.
+    unreadable: bool,
     locked: Option<Selection>,
     comp: Option<Comp>,
 }
@@ -267,6 +286,21 @@ impl ChampSelectState {
         if !self.entered {
             self.entered = true;
             changes.push(Change::Entered);
+        }
+
+        // Before reading anything out of it: a payload that contradicts
+        // itself cannot be trusted to be merely empty.
+        match session.unreadable() {
+            Some(reason) => {
+                if !self.unreadable {
+                    self.unreadable = true;
+                    changes.push(Change::Unreadable(reason));
+                }
+                return changes;
+            }
+            // A session that reads again after a bad one is worth hearing
+            // about, so the next break is reported too.
+            None => self.unreadable = false,
         }
 
         if let Some(selection) = session.selection() {
@@ -452,6 +486,14 @@ mod tests {
         assert_eq!(
             serde_json::to_value(ChampSelectEvent::Entered).unwrap(),
             json!({ "event": "entered" })
+        );
+        // A struct variant rather than a newtype one, because an internally
+        // tagged enum cannot serialise a variant holding a bare string — it
+        // returns an error instead, which would have made the one event that
+        // exists to break a silence fail silently itself.
+        assert_eq!(
+            serde_json::to_value(ChampSelectEvent::Unreadable { reason: "no team" }).unwrap(),
+            json!({ "event": "unreadable", "reason": "no team" })
         );
         assert_eq!(
             serde_json::to_value(ChampSelectEvent::Locked(LockedChampion {
