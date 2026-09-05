@@ -1,0 +1,178 @@
+# Builds the downloadable app for both platforms and publishes it as a
+# GitHub prerelease.
+#
+# Two things about this workflow are deliberate and easy to undo by accident.
+#
+# First, it runs on a Windows runner. Not for convenience — the app cannot be
+# cross-compiled. `ring`, underneath rustls, builds C, and there is no MSVC
+# toolchain on a Mac, so the Windows installer can only be produced on
+# Windows. The matrix is a requirement, not an optimisation.
+#
+# Second, every artifact here is UNSIGNED. macOS marks a downloaded unsigned
+# app as quarantined and Windows shows a SmartScreen warning, so testers need
+# the install notes in the README to get past both. That is an acceptable
+# trade for a beta and a bad one for a public launch. Adding the six Apple
+# secrets to the repo turns signing on without editing this file — but see
+# the signing step for why they cannot simply be listed as build env.
+name: release
+
+on:
+  # A tag is the trigger, so publishing is a deliberate act and never a
+  # side effect of merging. The tag must match the version in
+  # package.json, src-tauri/tauri.conf.json and src-tauri/Cargo.toml —
+  # nothing here checks that for you, and the tag names the release while
+  # the config names what is inside the binary.
+  push:
+    tags:
+      - "v*"
+  # Build the matrix without publishing, to prove a change compiles on
+  # Windows before committing to a tag.
+  #
+  # Note that GitHub will not dispatch a workflow that is absent from the
+  # default branch, whatever ref you aim it at, so this trigger is unusable
+  # until this file is on main. That is the reason for the pull_request
+  # trigger below rather than a preference for one over the other.
+  workflow_dispatch:
+  # The developer machine here is a Mac and the app cannot be cross-compiled,
+  # so without this nobody finds out that a change broke Windows until after
+  # a tag is pushed and testers are already downloading. Publishing is gated
+  # on the ref being a tag, so a pull request run builds both platforms and
+  # uploads nothing.
+  #
+  # Scoped to the things a build actually depends on: the daily crawl rewrites
+  # hundreds of files under data/, and none of them can break a compile.
+  pull_request:
+    paths:
+      - "src/**"
+      - "src-tauri/**"
+      - "index.html"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/release.yml"
+
+# Releases are attached to a tag, so two runs for one tag would race to
+# upload the same assets.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      # One platform failing should not delete the other platform's
+      # artifacts. Testers on the working OS can start while the other is
+      # fixed.
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            # One download for both Apple Silicon and Intel. The alternative
+            # is two runners and two DMGs, and a tester picking the wrong one
+            # gets an app that will not open.
+            args: "--target universal-apple-darwin"
+            rust_targets: "aarch64-apple-darwin,x86_64-apple-darwin"
+          - platform: windows-latest
+            args: ""
+            rust_targets: ""
+
+    runs-on: ${{ matrix.platform }}
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_targets }}
+
+      # A cold Rust build of the whole Tauri stack is most of this job's
+      # runtime, and a beta gets rebuilt often. CI-only: nothing here is
+      # linked into the app.
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "src-tauri -> target"
+
+      - name: Install frontend tooling
+        run: npm ci
+
+      # tauri.conf.json points frontendDist at ../dist and does not know how
+      # to produce it, so the TypeScript build has to happen before the Rust
+      # one rather than as part of it.
+      - name: Build the frontend
+        run: npm run build
+
+      # Tauri decides to sign when APPLE_CERTIFICATE is *present*, not when it
+      # holds anything, so handing the build an unset secret is not a no-op —
+      # it fails in `security import` on an empty certificate. That is why the
+      # variables are promoted here, only when there is something to promote,
+      # instead of being listed in the build step's env where an
+      # unconfigured repo cannot avoid them.
+      - name: Configure Apple signing, if a certificate is available
+        if: runner.os == 'macOS'
+        env:
+          CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          NOTARY_APPLE_ID: ${{ secrets.APPLE_ID }}
+          NOTARY_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -z "$CERTIFICATE" ]; then
+            echo "No APPLE_CERTIFICATE secret; building unsigned."
+            echo "Testers will need the install notes in the README."
+            exit 0
+          fi
+
+          # Heredoc form because a certificate is multi-line. The delimiter is
+          # deliberately not something base64 or a password could contain.
+          {
+            for pair in \
+              "APPLE_CERTIFICATE:$CERTIFICATE" \
+              "APPLE_CERTIFICATE_PASSWORD:$CERTIFICATE_PASSWORD" \
+              "APPLE_SIGNING_IDENTITY:$SIGNING_IDENTITY" \
+              "APPLE_ID:$NOTARY_APPLE_ID" \
+              "APPLE_PASSWORD:$NOTARY_PASSWORD" \
+              "APPLE_TEAM_ID:$TEAM_ID"
+            do
+              echo "${pair%%:*}<<__LEAGUECHECKER_EOF__"
+              echo "${pair#*:}"
+              echo "__LEAGUECHECKER_EOF__"
+            done
+          } >> "$GITHUB_ENV"
+          echo "Apple signing configured; this build will be signed and notarised."
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Only publish on a tag. A workflow_dispatch run builds the matrix
+          # and uploads nothing.
+          tagName: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+          releaseName: leaguechecker ${{ github.ref_name }}
+          releaseBody: |
+            Beta build. These installers are unsigned, so both systems will
+            try to stop you the first time.
+
+            **macOS** — the app is blocked on first open. System Settings →
+            Privacy & Security → scroll down → Open Anyway.
+
+            **Windows** — SmartScreen shows "Windows protected your PC".
+            More info → Run anyway.
+
+            League does not need to be running to install or open the app; it
+            waits for the client and reports when none is there.
+          # A beta is not a release. This also keeps the repo's "latest
+          # release" pointing at nothing until there is something to stand
+          # behind.
+          prerelease: true
+          # Published straight away — a draft would be invisible to the
+          # testers this workflow exists to serve.
+          releaseDraft: false
+          args: ${{ matrix.args }}
