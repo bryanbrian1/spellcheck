@@ -23,6 +23,7 @@
 //! commits nothing, and stopping early with most of the data is a good run.
 
 import { appendFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 
 import { OutOfBudget, RiotApi, RiotApiError } from "./api.mjs";
 import { isOnPatch, loadCatalog } from "./catalog.mjs";
@@ -129,11 +130,16 @@ const durationSeconds = (info) =>
     ? info.gameDuration
     : Math.round(info.gameDuration / 1000);
 
-async function crawl() {
-  if (!config.key) {
-    console.error("RIOT_API_KEY is not set. Nothing to crawl with.");
-    process.exit(1);
-  }
+/**
+ * One run.
+ *
+ * Returns a summary rather than calling `process.exit`, so the whole
+ * orchestration — seeding, paging, filtering, writing — can be driven from a
+ * test with a stubbed `fetch`. The exit code is the command line's job, at
+ * the bottom of this file.
+ */
+export async function crawl() {
+  if (!config.key) throw new Error("RIOT_API_KEY is not set. Nothing to crawl with.");
 
   const deadline = started + config.minutes * 60_000;
   const api = new RiotApi({ ...config, deadline, log });
@@ -199,17 +205,22 @@ async function crawl() {
       // The key died mid-run. Everything gathered so far is still good, so it
       // gets written — but this exits non-zero, because a key that expires
       // daily is an operational problem and must not pass quietly.
+      // The key died mid-run. Everything gathered so far is still good, so
+      // it gets written — but the run is a failure, because a key that
+      // expires daily is an operational problem that must not pass quietly.
       stopped = `the key stopped working (${error.status})`;
       writeAll(tally, catalog, counts);
       report(api, counts, stopped, true);
-      process.exit(1);
+      return { ok: false, why: stopped, counts };
     } else {
       throw error;
     }
   }
 
+  const why = stopped ?? "finished the match list";
   writeAll(tally, catalog, counts);
-  report(api, counts, stopped ?? "finished the match list", false);
+  report(api, counts, why, false);
+  return { ok: true, why, counts };
 }
 
 function writeAll(tally, catalog, counts) {
@@ -275,7 +286,16 @@ function report(api, counts, why, failed) {
   }
 }
 
-crawl().catch((error) => {
-  console.error(`\nThe crawl failed: ${error.message}\n`);
-  process.exit(1);
-});
+/* Run only when invoked directly, so importing this for a test does not
+   start a crawl as a side effect of the import. */
+const invokedDirectly =
+  process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (invokedDirectly) {
+  crawl()
+    .then((result) => process.exit(result.ok ? 0 : 1))
+    .catch((error) => {
+      console.error(`\nThe crawl failed: ${error.message}\n`);
+      process.exit(1);
+    });
+}
