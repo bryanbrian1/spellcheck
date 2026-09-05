@@ -2,9 +2,10 @@
  * leaguechecker UI.
  *
  * Vanilla TypeScript, no framework, no runtime dependencies. It talks to Rust
- * two ways — two commands for the search box, two events for champ select —
- * and renders whatever comes back. It deliberately does not know, and must
- * never learn, which provider answered.
+ * two ways — commands for the search box, events for the live screen — and
+ * renders whatever comes back. It deliberately does not know, and must never
+ * learn, which provider answered, or which of the two routes into the live
+ * screen asked for a build.
  */
 
 type Role = "top" | "jungle" | "middle" | "bottom" | "utility";
@@ -85,10 +86,19 @@ type LcuStatus =
   | ({ event: "locked" } & LockedChampion)
   | { event: "left" };
 
-/** `lcu:build` — the build for a locked champion. `lookup` and `error` are
- *  exclusive, and "no data for that pair" lives inside `lookup`. */
-interface ChampSelectBuild {
-  champion: LockedChampion;
+/**
+ * `live:build` — the build for the champion we are on.
+ *
+ * Sent when the client says we locked in, and sent when a game turns out to
+ * be running that we never saw the champ select for. The payload is identical
+ * either way and carries no hint of which route found it, because there is
+ * nothing this screen would do differently. `lookup` and `error` are
+ * exclusive, and "no data for that pair" lives inside `lookup`.
+ */
+interface LiveBuild {
+  /** The Data Dragon key, matched against the champion on screen. */
+  championKey: string;
+  position: string;
   lookup: BuildLookup | null;
   error: string | null;
 }
@@ -138,6 +148,9 @@ interface InGameState {
   champion: string | null;
   /** The Data Dragon key, which is what art is filed under. */
   championKey: string | null;
+  /** Our lane, when the mode assigns one — the one thing champ select and
+   *  the game both name, and so the reason either can ask for a build. */
+  role: Role | null;
   level: number;
   gameTime: number;
   standing: Standing | null;
@@ -310,8 +323,17 @@ const paintIcons = (): void => {
   });
 };
 
-/** Champion art in a header, falling back to the initials it used to show. */
+/** Champion art in a header, falling back to the initials it used to show.
+ *
+ *  The live header repaints on every reading of a game in progress, which is
+ *  twice a minute for the whole match. Tearing the image down and putting an
+ *  identical one back would make the portrait blink each time, so an
+ *  unchanged champion is left alone. */
 const setPortrait = (holder: HTMLElement, key: string | null, fallback: string): void => {
+  const wanted = key ? `champ:${key}` : "";
+  if (holder.dataset.painted === wanted) return;
+  holder.dataset.painted = wanted;
+
   holder.querySelector("img")?.remove();
   holder.textContent = fallback;
   if (key) holder.dataset.icon = `champ:${key}`;
@@ -815,12 +837,11 @@ el<HTMLDivElement>("roles").addEventListener("click", (event) => {
 
 const screens: Record<string, string> = {
   search: "s-search",
-  select: "s-select",
-  game: "s-game",
+  live: "s-live",
 };
 
 /** Show one screen and keep the mode strip agreeing with it, whether the
- *  change came from a click or from the client. */
+ *  change came from a click or from League. */
 const showScreen = (mode: string): void => {
   for (const [name, id] of Object.entries(screens)) {
     el(id).classList.toggle("on", name === mode);
@@ -834,13 +855,22 @@ for (const button of document.querySelectorAll<HTMLButtonElement>(".modes button
   button.addEventListener("click", () => showScreen(button.dataset.go ?? "search"));
 }
 
-/* ---------- champ select ---------- */
+/* ---------- the live screen ---------- */
 
 /*
- * Driven entirely by two events from Rust. Nothing here polls, nothing here
- * asks the client anything, and nothing here knows a WebSocket exists — the
- * LCU layer has already reduced all of it to "the client is offline" or "you
- * locked Ahri mid".
+ * Champ select and the game are one screen, because they are one run of
+ * League. Four event streams write to it and none of them coordinates:
+ *
+ *   lcu:status       where the client is — offline, in select, locked in
+ *   lcu:suggestions  checks one and two, over the champ select lobby
+ *   game:state       check three, and check one again, over the live game
+ *   live:build       the build, from whichever of the two routes found it
+ *
+ * Each owns its own slots below and never writes another's. That is what
+ * makes the handover work: when the game starts it adds blocks at the top of
+ * a screen that is already filled in, rather than clearing everything and
+ * beginning again somewhere else. Nothing polls, nothing here asks League
+ * anything, and nothing here knows a WebSocket or an HTTP poll exists.
  */
 
 const roleLabels: Record<string, string> = {
@@ -851,59 +881,136 @@ const roleLabels: Record<string, string> = {
   utility: "Support",
 };
 
-const selectPortrait = el<HTMLDivElement>("select-portrait");
-const selectName = el<HTMLDivElement>("select-name");
-const selectSub = el<HTMLDivElement>("select-sub");
-const selectPill = el<HTMLSpanElement>("select-pill");
-const selectBody = el<HTMLDivElement>("select-body");
+const livePortrait = el<HTMLDivElement>("live-portrait");
+const liveName = el<HTMLDivElement>("live-name");
+const liveSub = el<HTMLDivElement>("live-sub");
+const livePill = el<HTMLSpanElement>("live-pill");
+const liveBody = el<HTMLDivElement>("live-body");
 
-/** The champion the client last said we locked, so a build that arrives after
- *  a fast swap can be recognised as stale and dropped. */
+/**
+ * The champion the client last said we locked.
+ *
+ * Held past the end of champ select on purpose. The client stops talking
+ * about champ select the moment it closes, but the champion it named is the
+ * one about to be played, and it is what a late build is matched against.
+ */
 let locked: LockedChampion | null = null;
+
+/** The latest reading of a game in progress, or null when none is running.
+ *  Its presence is what puts this screen into its second half. */
+let playing: InGameState | null = null;
+
+/** The build, whichever route found it, or what the lookup came back with
+ *  instead of one. */
+let buildSlot = "";
+
+/** Check one and check two, as champ select saw them. */
+let threatSlot = "";
+let gapsSlot = "";
+
+/** What the client is doing. Shown only while there is nothing better on
+ *  screen, which once a game is running there always is. */
+let noticeSlot = "";
+
+/** The header, while no game is running. A game overrides all of it. */
+let selectSub = "Waiting for the League client";
+let selectPill: [text: string, connected: boolean] = ["Offline", false];
+
+/**
+ * Check three's heading.
+ *
+ * The advice underneath differs by footing — components and defence when
+ * behind, spikes when ahead — so the heading has to as well. A fixed "because
+ * you are behind" was wrong every game that was going well.
+ */
+const stateTitle = (standing: Standing | null): string => {
+  switch (standing?.footing) {
+    case "behind":
+      return "Because you are behind";
+    case "ahead":
+      return "Because you are ahead";
+    default:
+      return "How the game is going";
+  }
+};
 
 /** Teal for connected, neutral for not. Amber is never used here: it means
  *  "rule-based suggestion" everywhere else in the app. */
-const setPill = (text: string, connected: boolean): void => {
-  selectPill.textContent = text;
-  selectPill.className = connected ? "pill" : "pill off";
+const paintHeader = (): void => {
+  // A game outranks the client. Once one is running the champion, the lane
+  // and the clock all come from the thing actually being played, and the
+  // client has nothing left to say that this screen would rather show.
+  const key = playing?.championKey ?? locked?.championKey ?? null;
+  const name = playing?.champion ?? (locked ? nameFor(locked.championKey) : null);
+  const [pill, connected] = playing ? ["In game", true] : selectPill;
+
+  setPortrait(livePortrait, key, name ? name.slice(0, 2).toUpperCase() : "\u2014");
+  liveName.textContent = name ?? "Live";
+  liveSub.textContent = playing
+    ? [
+        playing.role ? roleLabels[playing.role] : null,
+        clock(playing.gameTime),
+        playing.level ? `level ${playing.level}` : null,
+      ]
+        .filter(Boolean)
+        .join(" \u00b7 ")
+    : selectSub;
+  livePill.textContent = pill;
+  livePill.className = connected ? "pill" : "pill off";
 };
 
-/* The champ select body is written by two independent sources: the build,
-   which arrives once when you lock in, and the suggestions, which change
-   every time one of the other nine players picks. Each holds its own half so
-   a late enemy pick does not wipe the build off the screen. */
-let buildHalf = "";
-let suggestionHalf = "";
+/* A game reports itself every half-minute for the length of the match and
+   almost nothing in it moves between readings. The last rendering is kept and
+   compared so the screen — including the build somebody is reading — is not
+   rebuilt twice a minute for a clock that lives in the header. */
+let lastBody = "";
 
-const paintSelect = (): void => {
-  selectBody.innerHTML = buildHalf + suggestionHalf;
+const paintBody = (): void => {
+  const blocks: string[] = [];
+
+  if (playing) {
+    if (playing.standing) blocks.push(standingBlock(playing.standing));
+    blocks.push(suggestionBlock(stateTitle(playing.standing), playing.state, playing.itemNames));
+    // Check one runs on both sides of the handover, and the game's reading is
+    // strictly the better one: champ select is often looking at five hidden
+    // seats, a game never is. So it replaces champ select's answer rather
+    // than sitting beside it disagreeing.
+    blocks.push(suggestionBlock("Against this team", playing.threat, playing.itemNames));
+  } else {
+    blocks.push(threatSlot);
+  }
+
+  // Check two is champ select's alone and survives into the game untouched:
+  // your own team's shape was settled when the last ally locked in, and no
+  // item anyone buys afterwards changes it.
+  blocks.push(gapsSlot);
+
+  // Last, because everything above it is a reason to deviate from it, and a
+  // reason reads better before the plan it modifies. It also means the game
+  // starting inserts blocks at the top instead of shuffling the build.
+  blocks.push(buildSlot);
+
+  const html = blocks.filter(Boolean).join("");
+  const shown =
+    html || (playing ? emptyHtml("Nothing to say about this game yet.") : noticeSlot);
+
+  if (shown === lastBody) return;
+  lastBody = shown;
+  liveBody.innerHTML = shown;
   paintIcons();
 };
 
-const selectMessage = (text: string, bad = false): void => {
-  buildHalf = bad ? badHtml(text) : emptyHtml(text);
-  selectBody.innerHTML = buildHalf + suggestionHalf;
+const paintLive = (): void => {
+  paintHeader();
+  paintBody();
 };
 
-/** A new champ select, or none at all. Both halves go. */
-const clearSelect = (): void => {
-  buildHalf = "";
-  suggestionHalf = "";
-};
-
-/** Header for a champion we have no build for yet. */
-const showLocked = (champion: LockedChampion): void => {
-  const name = nameFor(champion.championKey);
-  setPortrait(selectPortrait, champion.championKey, name.slice(0, 2).toUpperCase());
-  selectName.textContent = name;
-  selectSub.textContent =
-    roleLabels[champion.assignedPosition] ?? champion.assignedPosition;
-};
-
-const showWaiting = (name: string, sub: string): void => {
-  setPortrait(selectPortrait, null, "—");
-  selectName.textContent = name;
-  selectSub.textContent = sub;
+/** A new run of League. Everything either half had to say about the last one
+ *  goes, so a fresh champ select cannot open against the previous game. */
+const clearLive = (): void => {
+  buildSlot = "";
+  threatSlot = "";
+  gapsSlot = "";
 };
 
 const onStatus = (status: LcuStatus): void => {
@@ -911,152 +1018,117 @@ const onStatus = (status: LcuStatus): void => {
     // The default state of the machine. Said plainly, not as a failure.
     case "clientOffline":
       locked = null;
-      clearSelect();
-      showWaiting("Champ select", "Waiting for the League client");
-      setPill("Offline", false);
-      selectMessage("League isn't running. This screen fills itself when you lock a champion.");
+      clearLive();
+      selectSub = "Waiting for the League client";
+      selectPill = ["Offline", false];
+      noticeSlot = emptyHtml(
+        "League isn't running. This screen fills itself when you lock a champion.",
+      );
       break;
 
     case "clientConnected":
       locked = null;
-      clearSelect();
-      showWaiting("Champ select", "Client is open");
-      setPill("Connected", true);
-      selectMessage("Waiting for champ select.");
+      clearLive();
+      selectSub = "Client is open";
+      selectPill = ["Connected", true];
+      noticeSlot = emptyHtml("Waiting for champ select.");
       break;
 
     case "entered":
-      // A fresh champ select. Last game's enemy team must not survive into it.
-      clearSelect();
-      showWaiting("Champ select", "Pick your champion");
-      setPill("In select", true);
-      selectMessage("Lock a champion and the build appears here.");
+      // A fresh champ select. Last game's champion and enemy team must not
+      // survive into it.
+      locked = null;
+      clearLive();
+      selectSub = "Pick your champion";
+      selectPill = ["In select", true];
+      noticeSlot = emptyHtml("Lock a champion and the build appears here.");
       // You are in champ select now; this is the screen you want.
-      showScreen("select");
+      showScreen("live");
       break;
 
     case "locked":
       locked = status;
-      showLocked(status);
-      setPill("Live", true);
-      selectMessage(`Looking up ${nameFor(status.championKey)}…`);
-      showScreen("select");
+      selectSub = roleLabels[status.assignedPosition] ?? status.assignedPosition;
+      selectPill = ["Locked", true];
+      buildSlot = emptyHtml(`Looking up ${nameFor(status.championKey)}\u2026`);
+      showScreen("live");
       break;
 
-    // Champ select ended — dodged, or the game is loading. The build stays on
-    // screen, because the minute after champ select is exactly when it gets
-    // read. Only the pill changes.
+    // Champ select ended — dodged, or the game is loading. Nothing is
+    // cleared: the minute after champ select is exactly when the build gets
+    // read, and if a game is loading this is the build for it.
     case "left":
-      setPill("Connected", true);
+      selectPill = ["Connected", true];
       if (locked) {
-        const role = roleLabels[locked.assignedPosition] ?? locked.assignedPosition;
-        selectSub.textContent = `${role} · champ select ended`;
+        const lane = roleLabels[locked.assignedPosition] ?? locked.assignedPosition;
+        selectSub = `${lane} \u00b7 champ select ended`;
       }
       break;
   }
+
+  paintLive();
 };
 
-const onBuild = (payload: ChampSelectBuild): void => {
-  // A build for a champion we are no longer locked into lost the race.
-  if (locked && payload.champion.championKey !== locked.championKey) return;
-
-  if (payload.error !== null) {
-    selectMessage(payload.error, true);
-    return;
-  }
+const onBuild = (payload: LiveBuild): void => {
+  // A build for a champion we are no longer locked into lost a race with a
+  // fast swap. There is nothing to check when the game found it and we never
+  // saw the champ select, which is the case this arm exists to allow.
+  if (locked && payload.championKey !== locked.championKey) return;
 
   const lookup = payload.lookup;
-  if (lookup === null) {
-    selectMessage(`Nothing came back for ${nameFor(payload.champion.championKey)}.`);
-    return;
-  }
-
-  if (lookup.status === "noData") {
+  if (payload.error !== null) {
+    buildSlot = badHtml(payload.error);
+  } else if (lookup === null) {
+    buildSlot = emptyHtml(`Nothing came back for ${nameFor(payload.championKey)}.`);
+  } else if (lookup.status === "noData") {
     // The backend falls back to the key when it has no display name, so
     // prefer the roster: "no data for MonkeyKing" reads as a fault in the app
     // rather than an ordinary answer about Wukong.
-    const name = nameFor(lookup.championKey);
-    selectName.textContent = name;
-    selectMessage(`No data for ${name} ${lookup.role}. ${lookup.detail}`);
-    return;
+    buildSlot = emptyHtml(
+      `No data for ${nameFor(lookup.championKey)} ${lookup.role}. ${lookup.detail}`,
+    );
+  } else {
+    buildSlot =
+      buildHtml(lookup) ?? emptyHtml(`${lookup.champion.name} came back with an empty build.`);
   }
 
-  selectName.textContent = lookup.champion.name;
-  const html = buildHtml(lookup);
-  buildHalf = html ?? emptyHtml(`${lookup.champion.name} came back with an empty build.`);
-  paintSelect();
+  paintBody();
 };
 
 /**
- * The rule-based checks. These arrive on their own schedule — before the
- * build if you locked last, and repeatedly as the rest of the lobby picks —
- * so they replace only their own half of the screen.
+ * The champ-select checks. These arrive on their own schedule — before the
+ * build if you locked last, and again every time one of the other nine
+ * players picks — so they replace only their own slots.
  */
 const onSuggestions = (payload: ChampSelectSuggestions): void => {
-  suggestionHalf =
-    suggestionBlock("Against this team", payload.threat, payload.itemNames) +
-    suggestionBlock("For your team", payload.gaps, payload.itemNames);
-  paintSelect();
-};
-
-/* ---------- in game ---------- */
-
-const gamePortrait = el<HTMLDivElement>("game-portrait");
-const gameName = el<HTMLDivElement>("game-name");
-const gameSub = el<HTMLDivElement>("game-sub");
-const gamePill = el<HTMLSpanElement>("game-pill");
-const gameBody = el<HTMLDivElement>("game-body");
-
-/* The header moves every time we look; the advice moves a handful of times a
-   game. Rewriting the blocks on every reading would redraw the screen every
-   thirty seconds for nothing, so the last rendering is kept and compared. */
-let lastGameBlocks = "";
-
-const paintGameBody = (html: string): void => {
-  if (html === lastGameBlocks) return;
-  lastGameBlocks = html;
-  gameBody.innerHTML = html;
-  paintIcons();
+  threatSlot = suggestionBlock("Against this team", payload.threat, payload.itemNames);
+  gapsSlot = suggestionBlock("For your team", payload.gaps, payload.itemNames);
+  paintBody();
 };
 
 const onGameState = (update: InGameUpdate): void => {
   if (update.event === "noGame") {
-    setPortrait(gamePortrait, null, "\u2014");
-    gameName.textContent = "In game";
-    gameSub.textContent = "No game running";
-    gamePill.textContent = "No game";
-    gamePill.className = "pill off";
-    paintGameBody(emptyHtml("This screen fills itself once a game starts."));
+    // This arrives on a timer whether or not the client is even open, so it
+    // must touch nothing champ select owns — it is not evidence about champ
+    // select. The build in particular stays: the minutes after a game are
+    // exactly when someone reads what they should have built.
+    if (!playing) return;
+    playing = null;
+    paintLive();
     return;
   }
 
-  const champion = update.champion;
-  setPortrait(
-    gamePortrait,
-    update.championKey,
-    champion ? champion.slice(0, 2).toUpperCase() : "\u2014",
-  );
-  gameName.textContent = champion ?? "In game";
-  gameSub.textContent = `${clock(update.gameTime)}${update.level ? ` \u00b7 level ${update.level}` : ""}`;
-  gamePill.textContent = "Live";
-  gamePill.className = "pill";
-
-  const blocks = [
-    update.standing ? standingBlock(update.standing) : "",
-    suggestionBlock("Because you are behind", update.state, update.itemNames),
-    suggestionBlock("Against this team", update.threat, update.itemNames),
-  ]
-    .filter(Boolean)
-    .join("");
-
-  // Spectating, or a mode with no lanes and a champion we have no tags for.
-  paintGameBody(
-    blocks || emptyHtml("Nothing to say about this game yet."),
-  );
+  // Worth switching to, once. Not on every reading afterwards: somebody
+  // looking something up mid-game should not be yanked back here twice a
+  // minute.
+  const starting = playing === null;
+  playing = update;
+  if (starting) showScreen("live");
+  paintLive();
 };
 
 listen<LcuStatus>("lcu:status", onStatus);
-listen<ChampSelectBuild>("lcu:build", onBuild);
+listen<LiveBuild>("live:build", onBuild);
 listen<ChampSelectSuggestions>("lcu:suggestions", onSuggestions);
 listen<InGameUpdate>("game:state", onGameState);
 

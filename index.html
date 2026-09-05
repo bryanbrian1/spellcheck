@@ -12,13 +12,14 @@
 <body>
 <div id="app">
 
-  <!-- Champ select now drives itself: locking a champion switches to that
-       screen on its own. The strip stays because Search has to work with no
-       client running at all, and because In game is still a preview. -->
+  <!-- Two screens, not three. Champ select and the game are one run of
+       League and one screen here: it fills in when you lock a champion and
+       keeps going once the match starts, adding to what is already there
+       rather than starting again somewhere else. It drives itself, so the
+       strip exists only because Search has to work with no client at all. -->
   <div class="modes" role="group" aria-label="Mode">
     <button data-go="search" aria-pressed="true">Search</button>
-    <button data-go="select" aria-pressed="false">Champ select</button>
-    <button data-go="game" aria-pressed="false">In game</button>
+    <button data-go="live" aria-pressed="false">Live</button>
   </div>
 
   <!-- ============ SEARCH — live, wired to the provider ============ -->
@@ -47,42 +48,24 @@
     </div>
   </section>
 
-  <!-- ============ CHAMP SELECT — live, driven by the LCU events ============ -->
-  <section class="screen" id="s-select">
+  <!-- ============ LIVE — champ select and the game, one screen ============ -->
+  <section class="screen" id="s-live">
     <div class="hdr">
-      <div class="portrait" id="select-portrait">&mdash;</div>
+      <div class="portrait" id="live-portrait">&mdash;</div>
       <div class="hdr-main">
-        <div class="hdr-name" id="select-name">Champ select</div>
-        <div class="hdr-sub" id="select-sub">Waiting for the League client</div>
+        <div class="hdr-name" id="live-name">Live</div>
+        <div class="hdr-sub" id="live-sub">Waiting for the League client</div>
       </div>
-      <span class="pill off" id="select-pill">Offline</span>
+      <span class="pill off" id="live-pill">Offline</span>
     </div>
 
-    <div class="body" id="select-body">
+    <div class="body" id="live-body">
       <div class="empty"><p>League isn&#39;t running. This screen fills itself when you lock a champion.</p></div>
     </div>
 
     <div class="foot">
-      <button class="btn pri" id="select-import-runes" disabled>Import runes</button>
-      <button class="btn" id="select-import-items" disabled>Import items</button>
-    </div>
-  </section>
-
-  <!-- ============ IN GAME — preview, phase 3 ============ -->
-  <section class="screen" id="s-game">
-    <div class="hdr">
-      <div class="portrait" id="game-portrait">&mdash;</div>
-      <div class="hdr-main">
-        <div class="hdr-name" id="game-name">In game</div>
-        <div class="hdr-sub" id="game-sub">Waiting for a game</div>
-      </div>
-      <span class="pill off" id="game-pill">No game</span>
-    </div>
-
-    <div class="body" id="game-body"></div>
-
-    <div class="foot">
-      <button class="btn" id="game-import-items" disabled>Import items</button>
+      <button class="btn pri" id="live-import-runes" disabled>Import runes</button>
+      <button class="btn" id="live-import-items" disabled>Import items</button>
     </div>
   </section>
 
