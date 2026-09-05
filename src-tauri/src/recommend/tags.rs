@@ -128,6 +128,7 @@ struct ItemFile {
 pub struct Tags {
     champions: HashMap<String, ChampionTags>,
     by_champion_id: HashMap<u32, String>,
+    by_champion_name: HashMap<String, String>,
     untagged: Vec<String>,
     items: HashMap<u32, ItemTags>,
 }
@@ -167,6 +168,15 @@ impl Tags {
             .map(|(key, tags)| (tags.id, key.clone()))
             .collect();
 
+        // The live game API names champions the way a player does — `Wukong`,
+        // not `MonkeyKing` — and has no notion of the Data Dragon key at all,
+        // so display name has to be a way in.
+        let by_champion_name = champion_file
+            .champions
+            .iter()
+            .map(|(key, tags)| (tags.name.clone(), key.clone()))
+            .collect();
+
         let mut items = HashMap::with_capacity(item_file.items.len());
         for (raw_id, tags) in item_file.items {
             let id: u32 = raw_id
@@ -178,6 +188,7 @@ impl Tags {
         Ok(Tags {
             champions: champion_file.champions,
             by_champion_id,
+            by_champion_name,
             untagged: champion_file.untagged,
             items,
         })
@@ -195,6 +206,13 @@ impl Tags {
     /// Tags for a Riot numeric champion id, which is what champ select sends.
     pub fn champion_by_id(&self, id: u32) -> Option<&ChampionTags> {
         let key = self.by_champion_id.get(&id)?;
+        self.champions.get(key)
+    }
+
+    /// Tags for a champion's display name, which is all the live game API
+    /// gives us. `Wukong` rather than `MonkeyKing`.
+    pub fn champion_by_name(&self, name: &str) -> Option<&ChampionTags> {
+        let key = self.by_champion_name.get(name)?;
         self.champions.get(key)
     }
 
@@ -256,6 +274,14 @@ mod tests {
         // Wukong is the standing proof that key and display name differ.
         let wukong = tags.champion("MonkeyKing").expect("MonkeyKing is tagged");
         assert_eq!(wukong.name, "Wukong");
+
+        // The live game API only ever says "Wukong", so that has to work too.
+        assert_eq!(tags.champion_by_name("Wukong"), Some(wukong));
+        assert_eq!(tags.champion_by_name("Ahri"), Some(ahri));
+        assert!(
+            tags.champion_by_name("MonkeyKing").is_none(),
+            "the key is not a display name and must not resolve as one"
+        );
     }
 
     #[test]

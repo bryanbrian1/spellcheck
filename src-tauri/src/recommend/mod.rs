@@ -13,12 +13,14 @@
 //! every reason written here to containing no digit at all.
 
 pub mod gaps;
+pub mod state;
 pub mod tags;
 pub mod threat;
 
 use serde::{Deserialize, Serialize};
 
 pub use gaps::team_gaps;
+pub use state::{game_state, standing, Footing, Standing};
 pub use tags::{Answer, ChampionTags, DamageType, ItemTags, Tags};
 pub use threat::enemy_threat;
 
