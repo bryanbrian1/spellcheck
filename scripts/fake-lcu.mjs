@@ -10,8 +10,14 @@
 //   node scripts/fake-lcu.mjs
 //
 // It prints the command to start the app against it, then cycles forever:
-// connected, in champ select, locked, left, offline, and back — so every state
-// the champ select screen can show goes past about once a minute.
+// connected, in champ select, locked, in game, left, offline, and back — so
+// every state the app can show goes past about once a cycle.
+//
+// It also stands in for the *game*, on the fixed port Riot's Live Client Data
+// API uses, so the in-game screen can be watched without playing a match. That
+// server only listens while the fake game is running, which is exactly how the
+// real one behaves — and it is why the app must treat a refused connection as
+// "no game" rather than as a failure.
 //
 // What it proves, and a real client would too: the app subscribes rather than
 // polls, treats a 404 session as "not in champ select", resolves a championId
@@ -27,6 +33,11 @@ import { execFileSync } from "node:child_process";
 
 const PORT = 52519;
 const PASSWORD = "fake-lcu-password";
+
+// Riot's, not ours: the Live Client Data API is always on this port, so a
+// stand-in has to use it too. If a real game is running, binding fails and we
+// carry on with the champ select half rather than dying.
+const LIVE_PORT = 2999;
 
 // Everything this writes — key, certificate, lockfile — is throwaway and lives
 // outside the repository. A self-signed key is not something to commit.
@@ -124,6 +135,24 @@ const ALLIES = [
  *  every rule the first check has. */
 const ENEMIES = [122, 19, 238, 119, 89];
 
+/** The same five, as the live game names them: display names and lanes. The
+ *  lane assignments are what give every one of our three champions someone
+ *  standing opposite them. */
+const ENEMY_LIVE = [
+  { name: "Darius", position: "TOP" },
+  { name: "Warwick", position: "JUNGLE" },
+  { name: "Zed", position: "MIDDLE" },
+  { name: "Draven", position: "BOTTOM" },
+  { name: "Leona", position: "UTILITY" },
+];
+
+const ALLY_LIVE = [
+  { name: "Yasuo", position: "TOP" },
+  { name: "Kayn", position: "JUNGLE" },
+  { name: "Caitlyn", position: "BOTTOM" },
+  { name: "Soraka", position: "UTILITY" },
+];
+
 /** `championId` is 0 until the pick completes, which is how the app tells
  *  hovering from locking. Seats nobody has picked yet are sent as zero
  *  rather than omitted, exactly as the real client does — that is what lets
@@ -141,6 +170,103 @@ const session = (championId, position, phase, enemiesShown = 0) => ({
   })),
   timer: { phase },
 });
+
+/* ---------- the fake game ---------- */
+
+/** Mutated by the scenario; read by every request to the live server. */
+let live = null;
+
+const item = (price) => ({ itemID: 3020, price, count: 1, displayName: "an item" });
+
+const livePlayer = (name, team, position, gold, level, dead = false) => ({
+  championName: name,
+  team,
+  position,
+  level,
+  isDead: dead,
+  respawnTimer: dead ? 12.5 : 0,
+  riotId: `${name}#EUW`,
+  summonerName: name,
+  items: gold ? [item(gold)] : [],
+  scores: { kills: 2, deaths: 4, assists: 3, creepScore: 118, wardScore: 9 },
+});
+
+const allGameData = () => ({
+  activePlayer: {
+    riotId: `${live.champion.name}#EUW`,
+    summonerName: live.champion.name,
+    currentGold: live.goldInHand,
+    level: live.level,
+  },
+  allPlayers: [
+    livePlayer(live.champion.name, "ORDER", live.position, live.ourGold, live.level, live.dead),
+    ...ALLY_LIVE.map((ally) => livePlayer(ally.name, "ORDER", ally.position, 4000, 11)),
+    ...ENEMY_LIVE.map((enemy) =>
+      livePlayer(
+        enemy.name,
+        "CHAOS",
+        enemy.position,
+        // Only the player in our lane pulls ahead; the rest stay level, so
+        // the standing is unmistakably about one opponent.
+        enemy.position === live.position ? live.theirGold : 4200,
+        enemy.position === live.position ? live.level + live.levelGap : 11,
+      ),
+    ),
+  ],
+  gameData: { gameTime: live.gameTime, gameMode: "CLASSIC", mapName: "Map11", mapNumber: 11 },
+  events: { Events: [{ EventID: 0, EventName: "GameStart", EventTime: 0 }] },
+});
+
+/** Only listening while a fake game is running, which is the whole point: the
+ *  app has to read a refused connection as "no game" rather than a failure. */
+let liveServer = null;
+
+const startGame = (champion) => {
+  live = {
+    champion,
+    // Champ select spells positions in lower case and the live API in upper.
+    position: champion.position.toUpperCase(),
+    gameTime: 615,
+    level: 11,
+    levelGap: 0,
+    ourGold: 4000,
+    theirGold: 4200,
+    goldInHand: 350,
+    dead: false,
+  };
+
+  liveServer = https.createServer(
+    { key: fs.readFileSync(KEY), cert: fs.readFileSync(CERT) },
+    (req, res) => {
+      if (req.url && req.url.startsWith("/liveclientdata/allgamedata")) {
+        const body = JSON.stringify(allGameData());
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(body);
+        return;
+      }
+      res.writeHead(404, { "content-type": "application/json" });
+      res.end("{}");
+    },
+  );
+
+  liveServer.on("error", (error) => {
+    log(`live server could not bind ${LIVE_PORT} (${error.code}) — a real game is probably running`);
+    liveServer = null;
+    live = null;
+  });
+
+  liveServer.listen(LIVE_PORT, "127.0.0.1", () =>
+    log(`the game starts             -> live data on https://127.0.0.1:${LIVE_PORT}`),
+  );
+};
+
+const stopGame = () => {
+  live = null;
+  if (liveServer) {
+    liveServer.close();
+    liveServer = null;
+  }
+};
 
 let round = 0;
 
@@ -196,6 +322,27 @@ const upgrade = async (req, socket) => {
   log('push: champ select ended    -> screen: build stays, pill "Connected"');
   push("Delete", null);
 
+  // The game itself. Phases are long because the app deliberately looks
+  // rarely — every thirty seconds while alive — so a shorter phase would end
+  // before it was ever sampled. That slowness is the feature being tested.
+  startGame(champion);
+
+  await wait(35000);
+  log("you fall behind             -> expect a red banner and a cheap resist");
+  Object.assign(live, { ourGold: 4200, theirGold: 9000, levelGap: 2, gameTime: 1100, goldInHand: 1340 });
+
+  await wait(35000);
+  log("you die                     -> the watcher speeds up to every five seconds");
+  Object.assign(live, { dead: true, gameTime: 1180 });
+
+  await wait(20000);
+  log("you respawn, further behind -> the advice should not have changed its mind");
+  Object.assign(live, { dead: false, ourGold: 5200, theirGold: 11800, levelGap: 3, gameTime: 1500 });
+
+  await wait(35000);
+  log('the game ends               -> screen: "No game"');
+  stopGame();
+
   await wait(6000);
   log('the client quits            -> screen: "Offline"');
   socket.destroy();
@@ -218,6 +365,7 @@ server.on("upgrade", upgrade);
 
 const shutdown = () => {
   fs.rmSync(LOCKFILE, { force: true });
+  stopGame();
   process.exit(0);
 };
 process.on("SIGINT", shutdown);
@@ -227,5 +375,5 @@ server.listen(PORT, "127.0.0.1", () => {
   fs.writeFileSync(LOCKFILE, `LeagueClient:4242:${PORT}:${PASSWORD}:https`);
   log(`stand-in League client listening on https://127.0.0.1:${PORT}`);
   console.log(`\n  Start the app against it with:\n\n    LEAGUECHECKER_LOCKFILE=${LOCKFILE} npm run dev\n`);
-  log("cycling: connected -> in select -> locked -> left -> offline -> repeat");
+  log("cycling: connected -> in select -> locked -> in game -> offline -> repeat");
 });
