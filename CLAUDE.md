@@ -1,13 +1,16 @@
 # leaguechecker
 
-macOS desktop app. Detects the champion and role you're locked into during
-League champion select, then shows the optimal build path (items, runes,
-summoners, skill order) for that champion-role pair.
+Desktop app for macOS and Windows. Detects the champion and role you're
+locked into during League champion select, then shows the optimal build path
+(items, runes, summoners, skill order) for that champion-role pair.
 
 ## Hard constraints
 
 - **RAM is the primary constraint.** Target under 120MB resident. Never
   suggest Electron. Never add a heavy UI framework.
+- That budget was set against WKWebView. Windows renders in WebView2, which
+  runs more processes, so the number has to be measured on Windows and not
+  assumed to carry over. Measure before promising it.
 - Frontend: vanilla TypeScript + plain CSS. No React, no Tailwind, no
   component library. If a dependency isn't strictly necessary, don't add it.
 - Backend: Rust (Tauri v2).
@@ -67,7 +70,11 @@ Never present a rule-based suggestion as a statistic.
 
 ## LCU integration notes
 
-- Lockfile: `/Applications/League of Legends.app/Contents/LoL/lockfile`
+- Lockfile, macOS: `/Applications/League of Legends.app/Contents/LoL/lockfile`
+- Lockfile, Windows: `C:\Riot Games\League of Legends\lockfile`. Unlike the
+  macOS path this is only the common default — the installer takes a drive and
+  regional builds differ — so `LEAGUECHECKER_LOCKFILE` is a user-facing
+  setting on Windows, not just a development one
 - Format: `ProcessName:PID:Port:Password:Protocol`
 - Auth: HTTP Basic, username `riot`, password from lockfile
 - Base URL: `https://127.0.0.1:{port}` — self-signed cert, verification must
