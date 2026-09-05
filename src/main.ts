@@ -84,6 +84,7 @@ type LcuStatus =
   | { event: "clientConnected" }
   | { event: "entered" }
   | ({ event: "locked" } & LockedChampion)
+  | { event: "unreadable"; reason: string }
   | { event: "left" };
 
 /**
@@ -1064,6 +1065,23 @@ const onStatus = (status: LcuStatus): void => {
       selectSub = "Client is open";
       selectPill = ["Connected", true];
       noticeSlot = emptyHtml("Waiting for champ select.");
+      break;
+
+    // Champ select is running and the client's payload no longer parses the
+    // way this app expects. Shown rather than swallowed: it is otherwise
+    // identical on screen to "you have not locked in", which would leave
+    // somebody waiting through a whole champ select for a build that was
+    // never coming.
+    case "unreadable":
+      locked = null;
+      clearLive();
+      selectSub = "Can't read champ select";
+      selectPill = ["Confused", false];
+      noticeSlot = emptyHtml(
+        "League changed something this app reads, so it can't tell what you picked. " +
+          "Search for your champion above and the build still works.",
+      );
+      showScreen("live");
       break;
 
     case "entered":
