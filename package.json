@@ -9,7 +9,8 @@
     "dev": "npm run build && tauri dev",
     "app": "npm run build && tauri build",
     "tauri": "tauri",
-    "fake-client": "node scripts/fake-lcu.mjs"
+    "fake-client": "node scripts/fake-lcu.mjs",
+    "test:ingest": "node --test scripts/ingest/*.test.mjs"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
