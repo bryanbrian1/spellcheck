@@ -889,6 +889,17 @@ const roleLabels: Record<string, string> = {
   utility: "Support",
 };
 
+/**
+ * The lane, as a person would say it.
+ *
+ * Practice Tool, customs and ARAM assign nobody one, and champ select now
+ * reports those locks rather than swallowing them — so this has to render a
+ * blank. A blank line under the champion's name reads as a bug, so it says
+ * what is actually true instead.
+ */
+const laneLabel = (position: string): string =>
+  roleLabels[position] ?? (position || "No lane in this mode");
+
 const livePortrait = el<HTMLDivElement>("live-portrait");
 const liveName = el<HTMLDivElement>("live-name");
 const liveSub = el<HTMLDivElement>("live-sub");
@@ -1069,7 +1080,7 @@ const onStatus = (status: LcuStatus): void => {
 
     case "locked":
       locked = status;
-      selectSub = roleLabels[status.assignedPosition] ?? status.assignedPosition;
+      selectSub = laneLabel(status.assignedPosition);
       selectPill = ["Locked", true];
       buildSlot = emptyHtml(`Looking up ${nameFor(status.championKey)}\u2026`);
       showScreen("live");
@@ -1081,8 +1092,7 @@ const onStatus = (status: LcuStatus): void => {
     case "left":
       selectPill = ["Connected", true];
       if (locked) {
-        const lane = roleLabels[locked.assignedPosition] ?? locked.assignedPosition;
-        selectSub = `${lane} \u00b7 champ select ended`;
+        selectSub = `${laneLabel(locked.assignedPosition)} \u00b7 champ select ended`;
       }
       break;
   }

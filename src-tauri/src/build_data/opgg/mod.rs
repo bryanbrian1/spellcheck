@@ -58,10 +58,25 @@ const OUTPUT_FIELDS: &[&str] = &[
     "data.starter_items.ids_names",
     "data.starter_items.play",
     "data.starter_items.win",
-    "data.last_items[].ids",
-    "data.last_items[].ids_names",
-    "data.last_items[].play",
-    "data.last_items[].win",
+    // The three slots after the core, each a menu of options. NOT
+    // `last_items`, which sounds like the same thing and is not: that is the
+    // champion's most-built items overall, so its top entries are the core
+    // items again — 130,000 games of Voltaic Cyclosword on Zed, whose core
+    // starts with Voltaic Cyclosword. Showing that under "Situational" told
+    // the player to build what they were already building, and hid the half
+    // of the build that actually varies.
+    "data.fourth_items[].ids",
+    "data.fourth_items[].ids_names",
+    "data.fourth_items[].play",
+    "data.fourth_items[].win",
+    "data.fifth_items[].ids",
+    "data.fifth_items[].ids_names",
+    "data.fifth_items[].play",
+    "data.fifth_items[].win",
+    "data.sixth_items[].ids",
+    "data.sixth_items[].ids_names",
+    "data.sixth_items[].play",
+    "data.sixth_items[].win",
     "data.summoner_spells.ids",
     "data.summoner_spells.play",
     "data.summoner_spells.win",
@@ -321,10 +336,28 @@ mod tests {
     /// silently skips the field and the situational block goes missing.
     #[test]
     fn array_fields_are_spelled_as_arrays() {
-        assert!(OUTPUT_FIELDS.contains(&"data.last_items[].ids"));
-        for field in OUTPUT_FIELDS {
-            assert!(!field.starts_with("data.last_items."), "{field} lost its brackets");
+        for slot in ["fourth_items", "fifth_items", "sixth_items"] {
+            assert!(
+                OUTPUT_FIELDS.contains(&&*format!("data.{slot}[].ids")),
+                "{slot} is not being asked for at all"
+            );
+            assert!(
+                !OUTPUT_FIELDS.iter().any(|f| f.starts_with(&format!("data.{slot}."))),
+                "{slot} lost its brackets"
+            );
         }
+    }
+
+    /// `last_items` reads like "the items you finish on" and is not: it is the
+    /// champion's most-built items overall, so its top entries are the core
+    /// items again. Asking for it put the core under "Situational" and left
+    /// the back half of the build off the screen entirely.
+    #[test]
+    fn the_most_built_items_are_not_mistaken_for_the_late_ones() {
+        assert!(
+            !OUTPUT_FIELDS.iter().any(|field| field.contains("last_items")),
+            "last_items is back, and situational will repeat the core again"
+        );
     }
 
     #[test]
