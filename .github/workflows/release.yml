@@ -27,7 +27,28 @@ on:
       - "v*"
   # Build the matrix without publishing, to prove a change compiles on
   # Windows before committing to a tag.
+  #
+  # Note that GitHub will not dispatch a workflow that is absent from the
+  # default branch, whatever ref you aim it at, so this trigger is unusable
+  # until this file is on main. That is the reason for the pull_request
+  # trigger below rather than a preference for one over the other.
   workflow_dispatch:
+  # The developer machine here is a Mac and the app cannot be cross-compiled,
+  # so without this nobody finds out that a change broke Windows until after
+  # a tag is pushed and testers are already downloading. Publishing is gated
+  # on the ref being a tag, so a pull request run builds both platforms and
+  # uploads nothing.
+  #
+  # Scoped to the things a build actually depends on: the daily crawl rewrites
+  # hundreds of files under data/, and none of them can break a compile.
+  pull_request:
+    paths:
+      - "src/**"
+      - "src-tauri/**"
+      - "index.html"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/release.yml"
 
 # Releases are attached to a tag, so two runs for one tag would race to
 # upload the same assets.
