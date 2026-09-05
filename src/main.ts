@@ -604,6 +604,17 @@ const render = (lookup: BuildLookup): void => {
  *  did: whatever you typed is sent as-is. */
 let champions: Champion[] = [];
 
+/**
+ * The name to show for a Data Dragon key.
+ *
+ * Champ select hands us a key, and twenty-one champions are filed under
+ * something no player calls them — `MonkeyKing` for Wukong, `Chogath` for
+ * Cho'Gath. Showing the key looks like a bug because it is one. Falls back to
+ * the key itself, which is what the screen showed before the roster existed.
+ */
+const nameFor = (key: string): string =>
+  champions.find((champion) => champion.key === key)?.name ?? key;
+
 /** Apostrophes, spaces and full stops are things a player types and a key
  *  never contains — `Kai'Sa` is filed as `Kaisa`, `Dr. Mundo` as `DrMundo`. */
 const normalise = (raw: string): string => raw.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -880,11 +891,11 @@ const clearSelect = (): void => {
   suggestionHalf = "";
 };
 
-/** Header for a champion we have no build for yet. The key stands in until
- *  the lookup comes back with a display name — `MonkeyKing` becomes `Wukong`. */
+/** Header for a champion we have no build for yet. */
 const showLocked = (champion: LockedChampion): void => {
-  setPortrait(selectPortrait, champion.championKey, champion.championKey.slice(0, 2).toUpperCase());
-  selectName.textContent = champion.championKey;
+  const name = nameFor(champion.championKey);
+  setPortrait(selectPortrait, champion.championKey, name.slice(0, 2).toUpperCase());
+  selectName.textContent = name;
   selectSub.textContent =
     roleLabels[champion.assignedPosition] ?? champion.assignedPosition;
 };
@@ -928,7 +939,7 @@ const onStatus = (status: LcuStatus): void => {
       locked = status;
       showLocked(status);
       setPill("Live", true);
-      selectMessage(`Looking up ${status.championKey}…`);
+      selectMessage(`Looking up ${nameFor(status.championKey)}…`);
       showScreen("select");
       break;
 
@@ -956,13 +967,17 @@ const onBuild = (payload: ChampSelectBuild): void => {
 
   const lookup = payload.lookup;
   if (lookup === null) {
-    selectMessage(`Nothing came back for ${payload.champion.championKey}.`);
+    selectMessage(`Nothing came back for ${nameFor(payload.champion.championKey)}.`);
     return;
   }
 
   if (lookup.status === "noData") {
-    selectName.textContent = lookup.championName;
-    selectMessage(`No data for ${lookup.championName} ${lookup.role}. ${lookup.detail}`);
+    // The backend falls back to the key when it has no display name, so
+    // prefer the roster: "no data for MonkeyKing" reads as a fault in the app
+    // rather than an ordinary answer about Wukong.
+    const name = nameFor(lookup.championKey);
+    selectName.textContent = name;
+    selectMessage(`No data for ${name} ${lookup.role}. ${lookup.detail}`);
     return;
   }
 
