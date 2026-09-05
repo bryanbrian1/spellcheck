@@ -21,7 +21,7 @@ use tokio::sync::mpsc;
 use super::client::LcuClient;
 use super::error::LcuError;
 use super::lockfile::{default_lockfile_path, Lockfile};
-use super::session::{ChampSelectSession, Selection, CHAMP_SELECT_SESSION_URI};
+use super::session::{ChampSelectSession, Comp, Selection, CHAMP_SELECT_SESSION_URI};
 use super::ws::LcuEventStream;
 
 /// How often we look for the lockfile while the client is closed. Slow on
@@ -76,6 +76,15 @@ pub enum ChampSelectEvent {
     Entered,
     /// A champion is locked in a role we can look a build up for.
     Locked(LockedChampion),
+    /// The champions visible on both sides changed.
+    ///
+    /// Deliberately separate from `Locked`. Nine other people lock in during
+    /// a champ select, and folding their picks into the lock event would make
+    /// every one of them look like a new champion for us and fire a fresh
+    /// build lookup. This carries no build: it is what the recommendation
+    /// engine reads, and reasoning over it costs nothing but a few map
+    /// lookups.
+    CompChanged(Comp),
     /// Champ select ended — dodged, declined, or the game started.
     Left,
 }
@@ -194,6 +203,9 @@ async fn emit(
     for change in state.observe(session) {
         let event = match change {
             Change::Entered => ChampSelectEvent::Entered,
+            // No id to resolve and no lookup to make: the ids go out as they
+            // arrived and the engine reads them against its own tag file.
+            Change::CompChanged(comp) => ChampSelectEvent::CompChanged(comp),
             Change::Locked(selection) => {
                 match client.champion_key(selection.champion_id).await {
                     Ok(Some(champion_key)) => ChampSelectEvent::Locked(LockedChampion {
@@ -234,6 +246,7 @@ async fn emit(
 enum Change {
     Entered,
     Locked(Selection),
+    CompChanged(Comp),
 }
 
 /// Champ select sends an update for everything: every ban, every hover, every
@@ -244,6 +257,7 @@ enum Change {
 struct ChampSelectState {
     entered: bool,
     locked: Option<Selection>,
+    comp: Option<Comp>,
 }
 
 impl ChampSelectState {
@@ -260,6 +274,15 @@ impl ChampSelectState {
                 self.locked = Some(selection.clone());
                 changes.push(Change::Locked(selection));
             }
+        }
+
+        // Champ select sends an update for every hover, every timer tick and
+        // every trade offer. Only a change in who is actually locked in is
+        // worth telling anyone about.
+        let comp = session.comp();
+        if !comp.is_empty() && self.comp.as_ref() != Some(&comp) {
+            self.comp = Some(comp.clone());
+            changes.push(Change::CompChanged(comp));
         }
 
         changes
@@ -303,13 +326,21 @@ mod tests {
         // Still nothing picked, several updates later.
         assert!(state.observe(&session(0, "middle")).is_empty());
 
+        // The lock, and the composition it changed. Both go out, and they
+        // are separate changes on purpose — only the first costs a lookup.
         let changes = state.observe(&session(103, "middle"));
         assert_eq!(
             changes,
-            vec![Change::Locked(Selection {
-                champion_id: 103,
-                assigned_position: "middle".to_string(),
-            })]
+            vec![
+                Change::Locked(Selection {
+                    champion_id: 103,
+                    assigned_position: "middle".to_string(),
+                }),
+                Change::CompChanged(Comp {
+                    ally: vec![103],
+                    enemy: vec![],
+                }),
+            ]
         );
     }
 
@@ -329,11 +360,55 @@ mod tests {
         let changes = state.observe(&session(64, "jungle"));
         assert_eq!(
             changes,
-            vec![Change::Locked(Selection {
-                champion_id: 64,
-                assigned_position: "jungle".to_string(),
+            vec![
+                Change::Locked(Selection {
+                    champion_id: 64,
+                    assigned_position: "jungle".to_string(),
+                }),
+                Change::CompChanged(Comp {
+                    ally: vec![64],
+                    enemy: vec![],
+                }),
+            ]
+        );
+    }
+
+    /// The reason `CompChanged` exists at all: the other nine seats fill in
+    /// one at a time, and none of them may cost a build lookup.
+    #[test]
+    fn an_enemy_locking_in_moves_the_composition_and_nothing_else() {
+        let mut state = ChampSelectState::default();
+
+        let with_enemies = |enemy: Vec<u32>| {
+            ChampSelectSession::from_json(&json!({
+                "localPlayerCellId": 0,
+                "myTeam": [{ "cellId": 0, "championId": 103, "assignedPosition": "middle" }],
+                "theirTeam": enemy
+                    .iter()
+                    .map(|id| json!({ "championId": id }))
+                    .collect::<Vec<_>>(),
+            }))
+            .unwrap()
+        };
+
+        state.observe(&with_enemies(vec![0, 0]));
+
+        // One enemy locks. Our champion did not change, so no lookup may fire.
+        let changes = state.observe(&with_enemies(vec![266, 0]));
+        assert_eq!(
+            changes,
+            vec![Change::CompChanged(Comp {
+                ally: vec![103],
+                enemy: vec![266, 0],
             })]
         );
+        assert!(
+            !changes.iter().any(|c| matches!(c, Change::Locked(_))),
+            "an enemy pick triggered a build lookup for our own champion"
+        );
+
+        // The same session again is silence, as everything else here is.
+        assert!(state.observe(&with_enemies(vec![266, 0])).is_empty());
     }
 
     #[test]
