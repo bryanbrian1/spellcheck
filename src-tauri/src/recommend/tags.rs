@@ -216,6 +216,14 @@ impl Tags {
         self.champions.get(key)
     }
 
+    /// The Data Dragon key for a display name — `Wukong` to `MonkeyKing`.
+    ///
+    /// Icon art is filed under the key, and the live game API only ever says
+    /// the name, so this is the bridge between the two.
+    pub fn champion_key_by_name(&self, name: &str) -> Option<&str> {
+        self.by_champion_name.get(name).map(String::as_str)
+    }
+
     pub fn item(&self, id: u32) -> Option<&ItemTags> {
         self.items.get(&id)
     }
@@ -282,6 +290,11 @@ mod tests {
             tags.champion_by_name("MonkeyKing").is_none(),
             "the key is not a display name and must not resolve as one"
         );
+
+        // Icons are filed under the key, so the name has to lead back to it.
+        assert_eq!(tags.champion_key_by_name("Wukong"), Some("MonkeyKing"));
+        assert_eq!(tags.champion_key_by_name("Ahri"), Some("Ahri"));
+        assert_eq!(tags.champion_key_by_name("Nobody"), None);
     }
 
     #[test]

@@ -1,6 +1,6 @@
 //! The frontend's entire surface area.
 //!
-//! Two commands, both thin. Neither one names a provider: the UI asks for a
+//! Three commands, all thin. None of them names a provider: the UI asks for a
 //! build and gets [`BuildLookup`] back, whether that came from OP.GG or from
 //! our own crawl. Swapping sources is a config change, invisible from here.
 
@@ -8,6 +8,7 @@ use std::sync::Arc;
 
 use tauri::State;
 
+use crate::icons::{IconCatalog, IconState};
 use crate::{BuildLookup, BuildService};
 
 /// Attribution string for whichever source is live. The UI renders it
@@ -35,5 +36,22 @@ pub async fn fetch_build(
     service
         .build_for(&champion, &role, None)
         .await
+        .map_err(|error| error.to_string())
+}
+
+/// Where icon art lives.
+///
+/// The page may display images from Data Dragon but may not call it — the
+/// window's content security policy is `default-src 'self'` — so the two
+/// lookup tables it cannot derive from an id come through here instead.
+///
+/// An error is ordinary rather than fatal: the UI falls back to the text
+/// labels it has always drawn, and the next call tries again.
+#[tauri::command]
+pub async fn icon_catalog(icons: State<'_, Arc<IconState>>) -> Result<IconCatalog, String> {
+    icons
+        .get()
+        .await
+        .cloned()
         .map_err(|error| error.to_string())
 }
