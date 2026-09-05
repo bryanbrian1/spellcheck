@@ -139,8 +139,11 @@ body{
 
 .state{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:var(--radius);background:#1a2620;border:1px solid #274036}
 .state.behind{background:#241a1a;border-color:#452c2c}
+/* Even is not good news, so it must not wear the colour that means ahead. */
+.state.even{background:#181d23;border-color:#26313b}
 .state-n{font-size:17px;font-weight:700;color:var(--stat-hi)}
 .state.behind .state-n{color:var(--danger)}
+.state.even .state-n{color:var(--ink-2)}
 .state-t{font-size:12px;color:var(--ink-2);line-height:1.35}
 .state-t b{color:var(--ink);font-weight:600}
 
