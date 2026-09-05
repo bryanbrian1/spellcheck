@@ -110,14 +110,35 @@ const sessionEvent = (eventType, data) =>
     data,
   }]);
 
+/** Our other four. Chosen so nothing on this side can hold a front line,
+ *  which is the one team gap the second check can put an item behind. */
+const ALLIES = [
+  { cellId: 0, championId: 157, assignedPosition: "top" },      // Yasuo
+  { cellId: 1, championId: 141, assignedPosition: "jungle" },   // Kayn
+  { cellId: 3, championId: 51, assignedPosition: "bottom" },    // Caitlyn
+  { cellId: 4, championId: 16, assignedPosition: "utility" },   // Soraka
+];
+
+/** The enemy, in lock order. Darius and Warwick heal, Warwick and Zed dive,
+ *  and four of the five bring hard crowd control — between them they trip
+ *  every rule the first check has. */
+const ENEMIES = [122, 19, 238, 119, 89];
+
 /** `championId` is 0 until the pick completes, which is how the app tells
- *  hovering from locking. */
-const session = (championId, position, phase) => ({
+ *  hovering from locking. Seats nobody has picked yet are sent as zero
+ *  rather than omitted, exactly as the real client does — that is what lets
+ *  the app tell a hidden enemy team from a small one. */
+const session = (championId, position, phase, enemiesShown = 0) => ({
   localPlayerCellId: 2,
   myTeam: [
-    { cellId: 0, championId: 0, assignedPosition: "top" },
+    ...ALLIES,
     { cellId: 2, championId, championPickIntent: 0, assignedPosition: position },
   ],
+  theirTeam: ENEMIES.map((id, seat) => ({
+    cellId: 5 + seat,
+    championId: seat < enemiesShown ? id : 0,
+    assignedPosition: "",
+  })),
   timer: { phase },
 });
 
@@ -156,6 +177,20 @@ const upgrade = async (req, socket) => {
   await wait(2000);
   log("push: the same lock again   -> must NOT look it up twice");
   push("Update", session(champion.id, champion.position, "FINALIZATION"));
+
+  // The enemy team fills in one seat at a time, which is what champ select
+  // actually looks like. None of these may trigger a second build lookup:
+  // our champion has not changed, only the composition around it.
+  for (let shown = 1; shown <= ENEMIES.length; shown++) {
+    await wait(2000);
+    log(
+      `push: enemy ${shown} of ${ENEMIES.length} locks in` +
+        (shown < 3
+          ? "  -> too few to call a split; expect silence"
+          : "  -> suggestions, and NO second build lookup"),
+    );
+    push("Update", session(champion.id, champion.position, "FINALIZATION", shown));
+  }
 
   await wait(12000);
   log('push: champ select ended    -> screen: build stays, pill "Connected"');

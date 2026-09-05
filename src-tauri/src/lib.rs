@@ -11,6 +11,7 @@ pub mod commands;
 pub mod lcu;
 pub mod recommend;
 
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -19,7 +20,9 @@ use tauri::{AppHandle, Emitter, Manager};
 use tokio::sync::mpsc;
 
 use build_data::config::CONFIG_FILE_NAME;
+use lcu::session::Comp;
 use lcu::{ChampSelectEvent, LockedChampion, WatcherConfig};
+use recommend::{enemy_threat, team_gaps, Suggestion, Tags, TeamView};
 
 pub use build_data::{
     BuildDataProvider, BuildLookup, BuildRequest, ChampionBuild, ProviderConfig, ProviderError,
@@ -78,6 +81,15 @@ pub const CHAMP_SELECT_STATUS_EVENT: &str = "lcu:status";
 /// Where the build for a locked champion reaches the UI.
 pub const CHAMP_SELECT_BUILD_EVENT: &str = "lcu:build";
 
+/// Where the rule-based checks reach the UI.
+///
+/// Separate from the build event because the two have different lifetimes: a
+/// build is fetched once when you lock in, while the suggestions change every
+/// time one of the other nine players picks. Sending them together would mean
+/// either re-fetching the build nine times or holding the suggestions back
+/// until they were stale.
+pub const CHAMP_SELECT_SUGGESTIONS_EVENT: &str = "lcu:suggestions";
+
 /// A build looked up because the client said so rather than because the user
 /// typed something. `lookup` and `error` are exclusive, and "this source has
 /// nothing for that pair" lives inside `lookup` as
@@ -88,6 +100,67 @@ pub struct ChampSelectBuild {
     pub champion: LockedChampion,
     pub lookup: Option<BuildLookup>,
     pub error: Option<String>,
+}
+
+/// What the two champ-select checks made of the composition.
+///
+/// Kept apart so the UI can say which check spoke. Every suggestion in here
+/// is a rule and wears the amber rail; none of them carries a number, and the
+/// engine has a test that holds them to it.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChampSelectSuggestions {
+    /// Check one: what the enemy composition forces.
+    pub threat: Vec<Suggestion>,
+    /// Check two: what your own team leaves uncovered.
+    pub gaps: Vec<Suggestion>,
+    /// Item id to display name, so the UI can label a tile without a second
+    /// lookup. It sits beside the suggestions rather than inside one because
+    /// the shape of a suggestion is fixed at
+    /// `{ itemId, priority, reason, source }`.
+    pub item_names: HashMap<u32, String>,
+}
+
+impl ChampSelectSuggestions {
+    pub fn is_empty(&self) -> bool {
+        self.threat.is_empty() && self.gaps.is_empty()
+    }
+}
+
+/// Run both champ-select checks over one composition.
+///
+/// `None` when we cannot say anything worth sending: the champion the user
+/// locked has no tags, so there is no damage type to filter items by and no
+/// honest way to guess one.
+fn suggestions_for(champion_id: u32, comp: &Comp) -> Option<ChampSelectSuggestions> {
+    let tags = Tags::get();
+    let ours = tags.champion_by_id(champion_id)?.damage_type;
+
+    let threat = enemy_threat(
+        tags,
+        &TeamView::from_ids(tags, comp.enemy.iter().copied()),
+        ours,
+    );
+    let gaps = team_gaps(
+        tags,
+        &TeamView::from_ids(tags, comp.ally.iter().copied()),
+        ours,
+    );
+
+    let item_names = threat
+        .iter()
+        .chain(&gaps)
+        .filter_map(|suggestion| {
+            let item = tags.item(suggestion.item_id)?;
+            Some((suggestion.item_id, item.name.clone()))
+        })
+        .collect();
+
+    Some(ChampSelectSuggestions {
+        threat,
+        gaps,
+        item_names,
+    })
 }
 
 /// Boot the desktop app.
@@ -139,14 +212,51 @@ fn spawn_champ_select(handle: &AppHandle, service: Arc<BuildService>) {
 
     tauri::async_runtime::spawn(lcu::watch(WatcherConfig::default(), sender));
     tauri::async_runtime::spawn(async move {
+        // The two halves of a suggestion arrive separately and in either
+        // order: you can lock in before the enemy team is visible, or after.
+        // Both are held until champ select ends so a late enemy pick can be
+        // reasoned about against the champion you already locked.
+        let mut locked: Option<u32> = None;
+        let mut comp: Option<Comp> = None;
+
         while let Some(event) = receiver.recv().await {
             // The UI shows "League isn't running" from this, so every state
             // goes out, not just the interesting one.
             let _ = handle.emit(CHAMP_SELECT_STATUS_EVENT, &event);
 
-            if let ChampSelectEvent::Locked(locked) = event {
-                let build = build_for_locked(&service, locked).await;
-                let _ = handle.emit(CHAMP_SELECT_BUILD_EVENT, build);
+            let recheck = match event {
+                ChampSelectEvent::Locked(champion) => {
+                    locked = Some(champion.champion_id);
+                    let build = build_for_locked(&service, champion).await;
+                    let _ = handle.emit(CHAMP_SELECT_BUILD_EVENT, build);
+                    true
+                }
+                ChampSelectEvent::CompChanged(changed) => {
+                    comp = Some(changed);
+                    true
+                }
+                // Champ select ended, or the client did. Whatever we were
+                // reasoning about is gone, and holding it would let the next
+                // champ select open against the last one's enemy team.
+                ChampSelectEvent::Left | ChampSelectEvent::ClientOffline => {
+                    locked = None;
+                    comp = None;
+                    false
+                }
+                _ => false,
+            };
+
+            if !recheck {
+                continue;
+            }
+
+            // Both checks are map lookups over a handful of champions. This
+            // runs during champ select, where the game is idle, and never
+            // once it starts.
+            if let (Some(champion_id), Some(comp)) = (locked, comp.as_ref()) {
+                if let Some(suggestions) = suggestions_for(champion_id, comp) {
+                    let _ = handle.emit(CHAMP_SELECT_SUGGESTIONS_EVENT, suggestions);
+                }
             }
         }
     });
@@ -289,5 +399,73 @@ mod tests {
         let service = BuildService::new(Arc::new(Stub));
         let error = service.build_for("Ahri", "", None).await.unwrap_err();
         assert!(matches!(error, ProviderError::UnknownRole(_)));
+    }
+}
+
+#[cfg(test)]
+mod suggestion_tests {
+    use super::*;
+    use recommend::{DamageType, SuggestionSource};
+
+    /// Locked Ahri into Darius, Zed, Caitlyn, Talon and Draven — five
+    /// physical-damage enemies, two of whom dive.
+    fn against_physical() -> Comp {
+        Comp {
+            ally: vec![103, 64, 22, 412, 86],
+            enemy: vec![122, 238, 51, 91, 119],
+        }
+    }
+
+    #[test]
+    fn a_full_champ_select_produces_advice_from_both_sides() {
+        let found = suggestions_for(103, &against_physical()).expect("Ahri is tagged");
+        assert!(!found.threat.is_empty(), "five enemies and nothing to say");
+        assert!(!found.is_empty());
+    }
+
+    #[test]
+    fn every_suggestion_can_be_labelled() {
+        let found = suggestions_for(103, &against_physical()).unwrap();
+        for suggestion in found.threat.iter().chain(&found.gaps) {
+            assert!(
+                found.item_names.contains_key(&suggestion.item_id),
+                "item {} reaches the UI with no name to render",
+                suggestion.item_id
+            );
+        }
+    }
+
+    #[test]
+    fn a_champion_we_have_no_tags_for_says_nothing_rather_than_guessing() {
+        assert!(
+            suggestions_for(999_999, &against_physical()).is_none(),
+            "an untagged champion produced advice from a damage type we invented"
+        );
+    }
+
+    #[test]
+    fn a_hidden_enemy_team_is_not_reasoned_about() {
+        // Blind pick: we locked in, and their side is five empty seats.
+        let blind = Comp {
+            ally: vec![103, 64, 22, 412, 86],
+            enemy: vec![0, 0, 0, 0, 0],
+        };
+        let found = suggestions_for(103, &blind).unwrap();
+        assert!(
+            found.threat.is_empty(),
+            "the enemy check spoke about a team it cannot see"
+        );
+    }
+
+    #[test]
+    fn the_items_suit_the_champion_that_locked_in() {
+        // Garen is physical damage and must never be handed an ability power
+        // item, however well it answers the threat.
+        let found = suggestions_for(86, &against_physical()).unwrap();
+        for suggestion in found.threat.iter().chain(&found.gaps) {
+            let item = Tags::get().item(suggestion.item_id).unwrap();
+            assert_ne!(item.damage, Some(DamageType::Ap), "{}", item.name);
+            assert_eq!(suggestion.source, SuggestionSource::Rule);
+        }
     }
 }

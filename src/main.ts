@@ -93,6 +93,30 @@ interface ChampSelectBuild {
   error: string | null;
 }
 
+/**
+ * `lcu:suggestions` — what the two rule-based checks made of the composition.
+ *
+ * Every one of these is a rule: it reasons from what champions and items are,
+ * not from a sample, so it wears the amber rail and carries no number. The
+ * engine asserts that; this screen must not undo it by rendering a count
+ * beside one.
+ */
+interface Suggestion {
+  itemId: number;
+  priority: "rush" | "core" | "situational";
+  reason: string;
+  source: "stat" | "rule";
+}
+
+interface ChampSelectSuggestions {
+  /** Check one: what the enemy composition forces. */
+  threat: Suggestion[];
+  /** Check two: what your own team leaves uncovered. */
+  gaps: Suggestion[];
+  /** Item id to display name. Beside the suggestions, never inside one. */
+  itemNames: Record<string, string>;
+}
+
 /** `withGlobalTauri` puts the bridge on window, so we need no npm package. */
 declare global {
   interface Window {
@@ -180,6 +204,69 @@ const block = (title: string, meta: string, inner: string, rail = "rail"): strin
       ${inner}
     </div>
   </div>`;
+
+/** When the advice wants acting on. Words, not numbers — see the colour law. */
+const priorityLabels: Record<Suggestion["priority"], string> = {
+  rush: "next back",
+  core: "in the core path",
+  situational: "if it turns that way",
+};
+
+/** Soonest first, which is also the order the engine declares them in. */
+const priorityOrder: Suggestion["priority"][] = ["rush", "core", "situational"];
+
+/**
+ * One reason, and every item that shares it.
+ *
+ * A check answering "they all deal physical damage" names both the component
+ * you buy now and the item you finish, and printing the same sentence under
+ * each of them reads as a stutter. The items are listed together and the
+ * argument is made once. They are joined with a comma rather than an arrow:
+ * some of these are a build path and some are alternatives, and the renderer
+ * cannot tell which.
+ */
+const sugRow = (group: Suggestion[], names: Record<string, string>): string => {
+  const first = group[0];
+  if (!first) return "";
+  // Every suggestion arrives with a name; the fallback is a word rather than
+  // an id because an amber block may not carry a number.
+  const named = group.map((s) => names[String(s.itemId)] ?? "Item");
+  const tiles = named
+    .map((name) => `<div class="tile rule" title="${escape(name)}">${escape(name.slice(0, 9))}</div>`)
+    .join("");
+  const soonest = priorityOrder.find((p) => group.some((s) => s.priority === p)) ?? "situational";
+
+  return `<div class="sug">
+    ${tiles}
+    <div class="sug-txt"><b>${escape(named.join(", "))} · ${priorityLabels[soonest]}</b>
+      <span class="sug-why">${escape(first.reason)}</span></div>
+  </div>`;
+};
+
+/**
+ * One check's output. Amber rail, and never `railFor` — that function reads a
+ * game count, and a rule has none.
+ */
+const suggestionBlock = (
+  title: string,
+  suggestions: Suggestion[],
+  names: Record<string, string>,
+): string => {
+  // A suggestion that claims to be a statistic is a bug upstream, and
+  // rendering it in amber would be the lie the colour law exists to prevent.
+  const rules = suggestions.filter((s) => s.source === "rule");
+  if (!rules.length) return "";
+
+  // Group by the argument being made, keeping the order the engine chose.
+  const groups: Suggestion[][] = [];
+  for (const suggestion of rules) {
+    const last = groups[groups.length - 1];
+    if (last && last[0]?.reason === suggestion.reason) last.push(suggestion);
+    else groups.push([suggestion]);
+  }
+
+  return block(title, "reasoning", groups.map((g) => sugRow(g, names)).join(""), "rail rule");
+};
 
 const runeBlock = (page: RunePage): string => {
   const keystone = page.primary?.[0];
@@ -410,8 +497,26 @@ const setPill = (text: string, connected: boolean): void => {
   selectPill.className = connected ? "pill" : "pill off";
 };
 
+/* The champ select body is written by two independent sources: the build,
+   which arrives once when you lock in, and the suggestions, which change
+   every time one of the other nine players picks. Each holds its own half so
+   a late enemy pick does not wipe the build off the screen. */
+let buildHalf = "";
+let suggestionHalf = "";
+
+const paintSelect = (): void => {
+  selectBody.innerHTML = buildHalf + suggestionHalf;
+};
+
 const selectMessage = (text: string, bad = false): void => {
-  selectBody.innerHTML = bad ? badHtml(text) : emptyHtml(text);
+  buildHalf = bad ? badHtml(text) : emptyHtml(text);
+  selectBody.innerHTML = buildHalf + suggestionHalf;
+};
+
+/** A new champ select, or none at all. Both halves go. */
+const clearSelect = (): void => {
+  buildHalf = "";
+  suggestionHalf = "";
 };
 
 /** Header for a champion we have no build for yet. The key stands in until
@@ -434,6 +539,7 @@ const onStatus = (status: LcuStatus): void => {
     // The default state of the machine. Said plainly, not as a failure.
     case "clientOffline":
       locked = null;
+      clearSelect();
       showWaiting("Champ select", "Waiting for the League client");
       setPill("Offline", false);
       selectMessage("League isn't running. This screen fills itself when you lock a champion.");
@@ -441,12 +547,15 @@ const onStatus = (status: LcuStatus): void => {
 
     case "clientConnected":
       locked = null;
+      clearSelect();
       showWaiting("Champ select", "Client is open");
       setPill("Connected", true);
       selectMessage("Waiting for champ select.");
       break;
 
     case "entered":
+      // A fresh champ select. Last game's enemy team must not survive into it.
+      clearSelect();
       showWaiting("Champ select", "Pick your champion");
       setPill("In select", true);
       selectMessage("Lock a champion and the build appears here.");
@@ -498,12 +607,25 @@ const onBuild = (payload: ChampSelectBuild): void => {
 
   selectName.textContent = lookup.champion.name;
   const html = buildHtml(lookup);
-  selectBody.innerHTML =
-    html ?? emptyHtml(`${lookup.champion.name} came back with an empty build.`);
+  buildHalf = html ?? emptyHtml(`${lookup.champion.name} came back with an empty build.`);
+  paintSelect();
+};
+
+/**
+ * The rule-based checks. These arrive on their own schedule — before the
+ * build if you locked last, and repeatedly as the rest of the lobby picks —
+ * so they replace only their own half of the screen.
+ */
+const onSuggestions = (payload: ChampSelectSuggestions): void => {
+  suggestionHalf =
+    suggestionBlock("Against this team", payload.threat, payload.itemNames) +
+    suggestionBlock("For your team", payload.gaps, payload.itemNames);
+  paintSelect();
 };
 
 listen<LcuStatus>("lcu:status", onStatus);
 listen<ChampSelectBuild>("lcu:build", onBuild);
+listen<ChampSelectSuggestions>("lcu:suggestions", onSuggestions);
 
 // Attribution for whichever source is live. Rendered verbatim, never branched on.
 void invoke<string>("source_label")
