@@ -27,16 +27,25 @@ pub fn source_label(service: State<'_, Arc<BuildService>>) -> String {
 /// Errors are stringified because they cross into JavaScript. "This source
 /// has nothing for that pair" is *not* an error — it comes back as
 /// [`BuildLookup::NoData`] so the UI can say so plainly.
+/// `opponent` is the Data Dragon key of a lane opponent to build against, or
+/// empty for the ordinary question. Naming one is only a request: whether the
+/// build that comes back is really filtered to them is answered by
+/// `matchup` on the build, which the screen reads rather than assuming.
 #[tauri::command]
 pub async fn fetch_build(
     service: State<'_, Arc<BuildService>>,
     champion: String,
     role: String,
+    opponent: Option<String>,
 ) -> Result<BuildLookup, String> {
+    // An empty box and an absent one mean the same thing, and the page sends
+    // whichever is easier — so neither reaches the provider as an opponent.
+    let opponent = opponent.filter(|key| !key.trim().is_empty());
+
     // The search box always names a role, so there is never a lane to work
     // out here and the flag that comes back is always false.
     service
-        .build_for(&champion, &role, None)
+        .build_for(&champion, &role, None, opponent.as_deref())
         .await
         .map(|resolved| resolved.lookup)
         .map_err(|error| error.to_string())

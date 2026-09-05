@@ -16,6 +16,104 @@
 
 use leaguechecker::{BuildLookup, BuildService, ProviderConfig};
 
+/// A matchup build, end to end, against the live endpoint.
+///
+/// It exists for the same reason the test below it does, and the risk is
+/// sharper here: this route calls a *different tool* with a different
+/// argument list, and a tool that rejects one of them answers with a
+/// successful call and no data — which from inside the app is
+/// indistinguishable from "OP.GG has nothing for this pairing". The unit
+/// tests pin the mapping against a payload we wrote; only this pins that the
+/// tool still takes `my_champion`, `opponent_champion` and `position`, and
+/// still answers in the shape the mapper reads.
+///
+/// The assertion that earns its keep is the last one: the matchup's sample
+/// must not be the champion's overall sample. Those two numbers live in the
+/// same payload, and reading the wrong one is silent.
+#[tokio::test]
+#[ignore = "hits the live OP.GG endpoint"]
+async fn returns_real_matchup_builds() {
+    let service = BuildService::from_config(&ProviderConfig::default()).unwrap();
+    let mut failures = Vec::new();
+
+    for (key, position, opponent) in [
+        ("Ahri", "middle", "Zed"),
+        ("Darius", "top", "Garen"),
+        // Both sides of the vocabulary trap, in one call. This tool wants
+        // `WUKONG` where the analysis tool wants `MONKEY_KING`, and `KAISA`
+        // where the display name would suggest `KAI_SA`. Sending either
+        // wrongly is an outright rejection, so this pair is the check that
+        // `opgg_matchup_champion` still agrees with the live endpoint.
+        ("MonkeyKing", "jungle", "Khazix"),
+        ("Kaisa", "bottom", "Jinx"),
+    ] {
+        match service
+            .build_for(key, position, None, Some(opponent))
+            .await
+            .map(|resolved| resolved.lookup)
+        {
+            Ok(BuildLookup::Found(build)) => {
+                let Some(matchup) = &build.matchup else {
+                    failures.push(format!(
+                        "{key} vs {opponent}: a build came back, but not a matchup build \
+                         — the tool answered and the mapper found nothing to filter on"
+                    ));
+                    continue;
+                };
+
+                let games = build.stats.and_then(|stats| stats.games).unwrap_or(0);
+                println!(
+                    "{key:>11} {position:<8} vs {:<10} {games:>7} games — {} — {}",
+                    matchup.opponent.name,
+                    matchup
+                        .lane_advantage
+                        .map(|side| format!("{side:?}"))
+                        .unwrap_or_else(|| "no read".to_string()),
+                    build
+                        .items
+                        .core
+                        .first()
+                        .map(|group| group
+                            .items
+                            .iter()
+                            .map(|item| item.name.clone().unwrap_or_else(|| format!("#{}", item.id)))
+                            .collect::<Vec<_>>()
+                            .join(" > "))
+                        .unwrap_or_default(),
+                );
+
+                if build.items.core.is_empty() {
+                    failures.push(format!("{key} vs {opponent}: no core path"));
+                }
+                if build.runes.is_empty() || build.summoners.is_empty() {
+                    failures.push(format!("{key} vs {opponent}: runes or summoners missing"));
+                }
+                if build.skills.order.is_empty() {
+                    failures.push(format!("{key} vs {opponent}: no skill order"));
+                }
+
+                // The whole point of the route. A matchup sample is a
+                // fraction of the champion's own, so anything near six
+                // figures here is the summary leaking through.
+                if games == 0 {
+                    failures.push(format!("{key} vs {opponent}: no matchup sample at all"));
+                } else if games > 100_000 {
+                    failures.push(format!(
+                        "{key} vs {opponent}: {games} games is the champion's whole record, \
+                         not this matchup's — the stats are being read from the summary"
+                    ));
+                }
+            }
+            Ok(BuildLookup::NoData(no_data)) => {
+                failures.push(format!("{key} vs {opponent}: no data — {}", no_data.detail))
+            }
+            Err(error) => failures.push(format!("{key} vs {opponent}: {error}")),
+        }
+    }
+
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
 /// The exact call champ select makes, for champions whose Data Dragon keys
 /// exercise the awkward corners of the endpoint's UPPER_SNAKE_CASE spelling.
 #[tokio::test]
@@ -32,7 +130,7 @@ async fn returns_real_builds() {
         ("KogMaw", "bottom"),
         ("Thresh", "utility"),
     ] {
-        match service.build_for(key, position, None).await.map(|r| r.lookup) {
+        match service.build_for(key, position, None, None).await.map(|r| r.lookup) {
             Ok(BuildLookup::Found(build)) => {
                 let core = build
                     .items
@@ -95,7 +193,7 @@ async fn names_the_lane_a_champion_is_actually_played_in() {
     // Teemo is top over jungle. All three are stable enough to assert on.
     for (key, expected) in [("Yasuo", "middle"), ("Thresh", "utility"), ("Teemo", "top")] {
         // The empty position is exactly what Practice Tool and customs give.
-        match service.build_for(key, "", None).await {
+        match service.build_for(key, "", None, None).await {
             Ok(resolved) => {
                 assert!(resolved.inferred_role, "{key}: reported as an assigned lane");
                 let role = match &resolved.lookup {

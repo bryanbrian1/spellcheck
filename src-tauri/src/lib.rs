@@ -71,15 +71,26 @@ impl BuildService {
     /// League-shaped entry point: champ select hands us a champion key and an
     /// `assignedPosition`; the live game hands us the same two things from
     /// its own payload. Either may leave the lane blank.
+    ///
+    /// `opponent_key` names the lane opponent to build against, when the
+    /// caller knows one. Whether the answer is actually filtered to them is
+    /// the provider's to say, and it says so on the build itself — see
+    /// [`ChampionBuild::matchup`](build_data::schema::ChampionBuild::matchup).
+    /// Asking is never an error: a provider with no matchup data answers with
+    /// the ordinary build.
     pub async fn build_for(
         &self,
         champion_key: &str,
         assigned_position: &str,
         champion_id: Option<u32>,
+        opponent_key: Option<&str>,
     ) -> Result<ResolvedBuild, ProviderError> {
         let (role, inferred_role) = self.resolve_role(champion_key, assigned_position).await?;
         let mut request = BuildRequest::new(champion_key, role);
         request.champion_id = champion_id;
+        if let Some(opponent) = opponent_key {
+            request = request.with_opponent(opponent);
+        }
 
         Ok(ResolvedBuild {
             lookup: self.build(&request).await?,
@@ -269,6 +280,14 @@ pub struct InGameState {
     pub game_time: f64,
     /// `None` in a mode that assigns no lanes, or while spectating.
     pub standing: Option<Standing>,
+    /// The lane opponent's Data Dragon key, which is what a build provider
+    /// looks up by. `Standing` already names them for display; this is the
+    /// same player spelled the way the build layer needs.
+    ///
+    /// `None` for the same reasons `standing` is, plus one more: a champion
+    /// released since the tag file was last written has no key to find.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub opponent_key: Option<String>,
     /// Check one, re-run against an enemy team that is now fully visible.
     pub threat: Vec<Suggestion>,
     /// Check three.
@@ -334,6 +353,10 @@ fn in_game_state(snapshot: &GameSnapshot) -> InGameState {
         level: us.map(|player| player.level).unwrap_or(0),
         game_time: snapshot.game_time,
         standing: standing(snapshot),
+        opponent_key: snapshot
+            .lane_opponent()
+            .and_then(|player| tags.champion_key_by_name(&player.champion_name))
+            .map(str::to_string),
         threat,
         state,
         item_names,
@@ -352,15 +375,25 @@ fn in_game_state(snapshot: &GameSnapshot) -> InGameState {
 /// turns the in-game poll into a retry for champ select, and it is why a
 /// queue that assigns no position still ends up with a build: champ select
 /// cannot name a lane there, but the game always can.
+///
+/// The opponent is part of the slot, not incidental to it. Champ select
+/// claims a pair with no opponent because it cannot see one; the game then
+/// finds the same pair *with* one, which is a different question and a
+/// different answer, so it must not be deduplicated into silence. That is one
+/// extra lookup per game, made while the map is loading.
 #[derive(Clone, Default)]
-struct BuildClaim(Arc<tokio::sync::Mutex<Option<(String, String)>>>);
+struct BuildClaim(Arc<tokio::sync::Mutex<Option<(String, String, Option<String>)>>>);
 
 impl BuildClaim {
     /// Take the slot for this pair. `false` when it already holds it, which
     /// is the caller's cue to say nothing.
-    async fn take(&self, champion_key: &str, position: &str) -> bool {
+    async fn take(&self, champion_key: &str, position: &str, opponent_key: Option<&str>) -> bool {
         let mut held = self.0.lock().await;
-        let pair = (champion_key.to_string(), position.to_string());
+        let pair = (
+            champion_key.to_string(),
+            position.to_string(),
+            opponent_key.map(str::to_string),
+        );
         if held.as_ref() == Some(&pair) {
             return false;
         }
@@ -464,14 +497,21 @@ fn spawn_champ_select(handle: &AppHandle, service: Arc<BuildService>) {
                     // always news, and it must win over whatever the game
                     // route may have claimed for the game before this one.
                     claim
-                        .take(&champion.champion_key, &champion.assigned_position)
+                        .take(&champion.champion_key, &champion.assigned_position, None)
                         .await;
 
+                    // No opponent here, and not for want of asking. The
+                    // client sends `theirTeam` with the positions blanked in
+                    // every queue that hides the enemy draft, so champ select
+                    // usually cannot say who is standing in your lane. The
+                    // game itself always can, which is where the matchup
+                    // build comes from — see `spawn_live_game`.
                     let build = build_for(
                         &service,
                         &champion.champion_key,
                         &champion.assigned_position,
                         Some(champion.champion_id),
+                        None,
                     )
                     .await;
                     // Nothing to hold the slot for. Letting it go means the
@@ -584,8 +624,14 @@ fn spawn_live_game(
                         // champion alone is enough to ask the source which
                         // lane it is played in and show that build.
                         let position = state.role.map(Role::as_str).unwrap_or("");
-                        if claim.take(key, position).await {
-                            let build = build_for(&service, key, position, None).await;
+                        // The one place in the app that reliably knows who is
+                        // standing in your lane. Champ select does not — the
+                        // client blanks enemy positions in every queue that
+                        // hides the draft — so this is where a matchup build
+                        // becomes askable at all.
+                        let opponent = state.opponent_key.as_deref();
+                        if claim.take(key, position, opponent).await {
+                            let build = build_for(&service, key, position, None, opponent).await;
                             if build.error.is_some() {
                                 claim.release().await;
                             }
@@ -617,9 +663,13 @@ async fn build_for(
     champion_key: &str,
     position: &str,
     champion_id: Option<u32>,
+    opponent_key: Option<&str>,
 ) -> LiveBuild {
     let (lookup, inferred_role, error) =
-        match service.build_for(champion_key, position, champion_id).await {
+        match service
+            .build_for(champion_key, position, champion_id, opponent_key)
+            .await
+        {
             Ok(resolved) => (Some(resolved.lookup), resolved.inferred_role, None),
             Err(error) => (None, false, Some(error.to_string())),
         };
@@ -710,7 +760,7 @@ mod tests {
     #[tokio::test]
     async fn a_game_with_no_lane_still_gets_the_champion_s_usual_build() {
         let service = BuildService::new(Arc::new(Knows(Role::Middle)));
-        let resolved = service.build_for("Yasuo", "", None).await.unwrap();
+        let resolved = service.build_for("Yasuo", "", None, None).await.unwrap();
 
         assert!(resolved.inferred_role, "the screen would call this an assignment");
         match resolved.lookup {
@@ -724,7 +774,7 @@ mod tests {
     #[tokio::test]
     async fn a_lane_league_named_is_never_reported_as_inferred() {
         let service = BuildService::new(Arc::new(Knows(Role::Middle)));
-        let resolved = service.build_for("Yasuo", "top", None).await.unwrap();
+        let resolved = service.build_for("Yasuo", "top", None, None).await.unwrap();
 
         assert!(!resolved.inferred_role);
         match resolved.lookup {
@@ -737,7 +787,7 @@ mod tests {
     #[tokio::test]
     async fn a_lane_we_do_not_recognise_is_still_an_error() {
         let service = BuildService::new(Arc::new(Knows(Role::Middle)));
-        let error = service.build_for("Yasuo", "midlanee", None).await.unwrap_err();
+        let error = service.build_for("Yasuo", "midlanee", None, None).await.unwrap_err();
         assert!(matches!(error, ProviderError::UnknownRole(_)));
     }
 
@@ -746,7 +796,7 @@ mod tests {
     #[tokio::test]
     async fn a_source_that_cannot_name_a_lane_is_not_second_guessed() {
         let service = BuildService::new(Arc::new(Stub));
-        let error = service.build_for("Yasuo", "", None).await.unwrap_err();
+        let error = service.build_for("Yasuo", "", None, None).await.unwrap_err();
         assert!(matches!(error, ProviderError::UnknownRole(_)));
     }
 
@@ -755,7 +805,7 @@ mod tests {
         let service = BuildService::new(Arc::new(Stub));
         assert_eq!(service.source_label(), "stub");
 
-        let resolved = service.build_for("Ahri", "middle", Some(103)).await.unwrap();
+        let resolved = service.build_for("Ahri", "middle", Some(103), None).await.unwrap();
         assert!(!resolved.inferred_role, "a named lane was not taken at its word");
         match resolved.lookup {
             BuildLookup::NoData(no_data) => {
@@ -769,7 +819,7 @@ mod tests {
     #[tokio::test]
     async fn a_locked_champion_goes_straight_to_the_active_provider() {
         let service = BuildService::new(Arc::new(Stub));
-        let build = build_for(&service, "Ahri", "middle", Some(103)).await;
+        let build = build_for(&service, "Ahri", "middle", Some(103), None).await;
 
         assert!(build.error.is_none());
         assert!(matches!(build.lookup, Some(BuildLookup::NoData(_))));
@@ -783,8 +833,8 @@ mod tests {
     async fn both_routes_produce_the_same_payload() {
         let service = BuildService::new(Arc::new(Stub));
 
-        let from_champ_select = build_for(&service, "Ahri", "middle", Some(103)).await;
-        let from_the_game = build_for(&service, "Ahri", "middle", None).await;
+        let from_champ_select = build_for(&service, "Ahri", "middle", Some(103), None).await;
+        let from_the_game = build_for(&service, "Ahri", "middle", None, None).await;
 
         assert_eq!(
             serde_json::to_value(&from_champ_select).unwrap(),
@@ -798,7 +848,7 @@ mod tests {
     #[tokio::test]
     async fn the_build_payload_the_ui_reads_is_fixed() {
         let service = BuildService::new(Arc::new(Stub));
-        let build = build_for(&service, "Ahri", "middle", Some(103)).await;
+        let build = build_for(&service, "Ahri", "middle", Some(103), None).await;
 
         let json = serde_json::to_value(&build).unwrap();
         assert_eq!(json["championKey"], "Ahri");
@@ -811,7 +861,7 @@ mod tests {
     async fn a_failed_lookup_reaches_the_ui_as_a_message() {
         let service = BuildService::new(Arc::new(Stub));
         // Champ select in a queue that assigns no position.
-        let build = build_for(&service, "Ahri", "", Some(103)).await;
+        let build = build_for(&service, "Ahri", "", Some(103), None).await;
 
         assert!(build.lookup.is_none());
         assert!(build.error.unwrap().contains("unknown role"));
@@ -823,13 +873,13 @@ mod tests {
     async fn the_second_route_to_ask_for_a_pair_is_told_to_stay_quiet() {
         let claim = BuildClaim::default();
 
-        assert!(claim.take("Ahri", "middle").await, "nobody had asked yet");
+        assert!(claim.take("Ahri", "middle", None).await, "nobody had asked yet");
         assert!(
-            !claim.take("Ahri", "middle").await,
+            !claim.take("Ahri", "middle", None).await,
             "the game re-fetched a build champ select already had"
         );
         // A different pair is a different question.
-        assert!(claim.take("Ahri", "top").await);
+        assert!(claim.take("Ahri", "top", None).await);
     }
 
     /// A queue that assigns no position cannot be looked up in champ select,
@@ -839,10 +889,10 @@ mod tests {
     async fn a_released_claim_lets_the_other_route_try() {
         let claim = BuildClaim::default();
 
-        assert!(claim.take("Ahri", "").await);
+        assert!(claim.take("Ahri", "", None).await);
         claim.release().await;
         assert!(
-            claim.take("Ahri", "middle").await,
+            claim.take("Ahri", "middle", None).await,
             "champ select's failure locked the game out of asking"
         );
     }
@@ -853,8 +903,8 @@ mod tests {
     async fn the_inferred_flag_is_always_on_the_payload() {
         let service = BuildService::new(Arc::new(Knows(Role::Bottom)));
 
-        let named = build_for(&service, "Yasuo", "top", None).await;
-        let guessed = build_for(&service, "Yasuo", "", None).await;
+        let named = build_for(&service, "Yasuo", "top", None, None).await;
+        let guessed = build_for(&service, "Yasuo", "", None, None).await;
 
         assert_eq!(
             serde_json::to_value(&named).unwrap()["inferredRole"],

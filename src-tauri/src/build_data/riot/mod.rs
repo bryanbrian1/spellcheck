@@ -337,6 +337,45 @@ mod tests {
         assert_eq!(build.skills.priority.len(), 3);
     }
 
+    /// Asking this provider about a matchup is allowed, answers, and does
+    /// not lie about what came back.
+    ///
+    /// Our crawl buckets by champion and lane only, so there is no
+    /// opponent-filtered build here to give. The contract in
+    /// `BuildDataProvider::fetch_build` says what to do about that: answer
+    /// with the ordinary build and leave `matchup` empty. Failing would make
+    /// the app useless against a source that is otherwise fine; filling the
+    /// field in from the request would let the screen write "vs Zed" over a
+    /// build drawn from every Ahri game there is.
+    #[tokio::test]
+    async fn a_matchup_request_gets_the_ordinary_build_and_claims_nothing_more() {
+        let scratch = Scratch::new();
+        scratch.write("Ahri", Role::Middle, AHRI_MIDDLE);
+        let provider = RiotProvider::with_root(&scratch.0);
+
+        let against_zed = BuildRequest::new("Ahri", Role::Middle).with_opponent("Zed");
+        let build = provider
+            .fetch_build(&against_zed)
+            .await
+            .unwrap()
+            .build()
+            .expect("the ordinary build is still an answer")
+            .clone();
+
+        assert!(
+            build.matchup.is_none(),
+            "this provider has no matchup data and must not imply it has"
+        );
+
+        // And it is the same build the plain question returns — asking about
+        // an opponent changed nothing, which is exactly the claim being made.
+        let plain = provider
+            .fetch_build(&BuildRequest::new("Ahri", Role::Middle))
+            .await
+            .unwrap();
+        assert_eq!(BuildLookup::found(build), plain);
+    }
+
     #[tokio::test]
     async fn missing_file_is_no_data_not_an_error() {
         let scratch = Scratch::new();

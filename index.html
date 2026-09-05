@@ -29,6 +29,16 @@
              autocomplete="off" spellcheck="false" role="combobox"
              aria-expanded="false" aria-controls="suggest" aria-autocomplete="list">
       <ul class="suggest" id="suggest" role="listbox" aria-label="Champion matches" hidden></ul>
+
+      <!-- The lane opponent, and optional on purpose: most lookups are "what
+           do I build on Ahri mid", not "…against Zed". A native datalist
+           rather than a second hand-built combobox — the champion box needs
+           ranked matching for a two-letter query, this one is a name the
+           player already knows how to spell. -->
+      <input class="input vs" id="vs" list="roster" placeholder="vs — optional"
+             aria-label="Lane opponent" autocomplete="off" spellcheck="false">
+      <datalist id="roster"></datalist>
+
       <div class="roles" role="group" aria-label="Role" id="roles">
         <button class="role" data-role="top" aria-pressed="false">Top</button>
         <button class="role" data-role="jungle" aria-pressed="false">Jungle</button>

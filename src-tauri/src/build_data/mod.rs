@@ -30,7 +30,8 @@ pub use riot::RiotProvider;
 pub use role::Role;
 pub use schema::{
     BuildLookup, BuildRequest, BuildStats, ChampionBuild, ChampionRef, ItemGroup, ItemPlan,
-    ItemRef, NoData, RunePage, Skill, SkillPlan, SourceInfo, SummonerSet, SummonerSpell,
+    ItemRef, LaneAdvantage, MatchupInfo, NoData, RunePage, Skill, SkillPlan, SourceInfo,
+    SummonerSet, SummonerSpell,
 };
 
 use async_trait::async_trait;
@@ -51,6 +52,17 @@ pub trait BuildDataProvider: Send + Sync {
     /// Returns [`BuildLookup::NoData`](schema::BuildLookup::NoData) when the
     /// source simply has nothing for this pair — that is an expected answer,
     /// not a failure. `Err` is reserved for things that actually went wrong.
+    ///
+    /// # Answering a matchup request
+    ///
+    /// [`BuildRequest::opponent_key`](schema::BuildRequest::opponent_key) may
+    /// name a lane opponent. A source that cannot filter by opponent must
+    /// answer with the ordinary build and leave
+    /// [`ChampionBuild::matchup`](schema::ChampionBuild::matchup) empty — not
+    /// fail, and not fill the field in from the request. The field is the
+    /// only thing that distinguishes a build that really is about this
+    /// matchup from one that merely was asked about it, and the UI labels the
+    /// build on that field alone.
     async fn fetch_build(&self, request: &BuildRequest) -> Result<BuildLookup, ProviderError>;
 
     /// The lane this champion is actually played in most.
