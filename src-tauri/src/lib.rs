@@ -9,6 +9,7 @@
 pub mod build_data;
 pub mod commands;
 pub mod lcu;
+pub mod live;
 pub mod recommend;
 
 use std::collections::HashMap;
