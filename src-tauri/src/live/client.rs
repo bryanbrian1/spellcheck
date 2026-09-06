@@ -29,7 +29,12 @@ pub const ALL_GAME_DATA_PATH: &str = "/liveclientdata/allgamedata";
 /// The server is on this machine and answers in single-digit milliseconds. A
 /// request still outstanding after this is not slow, it is gone — usually
 /// because the game just ended.
-const REQUEST_TIMEOUT_SECS: u64 = 3;
+///
+/// Visible to the crate because it is the worst case for *any* answer from
+/// this client, including "no game". A test that waits for one has to wait
+/// longer than this, and deriving that deadline from this constant is what
+/// stops the two drifting apart — see the live watcher's tests.
+pub(crate) const REQUEST_TIMEOUT_SECS: u64 = 3;
 
 #[derive(Debug)]
 pub struct LiveClient {
