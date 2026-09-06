@@ -36,8 +36,8 @@ on:
   # The developer machine here is a Mac and the app cannot be cross-compiled,
   # so without this nobody finds out that a change broke Windows until after
   # a tag is pushed and testers are already downloading. Publishing is gated
-  # on the ref being a tag, so a pull request run builds both platforms and
-  # uploads nothing.
+  # on the ref being a tag, so a pull request run uploads nothing — and it
+  # builds Windows alone, for the reason set out on the matrix below.
   #
   # Scoped to the things a build actually depends on: the daily crawl rewrites
   # hundreds of files under data/, and none of them can break a compile.
@@ -67,16 +67,32 @@ jobs:
       # fixed.
       fail-fast: false
       matrix:
-        include:
-          - platform: macos-latest
-            # One download for both Apple Silicon and Intel. The alternative
-            # is two runners and two DMGs, and a tester picking the wrong one
-            # gets an app that will not open.
-            args: "--target universal-apple-darwin"
-            rust_targets: "aarch64-apple-darwin,x86_64-apple-darwin"
-          - platform: windows-latest
-            args: ""
-            rust_targets: ""
+        # A pull request builds Windows only, and the reason is what this
+        # repository costs rather than what it needs.
+        #
+        # Actions bills a private repository per OS: Linux 1x, Windows 2x,
+        # macOS 10x. Measured against this workflow's own history — macOS
+        # around 8.5 minutes, Windows around 12 — that is ~85 billed minutes
+        # for the Mac and ~24 for Windows, so the *faster* job is 78% of the
+        # bill. On the 2,000-minute monthly allowance, building both on every
+        # pull request is about eighteen runs; one branch here has spent four.
+        #
+        # Dropping macOS rather than Windows is the counter-intuitive half,
+        # and it is the right half. The developer machine is a Mac: `cargo
+        # test` and `npm run app` exercise that target every time anyone
+        # works on this. Nothing exercises Windows — `ring` builds C, there
+        # is no MSVC toolchain on a Mac, and the app cannot be
+        # cross-compiled, so the Windows runner is the only thing in this
+        # project that can report whether the Windows build still stands.
+        # Paying 10x to be told what the developer already knows, in order to
+        # save 2x on the one thing nobody knows, is backwards.
+        #
+        # Both platforms still build on a tag, and on workflow_dispatch, so
+        # nothing reaches a tester unproven. What a pull request no longer
+        # catches is a macOS-only break landing on main between releases —
+        # the tag build catches it before anybody downloads it, and the
+        # developer's own machine catches it first.
+        platform: ${{ fromJSON(github.event_name == 'pull_request' && '["windows-latest"]' || '["macos-latest", "windows-latest"]') }}
 
     runs-on: ${{ matrix.platform }}
     timeout-minutes: 60
@@ -88,9 +104,13 @@ jobs:
         with:
           node-version: "22"
 
+      # Both Apple architectures, so one download serves Apple Silicon and
+      # Intel. The alternative is two runners and two DMGs, and a tester
+      # picking the wrong one gets an app that will not open. Windows needs
+      # no extra target and an empty string is how this asks for none.
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.rust_targets }}
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
       # A cold Rust build of the whole Tauri stack is most of this job's
       # runtime, and a beta gets rebuilt often. CI-only: nothing here is
@@ -175,4 +195,4 @@ jobs:
           # Published straight away — a draft would be invisible to the
           # testers this workflow exists to serve.
           releaseDraft: false
-          args: ${{ matrix.args }}
+          args: ${{ matrix.platform == 'macos-latest' && '--target universal-apple-darwin' || '' }}
