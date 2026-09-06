@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "updatedAt": "2026-09-06T13:37:45.941Z",
   "stats": {
-    "games": 9,
-    "winRate": 0.4444
+    "games": 15,
+    "winRate": 0.4667
   },
   "items": {
     "starters": [
@@ -29,7 +29,7 @@
           1120,
           2003
         ],
-        "games": 3,
+        "games": 6,
         "winRate": 0.3333
       }
     ],
@@ -38,22 +38,22 @@
         "items": [
           1001
         ],
-        "games": 5,
-        "winRate": 0.6
+        "games": 8,
+        "winRate": 0.625
       },
       {
         "items": [
           3009
         ],
-        "games": 3,
-        "winRate": 0.3333
+        "games": 5,
+        "winRate": 0.2
       },
       {
         "items": [
-          3111
+          3047
         ],
         "games": 1,
-        "winRate": 0
+        "winRate": 1
       }
     ],
     "core": [
@@ -68,8 +68,8 @@
       {
         "items": [
           3087,
-          3071,
-          2523
+          3004,
+          3033
         ],
         "games": 1,
         "winRate": 1
@@ -77,8 +77,7 @@
       {
         "items": [
           3087,
-          3071,
-          3031
+          3071
         ],
         "games": 1,
         "winRate": 1
@@ -88,6 +87,20 @@
       {
         "items": [
           3026
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3031
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3085
         ],
         "games": 1,
         "winRate": 1
@@ -127,20 +140,20 @@
         5010,
         5001
       ],
-      "games": 4,
-      "winRate": 0.25
+      "games": 6,
+      "winRate": 0.5
     },
     {
       "primaryStyle": 8000,
       "secondaryStyle": 8200,
       "primary": [
-        8008,
+        8021,
         8009,
         9104,
         8017
       ],
       "secondary": [
-        8275,
+        8226,
         8234
       ],
       "shards": [
@@ -148,8 +161,8 @@
         5008,
         5011
       ],
-      "games": 1,
-      "winRate": 1
+      "games": 2,
+      "winRate": 0.5
     }
   ],
   "summoners": [

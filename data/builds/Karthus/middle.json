@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Karthus",
+    "name": "Karthus",
+    "id": 30
+  },
+  "role": "middle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "stats": {
+    "games": 5,
+    "winRate": 0.6
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 5,
+        "winRate": 0.6
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 5,
+        "winRate": 0.6
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          2503,
+          4646,
+          4645
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          2503,
+          6653,
+          4645
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          2503,
+          6653,
+          8010
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8992,
+        8226,
+        8233,
+        8236
+      ],
+      "secondary": [
+        8009,
+        8299
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 3,
+      "winRate": 1
+    },
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8992,
+        8224,
+        8233,
+        8236
+      ],
+      "secondary": [
+        8009,
+        8299
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 0
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 5,
+      "winRate": 0.6
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "Q",
+      "W",
+      "Q"
+    ]
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Fizz",
+    "name": "Fizz",
+    "id": 105
+  },
+  "role": "utility",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "stats": {
+    "games": 7,
+    "winRate": 0.2857
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 7,
+        "winRate": 0.2857
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 7,
+        "winRate": 0.2857
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          2065,
+          3157
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          4645,
+          4646,
+          3157
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          2065
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8000,
+      "primary": [
+        8112,
+        8143,
+        8140,
+        8135
+      ],
+      "secondary": [
+        9111,
+        8014
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8000,
+      "primary": [
+        8128,
+        8143,
+        8140,
+        8106
+      ],
+      "secondary": [
+        8014,
+        9111
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 7,
+      "winRate": 0.2857
+    }
+  ],
+  "skills": {
+    "priority": [
+      "E",
+      "W",
+      "Q"
+    ],
+    "order": [
+      "E",
+      "Q",
+      "W",
+      "E",
+      "E"
+    ]
+  }
+}

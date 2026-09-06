@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Sylas",
+    "name": "Sylas",
+    "id": 517
+  },
+  "role": "top",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "stats": {
+    "games": 11,
+    "winRate": 0.6364
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 11,
+        "winRate": 0.6364
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 10,
+        "winRate": 0.6
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3152
+        ],
+        "games": 4,
+        "winRate": 0.75
+      },
+      {
+        "items": [
+          6657,
+          4633,
+          3157
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3152,
+          4629,
+          3157
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8400,
+      "primary": [
+        8010,
+        8009,
+        9105,
+        8299
+      ],
+      "secondary": [
+        8451,
+        8473
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 2,
+      "winRate": 1
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8400,
+      "primary": [
+        8010,
+        8009,
+        9105,
+        8017
+      ],
+      "secondary": [
+        8444,
+        8451
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 2,
+      "winRate": 0.5
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 6,
+      "winRate": 1
+    },
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 3,
+      "winRate": 0.3333
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "E",
+      "Q"
+    ],
+    "order": [
+      "E",
+      "W",
+      "Q",
+      "W",
+      "W"
+    ]
+  }
+}

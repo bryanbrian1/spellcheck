@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "TwistedFate",
+    "name": "Twisted Fate",
+    "id": 4
+  },
+  "role": "top",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "stats": {
+    "games": 5,
+    "winRate": 0.6
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1086,
+          2003
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          1055,
+          2003
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          3006
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6672,
+          3032
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6672,
+          3032,
+          3036
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6672,
+          3094,
+          3031
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8200,
+      "primary": [
+        8008,
+        9101,
+        9104,
+        8017
+      ],
+      "secondary": [
+        8275,
+        8234
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 1,
+      "winRate": 1
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8400,
+      "primary": [
+        8008,
+        9101,
+        9104,
+        8017
+      ],
+      "secondary": [
+        8451,
+        8473
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        6
+      ],
+      "games": 2,
+      "winRate": 0.5
+    },
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "skills": {
+    "priority": [
+      "E",
+      "W",
+      "Q"
+    ],
+    "order": [
+      "E",
+      "W",
+      "E",
+      "Q",
+      "E"
+    ]
+  }
+}

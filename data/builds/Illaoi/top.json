@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "updatedAt": "2026-09-06T13:37:45.941Z",
   "stats": {
-    "games": 7,
-    "winRate": 0.2857
+    "games": 15,
+    "winRate": 0.3333
   },
   "items": {
     "starters": [
@@ -21,8 +21,8 @@
           1055,
           2003
         ],
-        "games": 5,
-        "winRate": 0.2
+        "games": 12,
+        "winRate": 0.3333
       },
       {
         "items": [
@@ -38,11 +38,27 @@
         "items": [
           1001
         ],
-        "games": 7,
-        "winRate": 0.2857
+        "games": 15,
+        "winRate": 0.3333
       }
     ],
     "core": [
+      {
+        "items": [
+          6631,
+          3071
+        ],
+        "games": 2,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3071,
+          3053
+        ],
+        "games": 1,
+        "winRate": 1
+      },
       {
         "items": [
           3071,
@@ -51,16 +67,9 @@
         ],
         "games": 1,
         "winRate": 1
-      },
-      {
-        "items": [
-          6631,
-          3071,
-          3143
-        ],
-        "games": 1,
-        "winRate": 1
-      },
+      }
+    ],
+    "situational": [
       {
         "items": [
           3071
@@ -68,8 +77,7 @@
         "games": 1,
         "winRate": 0
       }
-    ],
-    "situational": []
+    ]
   },
   "runes": [
     {
@@ -90,12 +98,12 @@
         5008,
         5011
       ],
-      "games": 2,
-      "winRate": 0.5
+      "games": 5,
+      "winRate": 0.2
     },
     {
       "primaryStyle": 8000,
-      "secondaryStyle": 8400,
+      "secondaryStyle": 8200,
       "primary": [
         8010,
         8009,
@@ -103,13 +111,13 @@
         8299
       ],
       "secondary": [
-        8444,
-        8242
+        8226,
+        8210
       ],
       "shards": [
         5008,
         5008,
-        5011
+        5001
       ],
       "games": 1,
       "winRate": 1
@@ -118,19 +126,19 @@
   "summoners": [
     {
       "spells": [
-        3,
-        4
+        4,
+        12
       ],
-      "games": 2,
-      "winRate": 0.5
+      "games": 5,
+      "winRate": 0.4
     },
     {
       "spells": [
         4,
         21
       ],
-      "games": 2,
-      "winRate": 0.5
+      "games": 4,
+      "winRate": 0.25
     }
   ],
   "skills": {
@@ -140,9 +148,9 @@
       "W"
     ],
     "order": [
+      "Q",
       "W",
       "E",
-      "Q",
       "Q",
       "Q"
     ]

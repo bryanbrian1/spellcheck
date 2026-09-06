@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "updatedAt": "2026-09-06T13:37:45.941Z",
   "stats": {
-    "games": 6,
-    "winRate": 0.6667
+    "games": 11,
+    "winRate": 0.5455
   },
   "items": {
     "starters": [
@@ -20,7 +20,7 @@
         "items": [
           2003
         ],
-        "games": 6,
+        "games": 9,
         "winRate": 0.6667
       }
     ],
@@ -29,8 +29,8 @@
         "items": [
           1001
         ],
-        "games": 6,
-        "winRate": 0.6667
+        "games": 11,
+        "winRate": 0.5455
       }
     ],
     "core": [
@@ -38,7 +38,7 @@
         "items": [
           6655
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 1
       },
       {
@@ -46,7 +46,7 @@
           2503,
           4628
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       },
       {
@@ -61,6 +61,27 @@
     "situational": []
   },
   "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8229,
+        8226,
+        8210,
+        8237
+      ],
+      "secondary": [
+        9105,
+        8017
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 2,
+      "winRate": 1
+    },
     {
       "primaryStyle": 8100,
       "secondaryStyle": 8200,
@@ -81,27 +102,6 @@
       ],
       "games": 1,
       "winRate": 1
-    },
-    {
-      "primaryStyle": 8200,
-      "secondaryStyle": 8000,
-      "primary": [
-        8229,
-        8226,
-        8210,
-        8237
-      ],
-      "secondary": [
-        9105,
-        8017
-      ],
-      "shards": [
-        5008,
-        5008,
-        5011
-      ],
-      "games": 1,
-      "winRate": 1
     }
   ],
   "summoners": [
@@ -110,15 +110,15 @@
         4,
         7
       ],
-      "games": 5,
-      "winRate": 0.8
+      "games": 9,
+      "winRate": 0.6667
     },
     {
       "spells": [
         3,
         4
       ],
-      "games": 1,
+      "games": 2,
       "winRate": 0
     }
   ],

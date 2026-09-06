@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Pyke",
+    "name": "Pyke",
+    "id": 555
+  },
+  "role": "middle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "stats": {
+    "games": 6,
+    "winRate": 0.6667
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1054,
+          2003
+        ],
+        "games": 6,
+        "winRate": 0.6667
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 6,
+        "winRate": 0.6667
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6698,
+          6699,
+          2520
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6698,
+          3142,
+          6696
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3142,
+          6698,
+          3814
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          2517
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8400,
+      "primary": [
+        9923,
+        8143,
+        8140,
+        8106
+      ],
+      "secondary": [
+        8444,
+        8242
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 4,
+      "winRate": 0.75
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8000,
+      "primary": [
+        9923,
+        8143,
+        8140,
+        8106
+      ],
+      "secondary": [
+        8017,
+        9105
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 6,
+      "winRate": 0.6667
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

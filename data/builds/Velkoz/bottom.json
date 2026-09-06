@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Velkoz",
+    "name": "Vel'Koz",
+    "id": 161
+  },
+  "role": "bottom",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "stats": {
+    "games": 5,
+    "winRate": 0.6
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 4,
+        "winRate": 0.75
+      },
+      {
+        "items": [
+          2003,
+          3070
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3020
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          2503
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          2503,
+          3102
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          4628,
+          4646,
+          3003
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3157
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6653
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3089
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8229,
+        8226,
+        8210,
+        8236
+      ],
+      "secondary": [
+        8017,
+        9105
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 1,
+      "winRate": 1
+    },
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8229,
+        8226,
+        8210,
+        8236
+      ],
+      "secondary": [
+        9105,
+        8017
+      ],
+      "shards": [
+        5008,
+        5001,
+        5001
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 3,
+      "winRate": 0.6667
+    },
+    {
+      "spells": [
+        4,
+        21
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "Q",
+      "W",
+      "E",
+      "W",
+      "Q"
+    ]
+  }
+}

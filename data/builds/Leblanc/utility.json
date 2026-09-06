@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "updatedAt": "2026-09-06T13:37:45.941Z",
   "stats": {
-    "games": 20,
-    "winRate": 0.65
+    "games": 50,
+    "winRate": 0.64
   },
   "items": {
     "starters": [
@@ -20,8 +20,8 @@
         "items": [
           2003
         ],
-        "games": 20,
-        "winRate": 0.65
+        "games": 50,
+        "winRate": 0.64
       }
     ],
     "boots": [
@@ -29,15 +29,15 @@
         "items": [
           1001
         ],
-        "games": 18,
-        "winRate": 0.6111
+        "games": 45,
+        "winRate": 0.6222
       },
       {
         "items": [
           3020
         ],
-        "games": 2,
-        "winRate": 1
+        "games": 5,
+        "winRate": 0.8
       }
     ],
     "core": [
@@ -45,26 +45,35 @@
         "items": [
           6655
         ],
-        "games": 6,
-        "winRate": 0.8333
+        "games": 13,
+        "winRate": 0.7692
       },
       {
         "items": [
           6655,
           4645
         ],
-        "games": 3,
-        "winRate": 1
+        "games": 12,
+        "winRate": 0.75
       },
       {
         "items": [
-          4646
+          6655,
+          3157
         ],
-        "games": 3,
-        "winRate": 0
+        "games": 4,
+        "winRate": 0.25
       }
     ],
-    "situational": []
+    "situational": [
+      {
+        "items": [
+          3102
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ]
   },
   "runes": [
     {
@@ -85,8 +94,8 @@
         5008,
         5011
       ],
-      "games": 9,
-      "winRate": 0.7778
+      "games": 27,
+      "winRate": 0.7037
     },
     {
       "primaryStyle": 8100,
@@ -106,7 +115,7 @@
         5008,
         5011
       ],
-      "games": 3,
+      "games": 5,
       "winRate": 1
     }
   ],
@@ -116,8 +125,8 @@
         4,
         14
       ],
-      "games": 20,
-      "winRate": 0.65
+      "games": 50,
+      "winRate": 0.64
     }
   ],
   "skills": {

@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-05T13:28:05.100Z",
+  "updatedAt": "2026-09-06T13:37:45.941Z",
   "stats": {
-    "games": 16,
-    "winRate": 0.75
+    "games": 31,
+    "winRate": 0.5484
   },
   "items": {
     "starters": [
@@ -20,8 +20,8 @@
         "items": [
           1101
         ],
-        "games": 7,
-        "winRate": 0.5714
+        "games": 16,
+        "winRate": 0.5
       },
       {
         "items": [
@@ -37,15 +37,15 @@
         "items": [
           3111
         ],
-        "games": 9,
-        "winRate": 0.6667
+        "games": 16,
+        "winRate": 0.625
       },
       {
         "items": [
           3047
         ],
-        "games": 5,
-        "winRate": 1
+        "games": 9,
+        "winRate": 0.6667
       },
       {
         "items": [
@@ -62,7 +62,7 @@
           2502,
           3065
         ],
-        "games": 4,
+        "games": 8,
         "winRate": 0.75
       },
       {
@@ -70,17 +70,15 @@
           3084,
           2502
         ],
-        "games": 3,
-        "winRate": 0.6667
+        "games": 5,
+        "winRate": 0.6
       },
       {
         "items": [
-          3084,
-          2502,
-          3109
+          3084
         ],
-        "games": 2,
-        "winRate": 1
+        "games": 5,
+        "winRate": 0
       }
     ],
     "situational": [
@@ -88,8 +86,15 @@
         "items": [
           3143
         ],
-        "games": 2,
-        "winRate": 0.5
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          6665
+        ],
+        "games": 3,
+        "winRate": 0.6667
       },
       {
         "items": [
@@ -114,13 +119,6 @@
       },
       {
         "items": [
-          6665
-        ],
-        "games": 1,
-        "winRate": 1
-      },
-      {
-        "items": [
           8020
         ],
         "games": 1,
@@ -139,16 +137,16 @@
         8451
       ],
       "secondary": [
-        8410,
-        8304
+        8304,
+        8410
       ],
       "shards": [
         5007,
         5001,
         5001
       ],
-      "games": 6,
-      "winRate": 0.8333
+      "games": 13,
+      "winRate": 0.5385
     },
     {
       "primaryStyle": 8400,
@@ -160,15 +158,15 @@
         8451
       ],
       "secondary": [
-        8304,
-        8410
+        8410,
+        8304
       ],
       "shards": [
         5007,
         5001,
         5001
       ],
-      "games": 6,
+      "games": 12,
       "winRate": 0.5
     }
   ],
@@ -178,8 +176,8 @@
         4,
         11
       ],
-      "games": 16,
-      "winRate": 0.75
+      "games": 31,
+      "winRate": 0.5484
     }
   ],
   "skills": {

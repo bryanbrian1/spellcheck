@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Gragas",
+    "name": "Gragas",
+    "id": 79
+  },
+  "role": "jungle",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "stats": {
+    "games": 7,
+    "winRate": 0.7143
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1102
+        ],
+        "games": 5,
+        "winRate": 0.6
+      },
+      {
+        "items": [
+          1101
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          3020
+        ],
+        "games": 6,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          1001
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3100,
+          4645,
+          3089
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3100
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3100,
+          4645,
+          3157
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8300,
+      "primary": [
+        8128,
+        8143,
+        8140,
+        8135
+      ],
+      "secondary": [
+        8347,
+        8304
+      ],
+      "shards": [
+        5007,
+        5008,
+        5001
+      ],
+      "games": 4,
+      "winRate": 0.5
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8200,
+      "primary": [
+        8128,
+        8143,
+        8137,
+        8105
+      ],
+      "secondary": [
+        8233,
+        8236
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 7,
+      "winRate": 0.7143
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "W",
+      "Q",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

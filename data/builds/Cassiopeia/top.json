@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Cassiopeia",
+    "name": "Cassiopeia",
+    "id": 69
+  },
+  "role": "top",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "stats": {
+    "games": 5,
+    "winRate": 0.2
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 5,
+        "winRate": 0.2
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 4,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6657,
+          3003,
+          3116
+        ],
+        "games": 2,
+        "winRate": 0
+      },
+      {
+        "items": [
+          6657,
+          3003
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3003,
+          3137
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8992,
+        8226,
+        8234,
+        8237
+      ],
+      "secondary": [
+        9105,
+        8017
+      ],
+      "shards": [
+        5008,
+        5010,
+        5011
+      ],
+      "games": 2,
+      "winRate": 0
+    },
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8992,
+        8226,
+        8234,
+        8237
+      ],
+      "secondary": [
+        9105,
+        8017
+      ],
+      "shards": [
+        5007,
+        5010,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 2,
+      "winRate": 0.5
+    },
+    {
+      "spells": [
+        1,
+        4
+      ],
+      "games": 1,
+      "winRate": 0
+    }
+  ],
+  "skills": {
+    "priority": [
+      "E",
+      "Q",
+      "W"
+    ],
+    "order": [
+      "E",
+      "Q",
+      "E",
+      "W",
+      "E"
+    ]
+  }
+}

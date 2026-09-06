@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Azir",
+    "name": "Azir",
+    "id": 268
+  },
+  "role": "bottom",
+  "patch": "16.17",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "stats": {
+    "games": 7,
+    "winRate": 0.5714
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 7,
+        "winRate": 0.5714
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 5,
+        "winRate": 0.4
+      },
+      {
+        "items": [
+          3020
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3111
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3115,
+          4645,
+          3089
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3115,
+          3157,
+          3089
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3115,
+          3157,
+          3137
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8200,
+      "primary": [
+        8008,
+        8009,
+        9104,
+        8017
+      ],
+      "secondary": [
+        8210,
+        8237
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 3,
+      "winRate": 0.3333
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8005,
+        8009,
+        9104,
+        8017
+      ],
+      "secondary": [
+        8321,
+        8313
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 6,
+      "winRate": 0.5
+    },
+    {
+      "spells": [
+        1,
+        4
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "Q",
+      "E"
+    ],
+    "order": [
+      "W",
+      "Q",
+      "E",
+      "W",
+      "W"
+    ]
+  }
+}
