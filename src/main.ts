@@ -46,12 +46,24 @@ interface SourceInfo {
 }
 interface ChampionRef { key: string; name: string; id?: number }
 
+type LaneAdvantage = "ours" | "theirs" | "even";
+
+/** Present only on a build a source really filtered to one opponent. Its
+ *  absence is the signal that this is the general build — see `render`. */
+interface MatchupInfo {
+  opponent: ChampionRef;
+  tip?: string;
+  laneAdvantage?: LaneAdvantage;
+  playStyle?: string;
+}
+
 interface FoundBuild {
   status: "found";
   champion: ChampionRef;
   role: Role;
   source: SourceInfo;
   stats?: BuildStats;
+  matchup?: MatchupInfo;
   items: ItemPlan;
   runes?: RunePage[];
   summoners?: SummonerSet[];
@@ -561,6 +573,37 @@ const skillBlock = (skills: SkillPlan): string => {
   return block("Skill order", meta, `<div class="row">${row}</div>`, "rail lo");
 };
 
+/**
+ * The matchup banner.
+ *
+ * Drawn only from `matchup`, which a source sets only when the build really
+ * is filtered to this opponent. It carries no sample of its own — the
+ * build's own stats block already reports the matchup's games and win rate —
+ * so like the standing banner it wears neither rail: the advantage and the
+ * play style are the source's reading of a lane, and the tip is its prose.
+ * Neither is a statistic of ours and neither is one of our rules.
+ */
+const matchupBlock = (matchup: MatchupInfo): string => {
+  const advantage: Record<LaneAdvantage, string> = {
+    ours: "You have the lane",
+    theirs: `${matchup.opponent.name} has the lane`,
+    even: "Even lane",
+  };
+
+  const lead = matchup.laneAdvantage ? advantage[matchup.laneAdvantage] : "";
+  const style = matchup.playStyle ? `play it ${matchup.playStyle}` : "";
+  const line = [lead, style].filter(Boolean).join(" \u00b7 ");
+  const tip = matchup.tip ? `<p class="vs-tip">${escape(matchup.tip)}</p>` : "";
+
+  return `<div class="vs-hd ${escape(matchup.laneAdvantage ?? "even")}">
+    <span class="vs-portrait" data-icon="champ:${escape(matchup.opponent.key)}"></span>
+    <span class="vs-txt">
+      <b>vs ${escape(matchup.opponent.name)}</b>
+      ${line ? `<span class="vs-sub">${escape(line)}</span>` : ""}
+    </span>
+  </div>${tip}`;
+};
+
 /* ---------- rendering ---------- */
 
 const results = el<HTMLDivElement>("results");
@@ -598,6 +641,11 @@ const buildHtml = (lookup: FoundBuild): string | null => {
 
   if (!blocks.length) return null;
 
+  // Prepended after the emptiness check, never before it: a banner saying who
+  // the build is against is not itself a build, and must not be what makes an
+  // empty answer look like a full one.
+  if (lookup.matchup) blocks.unshift(matchupBlock(lookup.matchup));
+
   const src = lookup.source;
   const provenance = [src.patch && `patch ${src.patch}`, src.region, src.tier]
     .filter(Boolean)
@@ -606,7 +654,15 @@ const buildHtml = (lookup: FoundBuild): string | null => {
   return blocks.join("") + (provenance ? `<p class="note">${escape(provenance)}</p>` : "");
 };
 
-const render = (lookup: BuildLookup): void => {
+/**
+ * `askedOpponent` is the opponent the caller asked about, if any, and exists
+ * for one case: the question was a matchup and the answer is not one. A
+ * source with no matchup data answers with the ordinary build and leaves
+ * `matchup` unset, and the screen has to say so — silently drawing the
+ * general build under the name of an opponent would be a lie the user has no
+ * way to catch.
+ */
+const render = (lookup: BuildLookup, askedOpponent?: string): void => {
   if (lookup.status === "noData") {
     message(`No data for ${lookup.championName} ${lookup.role}. ${lookup.detail}`);
     return;
@@ -618,7 +674,13 @@ const render = (lookup: BuildLookup): void => {
     return;
   }
 
-  results.innerHTML = html;
+  const unanswered =
+    askedOpponent && !lookup.matchup
+      ? `<div class="thin">This source has no <b>${escape(askedOpponent)}</b> data. \
+Showing the general ${escape(lookup.champion.name)} ${escape(lookup.role)} build.</div>`
+      : "";
+
+  results.innerHTML = unanswered + html;
   paintIcons();
 
   // Import stays disabled: CLAUDE.md requires these to be user-initiated, and
@@ -688,6 +750,24 @@ const matchChampions = (query: string, limit = 8): Champion[] => {
 };
 
 const champInput = el<HTMLInputElement>("champ");
+const vsInput = el<HTMLInputElement>("vs");
+
+/**
+ * Fill the opponent box's datalist, once the roster has arrived.
+ *
+ * Display names only — the browser matches on what is in the list, and the
+ * point of the list is that a player picks a name they recognise. A typed key
+ * still works: `lookup` resolves whatever is in the box through the same
+ * matcher the champion box uses.
+ */
+const fillRoster = (): void => {
+  const roster = document.getElementById("roster");
+  if (!roster) return;
+  roster.innerHTML = champions
+    .map((champion) => `<option value="${escape(champion.name)}"></option>`)
+    .join("");
+};
+
 let role: Role = "middle";
 let inFlight = 0;
 
@@ -710,12 +790,20 @@ const lookup = async (): Promise<void> => {
   const champion = resolved?.key ?? typed;
   const shown = resolved?.name ?? typed;
 
+  // The same resolution for the opponent, and for the same reason: the box
+  // holds a name and a provider wants a key. An empty box asks the ordinary
+  // question, which is the common case.
+  const typedOpponent = vsInput.value.trim();
+  const foundOpponent = typedOpponent ? matchChampions(typedOpponent, 1)[0] ?? null : null;
+  const opponent = typedOpponent ? foundOpponent?.key ?? typedOpponent : "";
+  const opponentShown = foundOpponent?.name ?? typedOpponent;
+
   const ticket = ++inFlight;
-  message(`Looking up ${shown}…`);
+  message(opponent ? `Looking up ${shown} vs ${opponentShown}…` : `Looking up ${shown}…`);
   try {
-    const result = await invoke<BuildLookup>("fetch_build", { champion, role });
+    const result = await invoke<BuildLookup>("fetch_build", { champion, role, opponent });
     if (ticket !== inFlight) return; // a newer query already won
-    render(result);
+    render(result, opponent ? opponentShown : undefined);
   } catch (error) {
     if (ticket !== inFlight) return;
     message(error instanceof Error ? error.message : String(error), true);
@@ -832,6 +920,27 @@ suggest.addEventListener("click", (event) => {
 // Clicking away puts the list down; it must not sit over the build.
 document.addEventListener("click", (event) => {
   if (!(event.target as HTMLElement).closest(".search-wrap")) closeSuggestions();
+});
+
+let vsDebounce = 0;
+vsInput.addEventListener("input", () => {
+  // Only once the champion box has something to build for — an opponent on
+  // its own is not a question anybody can answer.
+  window.clearTimeout(vsDebounce);
+  if (!champInput.value.trim()) return;
+  // Clearing the box is a real change and must re-run: it is how you get back
+  // from the matchup build to the general one.
+  const typed = normalise(vsInput.value);
+  if (typed.length === 0 || typed.length >= 2) {
+    vsDebounce = window.setTimeout(lookup, 350);
+  }
+});
+
+vsInput.addEventListener("keydown", (event: KeyboardEvent) => {
+  if (event.key !== "Enter") return;
+  event.preventDefault();
+  window.clearTimeout(vsDebounce);
+  void lookup();
 });
 
 el<HTMLDivElement>("roles").addEventListener("click", (event) => {
@@ -1189,6 +1298,7 @@ void invoke<DataDragon>("data_dragon")
   .then((catalog) => {
     icons = catalog;
     champions = catalog.champions;
+    fillRoster();
     paintIcons();
   })
   .catch(() => {

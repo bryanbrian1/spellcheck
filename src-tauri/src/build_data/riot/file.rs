@@ -201,6 +201,12 @@ impl BuildFile {
                 updated_at: self.updated_at,
             },
             stats: self.stats.and_then(|stats| stats.into()),
+            // Our crawl buckets by champion and lane only, so there is no
+            // opponent-filtered build in here to offer. Saying so by leaving
+            // this empty is the whole of this provider's matchup support: the
+            // caller gets the ordinary build and the screen says that is what
+            // it is. See `ChampionBuild::matchup`.
+            matchup: None,
             items: ItemPlan {
                 starters: self.items.starters.into_iter().map(Into::into).collect(),
                 boots: self.items.boots.into_iter().map(Into::into).collect(),

@@ -27,6 +27,9 @@ use mcp::McpClient;
 pub const PROVIDER_LABEL: &str = "OP.GG";
 pub const DEFAULT_ENDPOINT: &str = "https://mcp-api.op.gg/mcp";
 pub const DEFAULT_TOOL: &str = "lol_get_champion_analysis";
+/// The tool that answers "…but against Zed". A separate call rather than an
+/// argument to the one above, which takes no opponent.
+pub const DEFAULT_MATCHUP_TOOL: &str = "lol_get_lane_matchup_guide";
 const DEFAULT_TIMEOUT_SECS: u64 = 10;
 /// The tool requires a game mode and has no default. Ranked solo queue is
 /// what champion select is usually feeding.
@@ -105,6 +108,9 @@ pub struct OpggConfig {
     /// MCP tool to call. Configurable so a renamed tool is a config change,
     /// not a release.
     pub tool: String,
+    /// Tool for a build against a named opponent. Configurable for the same
+    /// reason as `tool`.
+    pub matchup_tool: String,
     /// Which queue the numbers come from. Required by the tool:
     /// `ranked`, `flex`, `urf`, `aram` or `nexus_blitz`.
     pub game_mode: String,
@@ -122,6 +128,7 @@ impl Default for OpggConfig {
         OpggConfig {
             endpoint: DEFAULT_ENDPOINT.to_string(),
             tool: DEFAULT_TOOL.to_string(),
+            matchup_tool: DEFAULT_MATCHUP_TOOL.to_string(),
             game_mode: DEFAULT_GAME_MODE.to_string(),
             tier: None,
             timeout_secs: DEFAULT_TIMEOUT_SECS,
@@ -174,6 +181,22 @@ impl OpggProvider {
         arguments
     }
 
+    /// Arguments for the matchup tool.
+    ///
+    /// A shorter list than the analysis tool's, and deliberately not a
+    /// superset of it: this tool takes no `game_mode`, no `tier` and no
+    /// `desired_output_fields`, so it always answers in full and always from
+    /// the same sample. Anything the configuration says about tier does not
+    /// apply here and is not sent — see the mapper, which refuses to claim a
+    /// tier for the same reason.
+    fn matchup_arguments(&self, request: &BuildRequest, opponent_key: &str) -> Value {
+        json!({
+            "my_champion": opgg_matchup_champion(&request.champion_key),
+            "opponent_champion": opgg_matchup_champion(opponent_key),
+            "position": request.role.opgg_position(),
+        })
+    }
+
     /// Which lane this champion is played in, and how often.
     ///
     /// A different question from a build, and a far smaller answer — a couple
@@ -185,7 +208,17 @@ impl OpggProvider {
 
     /// One call, mapped through the same wire handling as a build.
     async fn call(&self, arguments: Value) -> Result<Value, ProviderError> {
-        let payload = self.client.call_tool(&self.config.tool, arguments).await?;
+        self.call_tool(&self.config.tool, arguments).await
+    }
+
+    /// The same, against a named tool.
+    ///
+    /// The wire handling is not specific to the analysis tool: a payload that
+    /// arrives as text is decoded, and one that arrives as JSON — which the
+    /// matchup tool's does — is passed through. Neither tool promises which
+    /// it will send, so both go through here.
+    async fn call_tool(&self, tool: &str, arguments: Value) -> Result<Value, ProviderError> {
+        let payload = self.client.call_tool(tool, arguments).await?;
         Ok(match payload.as_str() {
             Some(text) => wire::parse(text).unwrap_or_else(|_| payload.clone()),
             None => payload,
@@ -220,6 +253,38 @@ fn opgg_champion(key: &str) -> String {
     out
 }
 
+/// The champion spelling the *matchup* tool wants, which is not the one the
+/// analysis tool wants.
+///
+/// Both advertise "UPPER_SNAKE_CASE", and for all but three champions the two
+/// agree, which is what makes the disagreement worth writing down. The
+/// analysis tool speaks the Data Dragon key: `MONKEY_KING`. The matchup tool
+/// speaks the *display name* with its punctuation removed and its spaces
+/// turned into underscores: `WUKONG`. Where a name has an apostrophe the two
+/// diverge the other way — `Bel'Veth` is `BELVETH`, from the key, and
+/// `BEL_VETH` is rejected.
+///
+/// Sending the wrong one is not a soft failure. The endpoint answers
+/// `-32600 Invalid position or champion specified`, so it is loud — but only
+/// for the handful of champions below, which is exactly the kind of gap that
+/// survives testing on Ahri.
+///
+/// The table is keyed on what every caller already has. Each entry was found
+/// by asking the live endpoint both spellings; `returns_real_matchup_builds`
+/// keeps one of them honest. A champion released with a two-word name and a
+/// one-word key belongs here, and the symptom is that one champion failing
+/// while every other works.
+fn opgg_matchup_champion(key: &str) -> String {
+    match key {
+        "MonkeyKing" => "WUKONG".to_string(),
+        "Nunu" => "NUNU_WILLUMP".to_string(),
+        "Renata" => "RENATA_GLASC".to_string(),
+        // Every other champion, including the apostrophe names, is spelled
+        // from the key exactly as the analysis tool spells it.
+        other => opgg_champion(other),
+    }
+}
+
 #[async_trait]
 impl BuildDataProvider for OpggProvider {
     fn label(&self) -> &str {
@@ -230,6 +295,25 @@ impl BuildDataProvider for OpggProvider {
         // Validated even though this is not a filesystem path: the key goes
         // into a request we make on the user's behalf.
         validate_champion_key(&request.champion_key)?;
+
+        // Naming an opponent asks a different tool a different question, and
+        // gets a differently shaped answer back. Both land in the same
+        // schema, which is the point: nothing above this line can tell which
+        // of the two ran.
+        if let Some(opponent_key) = request.opponent() {
+            // Validated for the same reason as our own key, and separately:
+            // it reaches the endpoint as an argument too.
+            validate_champion_key(opponent_key)?;
+
+            let payload = self
+                .call_tool(
+                    &self.config.matchup_tool,
+                    self.matchup_arguments(request, opponent_key),
+                )
+                .await?;
+
+            return Ok(map::matchup_from_payload(&payload, request, self.label()));
+        }
 
         // The endpoint answers in its own compact format rather than JSON.
         // Anything that does not parse is left as text, which the mapper
@@ -298,6 +382,50 @@ impl BuildDataProvider for OpggProvider {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The nine champions whose Data Dragon key and display name are spelled
+    /// differently, each pinned to the spelling the live matchup tool
+    /// actually accepts.
+    ///
+    /// Every one of these was asked of the endpoint both ways. Six take the
+    /// key's spelling and reject the name's; three do the opposite. There is
+    /// no rule here to derive — only a fact about somebody else's API — so
+    /// the fact is written down and tested.
+    #[test]
+    fn the_matchup_tool_is_spelled_to_its_own_vocabulary() {
+        // Rejected as MONKEY_KING, NUNU and RENATA.
+        assert_eq!(opgg_matchup_champion("MonkeyKing"), "WUKONG");
+        assert_eq!(opgg_matchup_champion("Nunu"), "NUNU_WILLUMP");
+        assert_eq!(opgg_matchup_champion("Renata"), "RENATA_GLASC");
+
+        // Rejected as BEL_VETH, CHO_GATH, K_SANTE, KAI_SA, KHA_ZIX, VEL_KOZ —
+        // the apostrophe names go the other way.
+        assert_eq!(opgg_matchup_champion("Belveth"), "BELVETH");
+        assert_eq!(opgg_matchup_champion("Chogath"), "CHOGATH");
+        assert_eq!(opgg_matchup_champion("KSante"), "KSANTE");
+        assert_eq!(opgg_matchup_champion("Kaisa"), "KAISA");
+        assert_eq!(opgg_matchup_champion("Khazix"), "KHAZIX");
+        assert_eq!(opgg_matchup_champion("Velkoz"), "VELKOZ");
+
+        // Everybody else, where the two tools agree.
+        assert_eq!(opgg_matchup_champion("Ahri"), "AHRI");
+        assert_eq!(opgg_matchup_champion("LeeSin"), "LEE_SIN");
+        assert_eq!(opgg_matchup_champion("JarvanIV"), "JARVAN_IV");
+        assert_eq!(opgg_matchup_champion("DrMundo"), "DR_MUNDO");
+    }
+
+    /// The two tools disagree, and the analysis tool must keep its own
+    /// spelling — a live test proves `MONKEY_KING` is what it wants.
+    #[test]
+    fn the_analysis_tool_keeps_the_key_spelling() {
+        assert_eq!(opgg_champion("MonkeyKing"), "MONKEY_KING");
+        assert_ne!(
+            opgg_champion("MonkeyKing"),
+            opgg_matchup_champion("MonkeyKing"),
+            "the whole reason the second function exists"
+        );
+    }
+
     use crate::build_data::role::Role;
 
     fn provider() -> OpggProvider {

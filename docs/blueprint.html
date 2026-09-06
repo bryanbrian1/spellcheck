@@ -238,7 +238,7 @@ pre .p{color:var(--stat)}
       <span>Rust <b>1.98.1</b></span>
       <span>Tauri <b>v2</b></span>
       <span>Vanilla <b>TypeScript</b></span>
-      <span><b>200</b> tests</span>
+      <span><b>219</b> tests</span>
       <span><b>11,750</b> lines</span>
       <span>Download <b>3.2 MB</b></span>
       <span>Installed <b>8.2 MB</b></span>
@@ -650,7 +650,9 @@ pre .p{color:var(--stat)}
         <div><span class="k yes">Works</span><span class="v"><b>Crawler.</b> Riot&#8217;s match API into <code>data/builds/</code>, on a daily schedule behind three gates. Nineteen tests on Node&#8217;s own runner, including one whole run against a stubbed Riot.</span></div>
         <div><span class="k part">Untested</span><span class="v"><b>The crawl against the live API.</b> Every response shape is stubbed from the documentation rather than from a real answer, and no run has been made with a real key. The first scheduled run is the test &#8212; which is what the key check and the output guard exist to survive.</span></div>
         <div><span class="k yes">Works</span><span class="v"><b>Crawled data.</b> The schedule has run: 277 files, 1.1&#8239;MB, committed under <code>data/builds/</code> and shipped inside the app as a bundle resource. <code>RiotProvider</code> has something to read.</span></div>
-        <div><span class="k no">Missing</span><span class="v"><b>Matchup builds.</b> The design promises &#8220;core build vs. Syndra&#8221;, but <code>BuildRequest</code> carries champion and role with no opponent field. Needs a schema change and provider support on both sides.</span></div>
+        <div><span class="k yes">Works</span><span class="v"><b>Matchup builds.</b> &#8220;Core build vs. Zed&#8221;, from the search box and from a game in progress. <code>BuildRequest</code> carries an opponent; <code>OpggProvider</code> answers it through a second tool, <code>lol_get_lane_matchup_guide</code>; <code>RiotProvider</code> cannot and says so by leaving <code>matchup</code> empty, which is what makes the screen able to tell you it is showing the general build instead. Live-checked against four pairings, including both sides of the vocabulary trap below.</span></div>
+        <div><span class="k part">Untested</span><span class="v"><b>Matchups in a real game.</b> Champ select cannot name your lane opponent &#8212; the client blanks <code>theirTeam</code> positions in every queue that hides the draft &#8212; so the matchup build is asked for once the match starts, off the live API&#8217;s <code>lane_opponent</code>. That path is unit-tested and has never met a real game, like everything else downstream of a running League.</span></div>
+        <div><span class="k part">Watch</span><span class="v"><b>The two OP.GG tools do not speak the same champion vocabulary.</b> The analysis tool wants the Data Dragon key &#8212; <code>MONKEY_KING</code>. The matchup tool wants the display name with its punctuation stripped &#8212; <code>WUKONG</code>, and it rejects <code>MONKEY_KING</code> outright. It reverses for apostrophe names: <code>BELVETH</code> is right and <code>BEL_VETH</code> is refused. Three keys need the table in <code>opgg_matchup_champion</code>; a new champion with a two-word name and a one-word key belongs there too, and the symptom is that one champion failing while every other works.</span></div>
       </div>
     </section>
 
