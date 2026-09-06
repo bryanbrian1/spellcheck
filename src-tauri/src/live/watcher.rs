@@ -313,7 +313,22 @@ mod tests {
         let task = tokio::spawn(watch(config, running_rx, events_tx));
         running_tx.send(true).expect("the receiver is alive");
 
-        let event = tokio::time::timeout(Duration::from_secs(2), events_rx.recv())
+        // Longer than the client's own request timeout, and derived from it
+        // so the two cannot drift apart.
+        //
+        // This waits on a connection to a port nothing is listening on, and
+        // how long that takes to fail is the platform's business, not ours.
+        // A refused connection on macOS and Linux comes back instantly, so a
+        // two-second deadline passed there for a year and looked principled.
+        // Windows does not refuse loopback that quickly, and the wake-up it
+        // was waiting for could only arrive once the client's own three-
+        // second timeout had fired — a second after the test had given up.
+        // The deadline was shorter than the worst case of the code it was
+        // testing, which is a bug in the test on every platform; only one of
+        // them was ever going to say so.
+        let deadline = Duration::from_secs(crate::live::client::REQUEST_TIMEOUT_SECS) * 3;
+
+        let event = tokio::time::timeout(deadline, events_rx.recv())
             .await
             .expect("the watcher woke up");
         assert_eq!(event, Some(GameEvent::NoGame));
