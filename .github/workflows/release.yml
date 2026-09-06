@@ -128,6 +128,27 @@ jobs:
       - name: Build the frontend
         run: npm run build
 
+      # Until this step existed, nothing ran these tests on any machine but
+      # the developer's: this workflow only built, and the crawler's Node
+      # tests run on the ingest schedule. A release could be cut, and was,
+      # over a suite nobody had run since the last time somebody typed
+      # `cargo test` by hand.
+      #
+      # It sits here, before the long build, so a failure costs seconds
+      # rather than the whole Tauri compile — and it runs on every platform
+      # in the matrix, which means the suite now runs on Windows, where none
+      # of it has ever executed. The toolchain and the cache are already warm
+      # by this point, so it adds well under a minute.
+      #
+      # The OP.GG live tests stay behind `#[ignore]` and do not run here.
+      # That is deliberate: CI must not depend on a third party being up, and
+      # a run that reaches the network is not one you can trust to fail for
+      # the reason it says. Run them by hand when the provider is in doubt —
+      # `cargo test --test opgg_live -- --ignored`.
+      - name: Test
+        working-directory: src-tauri
+        run: cargo test
+
       # Tauri decides to sign when APPLE_CERTIFICATE is *present*, not when it
       # holds anything, so handing the build an unset secret is not a no-op —
       # it fails in `security import` on an empty certificate. That is why the
