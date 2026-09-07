@@ -7,7 +7,8 @@
 // dependencies. It is a development tool and never ships — nothing in src/ or
 // src-tauri/ knows it exists.
 //
-//   node scripts/fake-lcu.mjs
+//   node scripts/fake-lcu.mjs              # the whole cycle, from champ select
+//   node scripts/fake-lcu.mjs --mid-game   # a game already in progress
 //
 // It prints the command to start the app against it, then cycles forever:
 // connected, in champ select, locked, in game, left, offline, and back — so
@@ -18,6 +19,15 @@
 // server only listens while the fake game is running, which is exactly how the
 // real one behaves — and it is why the app must treat a refused connection as
 // "no game" rather than as a failure.
+//
+// `--mid-game` exists because the app supports a route nothing could exercise.
+// Opening spellcheck while a match is already running is an ordinary way to
+// use it, and it is the one path whose champion does not come from the client:
+// champ select hands over the Data Dragon key, while a game in progress offers
+// only the live API's display name. The ordinary scenario always opens with
+// champ select, so that route had never been driven by anything — not a test,
+// not this stand-in. In this mode the client is up, the game is already
+// running, and no champ select ever happens.
 //
 // What it proves, and a real client would too: the app subscribes rather than
 // polls, treats a 404 session as "not in champ select", resolves a championId
@@ -55,6 +65,9 @@ const CHAMPIONS = [
   { id: 62, alias: "MonkeyKing", name: "Wukong", position: "jungle" },
   { id: 412, alias: "Thresh", name: "Thresh", position: "utility" },
 ];
+
+/** A game already in progress, and no champ select before it. */
+const MID_GAME = process.argv.includes("--mid-game");
 
 const log = (...parts) => console.log(new Date().toTimeString().slice(0, 8), ...parts);
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -176,7 +189,38 @@ const session = (championId, position, phase, enemiesShown = 0) => ({
 /** Mutated by the scenario; read by every request to the live server. */
 let live = null;
 
-const item = (price) => ({ itemID: 3020, price, count: 1, displayName: "an item" });
+// The real payload's item shape, all nine fields, and the two that matter are
+// the ones this stand-in used to get wrong.
+//
+// `itemID` capitalises both letters — it is the only field in the payload
+// shaped that way, and a parser deriving it from camelCase silently reads zero.
+//
+// `price` is the *combine* cost, not what the item is worth: a finished
+// Rabadon's Deathcap reports 1100 against a real 3500, and finished boots
+// report zero. This stand-in used to mint a price the scenario chose, which is
+// how the app spent months summing combine costs while every test agreed with
+// it. Ids here are real, and what they cost is data/meta/items.json's business.
+const HELD = [
+  { itemID: 3020, price: 350, slot: 0, displayName: "Sorcerer's Shoes" },
+  { itemID: 3165, price: 800, slot: 1, displayName: "Morellonomicon" },
+  { itemID: 3157, price: 1000, slot: 2, displayName: "Zhonya's Hourglass" },
+  { itemID: 3089, price: 1100, slot: 3, displayName: "Rabadon's Deathcap" },
+];
+
+const item = (entry, count = 1) => ({
+  canUse: false,
+  consumable: false,
+  count,
+  displayName: entry.displayName,
+  itemID: entry.itemID,
+  price: entry.price,
+  rawDescription: "GeneratedTip_Item_" + entry.itemID + "_Description",
+  rawDisplayName: "Item_" + entry.itemID + "_Name",
+  slot: entry.slot,
+});
+
+/** A plausible inventory. `depth` picks how far into the build they are. */
+const inventory = (depth) => HELD.slice(0, Math.max(0, Math.min(depth, HELD.length))).map((e) => item(e));
 
 const livePlayer = (name, team, position, gold, level, dead = false) => ({
   championName: name,
@@ -187,7 +231,10 @@ const livePlayer = (name, team, position, gold, level, dead = false) => ({
   respawnTimer: dead ? 12.5 : 0,
   riotId: `${name}#EUW`,
   summonerName: name,
-  items: gold ? [item(gold)] : [],
+  // `gold` is the scenario's shorthand for "how far along are they", not a
+  // number the payload carries: the live API never reports what a player has
+  // spent, only what they hold.
+  items: inventory(Math.round(gold / 1200)),
   scores: { kills: 2, deaths: 4, assists: 3, creepScore: 118, wardScore: 9 },
 });
 
@@ -239,6 +286,9 @@ const startGame = (champion) => {
     { key: fs.readFileSync(KEY), cert: fs.readFileSync(CERT) },
     (req, res) => {
       if (req.url && req.url.startsWith("/liveclientdata/allgamedata")) {
+        // Logged because the whole question about the in-game route is
+        // whether the app ever asks. Silence here is the symptom.
+        log("GET /liveclientdata/allgamedata");
         const body = JSON.stringify(allGameData());
         res.writeHead(200, { "content-type": "application/json" });
         res.end(body);
@@ -292,6 +342,15 @@ const upgrade = async (req, socket) => {
     if (!socket.destroyed) socket.write(frame(sessionEvent(eventType, data)));
   };
 
+  if (MID_GAME) {
+    // Nothing to push. The client is connected and idle — exactly what it
+    // looks like from the app's side when a match is already under way — and
+    // everything the screen shows has to come from the live API alone.
+    log("mid-game mode: no champ select will happen");
+    log("expect: the app finds the running game on its own and shows a build");
+    return;
+  }
+
   await wait(4000);
   log('push: champ select opened   -> screen: "Pick your champion"');
   push("Create", session(0, champion.position, "PLANNING"));
@@ -340,7 +399,8 @@ const upgrade = async (req, socket) => {
   Object.assign(live, { dead: false, ourGold: 5200, theirGold: 11800, levelGap: 3, gameTime: 1500 });
 
   await wait(35000);
-  log('the game ends               -> screen: "No game"');
+  log('the game ends               -> screen: pill "Game over", sub "· game ended",');
+  log('                               the standing goes, the build stays');
   stopGame();
 
   await wait(6000);
@@ -375,5 +435,14 @@ server.listen(PORT, "127.0.0.1", () => {
   fs.writeFileSync(LOCKFILE, `LeagueClient:4242:${PORT}:${PASSWORD}:https`);
   log(`stand-in League client listening on https://127.0.0.1:${PORT}`);
   console.log(`\n  Start the app against it with:\n\n    SPELLCHECK_LOCKFILE=${LOCKFILE} npm run dev\n`);
+
+  if (MID_GAME) {
+    // Before the app is even started, so that whenever it connects the match
+    // is already under way and there is no champ select to have missed.
+    startGame(CHAMPIONS[0]);
+    log("mid-game: a match is already running; start the app now");
+    return;
+  }
+
   log("cycling: connected -> in select -> locked -> in game -> offline -> repeat");
 });

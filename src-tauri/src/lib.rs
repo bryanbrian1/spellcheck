@@ -352,7 +352,7 @@ fn in_game_state(snapshot: &GameSnapshot) -> InGameState {
         role: us.and_then(|player| player.position),
         level: us.map(|player| player.level).unwrap_or(0),
         game_time: snapshot.game_time,
-        standing: standing(snapshot),
+        standing: standing(tags, snapshot),
         opponent_key: snapshot
             .lane_opponent()
             .and_then(|player| tags.champion_key_by_name(&player.champion_name))
@@ -998,7 +998,10 @@ mod in_game_tests {
             json!({
                 "championName": name, "team": team, "position": position,
                 "riotId": format!("{name}#EUW"), "level": 11, "isDead": false,
-                "items": [{ "itemID": 1, "price": gold, "count": 1 }],
+                // A real id the committed table can price, stacked to reach
+                // the total. Id 1 with an invented price used to work here and
+                // no longer can, which is the point of the change.
+                "items": [{ "itemID": 2003, "count": gold / 50 }],
                 "scores": { "kills": 2, "deaths": 4, "assists": 1, "creepScore": 90 },
             })
         };
@@ -1102,5 +1105,33 @@ mod in_game_tests {
         assert!(state.standing.is_none());
         assert!(state.threat.is_empty());
         assert!(state.state.is_empty());
+    }
+}
+
+#[cfg(test)]
+mod mid_game_tests {
+    use super::*;
+
+    const REAL_GAME: &str = include_str!("live/testdata/allgamedata.json");
+
+    /// Opening the app with a game already running is an ordinary way to use
+    /// it, and it is the one route whose champion does not come from the
+    /// client. Champ select is handed the Data Dragon key; here there is only
+    /// the live API's display name, so everything downstream depends on that
+    /// conversion working.
+    #[test]
+    fn a_running_game_names_a_champion_a_build_can_be_asked_for() {
+        let body: serde_json::Value = serde_json::from_str(REAL_GAME).expect("captured payload");
+        let snapshot = GameSnapshot::from_json(&body).expect("a real game parses");
+        let state = in_game_state(&snapshot);
+
+        assert_eq!(state.champion.as_deref(), Some("Viktor"), "who we are");
+        assert_eq!(
+            state.champion_key.as_deref(),
+            Some("Viktor"),
+            "and the key a provider is asked for — without this there is no build"
+        );
+        assert_eq!(state.role, Some(Role::Middle));
+        assert_eq!(state.opponent_key.as_deref(), Some("Velkoz"), "the lane matchup");
     }
 }

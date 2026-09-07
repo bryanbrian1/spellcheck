@@ -1,0 +1,615 @@
+<title>spellcheck Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* spellcheck roadmap.
+   Same palette, same rails, same meanings as docs/blueprint.html &#8212; this page
+   is read alongside that one and must not invent a second vocabulary. The
+   blueprint says how the thing is built; this says what is left to do. */
+:root{
+  --ground:#0b0e11;
+  --panel:#12171e;
+  --panel-2:#182029;
+  --line:#222d38;
+  --line-soft:#1a222b;
+  --ink:#e9eef3;
+  --ink-2:#94a3b2;
+  --ink-3:#61707f;
+  --stat:#3ec9a7;
+  --stat-dim:#1e3a34;
+  --rule:#e0a34b;
+  --rule-dim:#3a2f1a;
+  --danger:#e06a5a;
+  --danger-dim:#3a2320;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:Archivo,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:0;
+  max-width:1180px;
+  margin:0 auto;
+  padding:0 24px 96px;
+}
+@media (min-width:1000px){
+  .wrap{grid-template-columns:212px minmax(0,720px);gap:56px;justify-content:center;padding-top:8px}
+}
+
+/* ---------- masthead ---------- */
+.mast{grid-column:1/-1;padding:52px 0 30px;border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--stat);margin:0 0 14px;
+}
+.mast h1{
+  font-size:clamp(34px,5.4vw,52px);font-weight:700;letter-spacing:-.028em;
+  line-height:1.04;margin:0;text-wrap:balance;
+}
+.mast h1 span{color:var(--ink-3);font-weight:400}
+.lede{font-size:17px;color:var(--ink-2);margin:16px 0 0;max-width:62ch;line-height:1.55}
+.facts{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:24px;
+  font-family:var(--mono);font-size:11.5px;
+}
+.facts span{
+  border:1px solid var(--line);background:var(--panel);color:var(--ink-2);
+  padding:4px 9px;border-radius:2px;
+}
+.facts span b{color:var(--ink);font-weight:500}
+
+/* ---------- index ---------- */
+.index{display:none}
+@media (min-width:1000px){
+  .index{
+    display:block;grid-column:1;align-self:start;position:sticky;top:26px;
+    padding-top:40px;
+  }
+}
+.index p{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 12px;
+}
+.index a{
+  display:block;color:var(--ink-2);text-decoration:none;font-size:13.5px;
+  padding:4px 0 4px 12px;border-left:2px solid var(--line-soft);line-height:1.35;
+}
+.index a:hover{color:var(--ink);border-left-color:var(--stat)}
+.index a:focus-visible{outline:2px solid var(--stat);outline-offset:2px}
+
+/* ---------- reading column ---------- */
+.doc{grid-column:1/-1;padding-top:14px}
+@media (min-width:1000px){.doc{grid-column:2}}
+
+section{padding-top:44px}
+h2{
+  font-size:24px;font-weight:600;letter-spacing:-.018em;margin:0 0 6px;
+  text-wrap:balance;
+}
+h2 .n{
+  font-family:var(--mono);font-size:12px;font-weight:500;color:var(--stat);
+  display:block;letter-spacing:.1em;margin-bottom:7px;
+}
+h3{font-size:16px;font-weight:600;margin:26px 0 6px;letter-spacing:-.008em}
+p{margin:12px 0;max-width:66ch}
+.sub{color:var(--ink-2);margin-top:2px}
+strong{font-weight:600;color:var(--ink)}
+code{
+  font-family:var(--mono);font-size:.855em;background:var(--panel-2);
+  border:1px solid var(--line-soft);border-radius:2px;padding:1px 5px;color:#b9cad6;
+}
+a.lnk{color:var(--stat);text-decoration:none;border-bottom:1px solid var(--stat-dim)}
+a.lnk:hover{border-bottom-color:var(--stat)}
+a.lnk:focus-visible{outline:2px solid var(--stat);outline-offset:2px}
+
+/* ---------- the rail system ----------
+   Same meaning as inside the app, and as in the blueprint. Teal states how
+   the system is; amber is a constraint you may not break; red is a gap. */
+.rail{display:grid;grid-template-columns:3px minmax(0,1fr);gap:15px;margin:20px 0}
+.rail > i{border-radius:2px;background:var(--stat)}
+.rail.law > i{background:var(--rule)}
+.rail.gap > i{background:var(--danger)}
+.rail-in{min-width:0}
+.rail h4{
+  font-size:13.5px;font-weight:600;margin:0 0 4px;letter-spacing:-.004em;
+}
+.rail.law h4{color:var(--rule)}
+.rail.gap h4{color:var(--danger)}
+.rail p{margin:5px 0;font-size:14px;color:var(--ink-2);max-width:64ch}
+.rail p strong{color:var(--ink)}
+
+/* ---------- legend ---------- */
+.legend{
+  display:grid;gap:2px;margin:28px 0 4px;border:1px solid var(--line);
+  background:var(--panel);border-radius:3px;overflow:hidden;
+}
+.legend div{display:grid;grid-template-columns:3px 1fr;gap:13px;padding:11px 14px 11px 13px;background:var(--panel)}
+.legend div + div{border-top:1px solid var(--line-soft)}
+.legend i{border-radius:2px}
+.legend .t{font-size:13.5px;color:var(--ink-2);line-height:1.45}
+.legend .t b{color:var(--ink);font-weight:600}
+
+/* ---------- defect cards ---------- */
+.defect{
+  border:1px solid var(--line);background:var(--panel);border-radius:3px;
+  margin:22px 0;overflow:hidden;
+}
+.defect > header{
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:baseline;
+  padding:13px 16px;background:var(--panel-2);border-bottom:1px solid var(--line);
+}
+.defect .tag{
+  font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--danger);border:1px solid var(--danger-dim);background:#1c1412;
+  border-radius:2px;padding:3px 7px;white-space:nowrap;
+}
+.defect h3{margin:0;font-size:15.5px;font-weight:600;letter-spacing:-.008em}
+.defect .in{padding:4px 16px 16px}
+.defect p{font-size:14px;color:var(--ink-2);max-width:62ch}
+.defect p strong{color:var(--ink)}
+.finding{
+  font-family:var(--mono);font-size:12px;color:var(--ink-2);
+  border-left:2px solid var(--stat-dim);padding:2px 0 2px 12px;margin:14px 0;
+  line-height:1.6;max-width:62ch;
+}
+.finding b{color:var(--stat);font-weight:500}
+
+/* ---------- data table ---------- */
+.map{
+  font-family:var(--mono);font-size:12.5px;border:1px solid var(--line);
+  background:var(--panel);border-radius:3px;overflow-x:auto;margin:20px 0;
+}
+.map table{border-collapse:collapse;width:100%;min-width:520px}
+.map td{padding:7px 14px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.map tr:last-child td{border-bottom:0}
+.map .f{color:#b9cad6;white-space:nowrap}
+.map .f em{color:var(--ink-3);font-style:normal}
+.map .d{color:var(--ink-2);font-family:var(--sans);font-size:13.5px;line-height:1.45}
+.map .l{color:var(--ink-3);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.map .l b{color:var(--ink);font-weight:500}
+.map .warn b{color:var(--rule)}
+.map tr.head td{
+  background:var(--panel-2);color:var(--ink-3);font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;border-bottom:1px solid var(--line);
+}
+
+/* ---------- steps ---------- */
+ol.steps{margin:18px 0;padding:0;list-style:none;counter-reset:s}
+ol.steps li{
+  counter-increment:s;position:relative;padding:0 0 0 38px;margin:0 0 16px;
+  font-size:14.5px;color:var(--ink-2);max-width:64ch;line-height:1.55;
+}
+ol.steps li::before{
+  content:counter(s);position:absolute;left:0;top:1px;
+  width:23px;height:23px;border-radius:2px;border:1px solid var(--stat-dim);
+  background:#101c1a;color:var(--stat);font-family:var(--mono);font-size:11.5px;
+  display:grid;place-items:center;font-weight:500;
+}
+ol.steps li strong{color:var(--ink)}
+
+/* ---------- status ---------- */
+.status{display:grid;gap:2px;margin:20px 0;border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.status div{
+  display:grid;grid-template-columns:88px 1fr;gap:14px;align-items:baseline;
+  padding:10px 14px;background:var(--panel);
+}
+.status div + div{border-top:1px solid var(--line-soft)}
+.status .k{
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 0;border-radius:2px;text-align:center;border:1px solid;
+}
+.status .yes{color:var(--stat);border-color:var(--stat-dim);background:#101c1a}
+.status .no{color:var(--danger);border-color:var(--danger-dim);background:#1c1412}
+.status .part{color:var(--rule);border-color:var(--rule-dim);background:#1c1710}
+.status .v{font-size:14px;color:var(--ink-2);line-height:1.45}
+.status .v b{color:var(--ink);font-weight:600}
+
+/* ---------- shell ---------- */
+pre{
+  font-family:var(--mono);font-size:12.5px;line-height:1.65;background:var(--panel);
+  border:1px solid var(--line);border-radius:3px;padding:13px 15px;overflow-x:auto;
+  margin:16px 0;color:#b9cad6;
+}
+pre .c{color:var(--ink-3)}
+pre .p{color:var(--stat)}
+
+.end{
+  grid-column:1/-1;margin-top:60px;padding-top:22px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--ink-3);max-width:66ch;line-height:1.55;
+}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <p class="eyebrow">Developer roadmap &#183; 6 September 2026</p>
+    <h1>spellcheck <span>&#8212; what is left</span></h1>
+    <p class="lede">The app has now been run against a real League client, and it works. That retires the largest risk in the project and replaces it with five specific defects. This page is what remains: the defects first, then the data, then the things that stand between a beta and something you would hand a stranger.</p>
+    <div class="facts">
+      <span><b>219</b> Rust tests</span>
+      <span><b>19</b> Node tests</span>
+      <span><b>15,785</b> lines</span>
+      <span><b>5</b> live defects <em>4 fixed</em></span>
+      <span>Crawled <b>295</b> pairs</span>
+      <span>Median core sample <b>8</b> games</span>
+      <span>RAM <b>65 MB</b> <em>macOS</em></span>
+    </div>
+  </header>
+
+  <nav class="index" aria-label="Sections">
+    <p>Contents</p>
+    <a href="#read">How to read this</a>
+    <a href="#live">Five defects</a>
+    <a href="#data">The data</a>
+    <a href="#ship">Ship gaps</a>
+    <a href="#engine">Holes in the engine</a>
+    <a href="#drift">Document drift</a>
+    <a href="#order">What to do first</a>
+  </nav>
+
+  <main class="doc">
+
+    <section id="read">
+      <h2><span class="n">00</span>How to read this</h2>
+      <p>Same three rails as <a class="lnk" href="blueprint.html">the blueprint</a> and as the app itself. Nothing here invents a second vocabulary.</p>
+
+      <div class="legend">
+        <div><i style="background:#3ec9a7"></i><span class="t"><b>Teal &#8212; how it is.</b> Verified against the code as it stands today.</span></div>
+        <div><i style="background:#e0a34b"></i><span class="t"><b>Amber &#8212; a rule.</b> A constraint on how the work may be done. Breaking one breaks something real.</span></div>
+        <div><i style="background:#e06a5a"></i><span class="t"><b>Red &#8212; a gap.</b> Does not exist, or does not work.</span></div>
+      </div>
+
+      <div class="rail law">
+        <i></i>
+        <div class="rail-in">
+          <h4>This page is a snapshot; the other two are the authority</h4>
+          <p><code>CLAUDE.md</code> holds the constraints and outranks everything. The blueprint describes the architecture. This page describes only the <strong>remaining work</strong>, measured on 6 September 2026, and it goes stale the moment any of it is done &#8212; so treat a claim here as a lead to verify, not a fact to build on.</p>
+        </div>
+      </div>
+
+      <div class="rail">
+        <i></i>
+        <div class="rail-in">
+          <h4>The unknown that dominated this project is gone</h4>
+          <p>Until now every layer that touches a running game &#8212; the LCU client, the champ select socket, the live data poll, the suggestions, the matchup path &#8212; was unit-tested and had never met League. That was the single largest source of risk, and it has been discharged by playing a game. What replaced it is five ordinary bugs, which is a far better position.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="live">
+      <h2><span class="n">01</span>Five defects from the first real game</h2>
+      <p>All five came out of one session against the real client. Four are traced to a specific line; the gold one has since been diagnosed from a captured game and its fix is fully specified. They are listed hardest-to-diagnose first, not most-severe first.</p>
+
+      <div class="defect">
+        <header>
+          <span class="tag">Defect 1</span>
+          <h3>The gold number is wrong &#8212; fixed</h3>
+        </header>
+        <div class="in">
+          <p><strong>Diagnosed from a captured game, 6 September.</strong> 81 samples across one 40-minute match, taken on the app&#8217;s own 30-second cadence. The earlier guess on this page &#8212; that consumables and trinkets were inflating the total &#8212; was <strong>wrong</strong>, and is recorded here rather than deleted because the way it was wrong is instructive. The captured game ended with no consumables in either inventory at all, so that theory could not have explained anything.</p>
+
+          <div class="rail gap">
+            <i></i>
+            <div class="rail-in">
+              <h4>The live API&#8217;s <code>price</code> is the combine cost, not the item&#8217;s cost</h4>
+              <p>It is exactly Data Dragon&#8217;s <code>gold.base</code>, never <code>gold.total</code>. Summing it counts only the <em>last</em> purchase in each item&#8217;s build path and silently discards every component already consumed into it.</p>
+            </div>
+          </div>
+
+          <p>Three readings from the capture settle it beyond argument, checked against Data Dragon 16.17.1:</p>
+
+          <div class="map">
+            <table>
+              <tr class="head"><td>Item</td><td>API <code>price</code></td><td>gold.base</td><td>gold.total</td></tr>
+              <tr><td class="d">B. F. Sword <em>&#8212; a base component</em></td><td class="l"><b>1300</b></td><td class="l">1300</td><td class="l">1300</td></tr>
+              <tr><td class="d">Blackfire Torch</td><td class="l"><b>700</b></td><td class="l">700</td><td class="l">2800</td></tr>
+              <tr><td class="d">Void Staff</td><td class="l"><b>1050</b></td><td class="l">1050</td><td class="l">3000</td></tr>
+              <tr><td class="d">Rabadon&#8217;s Deathcap</td><td class="l"><b>1100</b></td><td class="l">1100</td><td class="l">3500</td></tr>
+              <tr><td class="d">Chainlaced Crushers <em>&#8212; finished boots</em></td><td class="l warn"><b>0</b></td><td class="l">0</td><td class="l">1100</td></tr>
+            </table>
+          </div>
+
+          <p>A base component reports its true cost, because for a base item the combine cost <em>is</em> the total &#8212; which is precisely why this survived review. Every completed item reports only its final step, and a finished pair of boots reports <strong>zero</strong>. A full six-item Viktor build summed to 3,950 gold.</p>
+
+          <h3>What it did to the feature</h3>
+
+          <div class="status">
+            <div><span class="k no">46%</span><span class="v">Your spend was counted at <b>46% of its real value</b>, averaged across the game.</span></div>
+            <div><span class="k no">37%</span><span class="v">The standing disagreed with the truth in <b>30 of 81 samples</b> &#8212; behind, even or ahead was simply the wrong word.</span></div>
+            <div><span class="k no">18%</span><span class="v">You were <b>genuinely behind and the app said nothing</b> for 15 samples. Behind is the only footing that produces advice, so the check was silent in exactly the window it exists to serve.</span></div>
+            <div><span class="k no">16&#215;</span><span class="v">It reported <b>ahead when you were not</b> in 16 samples &#8212; the reading that tells a player to keep doing what they are doing.</span></div>
+          </div>
+
+          <div class="rail law">
+            <i></i>
+            <div class="rail-in">
+              <h4>The error is biased, not noisy</h4>
+              <p>It does not average out. A player holding raw components is counted near-correctly; a player who has finished their items is counted at a quarter of the truth. So the comparison systematically favours <strong>whoever has completed fewer items</strong> &#8212; which is usually the player who is behind. The check was not merely inaccurate, it was leaning the wrong way, and worst exactly when the gap was widest: 2,950 gold of error at 31 minutes.</p>
+            </div>
+          </div>
+
+          <h3>The fix</h3>
+
+          <p>The app needs <code>gold.total</code> per item, which the live payload never carries. <code>data/meta/items.json</code> already holds a committed <code>cost</code> field derived from Data Dragon &#8212; exactly the right shape and already compiled in with <code>include_str!</code> &#8212; but it covers only the 75 items in the defensive vocabulary, and none of the five above are among them. <strong>Widening that table to all 868 items is the whole fix</strong>, and it needs no new network call, no new dependency, and no change to how the tags already ship.</p>
+
+          <div class="rail">
+            <i></i>
+            <div class="rail-in">
+              <h4>Done &#8212; and it uncovered a second bug on the way</h4>
+              <p>The table now carries all 868 items at <code>gold.total</code>, regenerated by <code>npm run meta:items</code>. Pricing moved into <code>recommend/state.rs</code>, which is the only layer allowed to know what an item costs, and <code>price</code> is no longer read at all.</p>
+              <p>Wiring the table up immediately failed every lookup, which exposed something that had been latent for months: the payload field is <code>itemID</code> with both letters capitalised, and <code>rename_all = "camelCase"</code> renders it <code>itemId</code>, so <strong><code>item_id</code> had been silently deserialising as zero</strong> the entire time. Nothing had ever read it, so nothing had ever noticed. It needed an explicit <code>rename</code>.</p>
+              <p>The scrubbed capture is committed at <code>src-tauri/src/live/testdata/allgamedata.json</code> and drives a regression test that asserts both the corrected verdict and the old one: the same payload reads <em>ahead by 1,800</em> from the table and <em>even by 800</em> from <code>price</code>. No hand-written fixture could have caught this, because the bug was in what a field <em>means</em>.</p>
+            </div>
+          </div>
+
+          <p>Two things still to settle. Sold and consumed purchases are still missing from any inventory sum, so &#8220;spent gold&#8221; remains an approximation even once the arithmetic is right &#8212; worth deciding whether the label should say so. And an item absent from the table must count as <em>unknown</em> rather than zero, or a future item will reintroduce this bug in miniature and just as quietly.</p>
+
+          <div class="rail">
+            <i></i>
+            <div class="rail-in">
+              <h4>Why 219 passing tests never saw it</h4>
+              <p>The stand-in client mints items as <code>{ itemID, price, count }</code> with a price the test itself chooses, so every assertion agreed with an arithmetic that was never in question. The real payload carries nine fields per item &#8212; <code>canUse</code>, <code>consumable</code>, <code>count</code>, <code>displayName</code>, <code>itemID</code>, <code>price</code>, <code>rawDescription</code>, <code>rawDisplayName</code>, <code>slot</code> &#8212; and the bug lives entirely in what <code>price</code> <em>means</em>, which no fixture invented by the same person who wrote the parser could ever contradict. A captured payload is the only thing that could have caught this, and now there is one.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="defect">
+        <header>
+          <span class="tag">Defect 2</span>
+          <h3>Opening the app mid-game &#8212; not reproduced, one real fault fixed</h3>
+        </header>
+        <div class="in">
+          <p><strong>The path exists and is deliberate.</strong> This is not a missing feature &#8212; it was built on purpose, with a comment saying so: opening the app after champ select is over is an ordinary way to use it, and the game names the same two things champ select does.</p>
+
+          <p class="finding"><b>src-tauri/src/lib.rs:612</b> &#8212; &#8220;Opening the app after champ select is over is an ordinary way to use it, and until now it meant playing the whole game with no build on screen.&#8221;</p>
+
+          <p><strong>The gate is probably not the problem.</strong> The live watcher sleeps on a <code>watch</code> channel that opens on any champ-select event other than <code>ClientOffline</code>, and <code>ClientConnected</code> is sent as soon as the socket connects &#8212; which happens mid-game, because the launcher stays running behind the game. That sequence looks correct on inspection.</p>
+
+          <p class="finding"><b>src-tauri/src/lib.rs:489</b> &#8212; launcher_running.send(!matches!(&amp;event, ClientOffline))<br><b>src-tauri/src/lcu/watcher.rs:156</b> &#8212; events.send(ChampSelectEvent::ClientConnected)</p>
+
+          <p><strong>Four hypotheses, all disproven by evidence.</strong> This entry previously blamed champion-key resolution through the tag file. That was wrong, and so was everything else tried:</p>
+
+          <div class="status">
+            <div><span class="k yes">Works</span><span class="v"><b>Champion resolution.</b> The captured payload runs through <code>in_game_state</code> and yields champion <code>Viktor</code>, key <code>Viktor</code>, role middle, opponent <code>Velkoz</code>. Pinned by a test.</span></div>
+            <div><span class="k yes">Works</span><span class="v"><b>The gate.</b> <code>ClientConnected</code> fires on connect and opens it, and a <code>watch</code> channel delivers a change regardless of which task races first.</span></div>
+            <div><span class="k yes">Works</span><span class="v"><b>The champ-select read.</b> A live client outside champ select answers <code>404</code>, which the client already reads as <code>Ok(None)</code> rather than an error.</span></div>
+            <div><span class="k yes">Works</span><span class="v"><b>The matchup vocabulary.</b> Checked live against the endpoint: Viktor&#8211;Vel&#8217;Koz, plus Wukong, Bel&#8217;Veth, Cho&#8217;Gath and Nunu. All five return matchup builds.</span></div>
+            <div><span class="k yes">Works</span><span class="v"><b>The whole route, end to end.</b> Driven against a stand-in serving a game with no champ select before it: the app connected, opened the gate, polled the live API and fetched a build from OP.GG unprompted.</span></div>
+          </div>
+
+          <div class="rail gap">
+            <i></i>
+            <div class="rail-in">
+              <h4>One real fault, and it is unique to this route</h4>
+              <p>Naming an opponent used to be a <strong>single point of failure</strong>. <code>fetch_build</code> called the matchup tool with <code>?</code> and had no fallback, so a matchup that errored &#8212; or simply had too few games for an uncommon pairing and returned <code>NoData</code> &#8212; took the whole build down with it.</p>
+              <p>Champ select never hit this, because the client blanks enemy positions and it cannot name an opponent. The in-game route always can, so it always asked. That is exactly one route showing nothing useful while the other works, which is the reported symptom &#8212; but it is <em>not confirmed</em> as what was seen, because it depends on the pairing and the pairing is unknown.</p>
+              <p>Fixed: a failed or empty matchup now falls back to the general build, which is what <code>commands.rs</code> already documented (&#8220;naming one is only a request&#8221;) and what the screen was already built to render.</p>
+            </div>
+          </div>
+
+          <div class="rail law">
+            <i></i>
+            <div class="rail-in">
+              <h4>The route had never been exercised by anything</h4>
+              <p>Not a test, not the stand-in client, which always opens with champ select. A documented, supported way of using the app had never once been driven. <code>node scripts/fake-lcu.mjs --mid-game</code> now starts a match with no champ select before it, which is how everything above was ruled out &#8212; and is what anyone should reach for the next time this is reported.</p>
+            </div>
+          </div>
+
+          <p><strong>Still open.</strong> If it recurs, the thing to capture is the champion and the lane opponent, because the fallback above is the only failure mode that fits and it is pairing-dependent.</p>
+        </div>
+      </div>
+
+      <div class="defect">
+        <header>
+          <span class="tag">Defect 3</span>
+          <h3>The build never goes away after the match &#8212; fixed</h3>
+        </header>
+        <div class="in">
+          <p><strong>This one is working as designed, and the design is wrong.</strong> The <code>noGame</code> branch deliberately leaves the build on screen, with a stated rationale.</p>
+
+          <p class="finding"><b>src/main.ts:1272</b> &#8212; &#8220;The build in particular stays: the minutes after a game are exactly when someone reads what they should have built.&#8221;</p>
+
+          <p>The reasoning is sound and the result is still wrong, because the screen makes no distinction between <em>a build for the game you are playing</em> and <em>a build for the game you just played</em>. Those are the same pixels making two different claims, and the second one silently becomes a lie the moment the next champ select starts.</p>
+
+          <p><strong>So the fix is not to clear it.</strong> Deleting the build would discard the exact case the comment is protecting. What is missing is a signal that the thing on screen is finished &#8212; a state on the header, the live pill reading something other than a live state, the standing banner retiring since it describes a game that has ended. Keep the build, mark it over.</p>
+
+          <div class="rail">
+            <i></i>
+            <div class="rail-in">
+              <h4>Done &#8212; the build stays, the impression of a live game does not</h4>
+              <p>A finished reading is held in <code>lastGame</code>, so the header can say which game it is describing: the pill reads <strong>Game over</strong> and the subtitle <strong>&#8220;Mid &#183; game ended&#8221;</strong>, following the shape champ select ending already uses. <code>clearLive</code> drops it, so a fresh champ select still opens clean.</p>
+              <p>The blocks split on tense rather than all persisting or all vanishing. The standing and the advice beside it describe a game that is <em>running</em> &#8212; &#8220;Vel&#8217;Koz is 2,400 gold up on you&#8221; is a fact with a tense &#8212; so they drop at the whistle. Check one describes the enemy composition, which the final whistle does not change, so it stays. It now stays as the <em>game&#8217;s</em> reading too: reverting to champ select&#8217;s partial view at the end would have quietly swapped a complete answer for a worse one.</p>
+              <p>Verified by driving the built <code>main.js</code> through lock &#8594; build &#8594; playing &#8594; ended &#8594; next champ select against a stubbed bridge, rather than by reading the types.</p>
+            </div>
+          </div>
+
+          <p>The <code>BuildClaim</code> concern raised here earlier was unfounded: champ select takes the claim <em>unconditionally</em> on every lock, so the next game re-fetches even on the same champion. Nothing to release.</p>
+        </div>
+      </div>
+
+      <div class="defect">
+        <header>
+          <span class="tag">Defect 4</span>
+          <h3>Situational shows several items and explains none of them &#8212; fixed</h3>
+        </header>
+        <div class="in">
+          <p><strong>What is rendered.</strong> &#8220;Situational&#8221; arrives as several groups of one item each &#8212; a menu of alternatives &#8212; and is drawn as a row of tiles under a header that counts them. The header text is literally the count.</p>
+
+          <p class="finding"><b>src/main.ts:547</b> &#8212; itemRowBlock(&#8230;)<br><b>src/main.ts:563</b> &#8212; const meta = single ? statLine(first.stats) : `${shown.length} options`</p>
+
+          <p>Each tile carries its own win rate in a tooltip, so the numbers are honest and per-item. What no tile carries is the only thing a player actually needs: <em>when</em> to buy that one rather than the one beside it. Six options with no discriminator is not six times as useful as one recommendation; it is roughly as useful as none.</p>
+
+          <p><strong>The app already owns the missing sentences</strong> &#8212; a suggestion is <code>{ itemId, priority, reason, source }</code>, and the recommendation engine produces exactly the reasoning that would disambiguate this row. It is rendered in separate blocks (&#8220;Against this team&#8221;, &#8220;For your team&#8221;) rather than against the items it is talking about.</p>
+
+          <div class="rail law">
+            <i></i>
+            <div class="rail-in">
+              <h4>The colour law makes this a design problem, not a text problem</h4>
+              <p>The situational row is <strong>statistical</strong> &#8212; teal, drawn from the provider&#8217;s game counts. A reason is <strong>a rule</strong> &#8212; amber, and it argues in words. Dropping engine reasons into a teal block would let reasoning borrow a statistic&#8217;s authority, which is the precise failure the colour law exists to prevent, and painting the whole row amber would strip real win rates of theirs. Joining the two needs a rendering that keeps the sources visibly distinct, not a caption.</p>
+            </div>
+          </div>
+
+          <p>The cheaper half is available immediately and breaks no rule: the provider&#8217;s own numbers can order the row, and a group played in 3 games out of 98 probably should not sit beside one played in 40 as though the app were neutral between them. Saturation already encodes confidence elsewhere via <code>railFor()</code>; the same idea applies per tile.</p>
+        </div>
+      </div>
+      <div class="defect">
+        <header>
+          <span class="tag">Defect 5</span>
+          <h3>Three empty slots on the rune page &#8212; fixed</h3>
+        </header>
+        <div class="in">
+          <p>They are not extra slots. <strong>They are the stat shards</strong>, and they are the best-understood defect on this page &#8212; two lines explain the whole thing.</p>
+
+          <p><strong>No name.</strong> <code>runeBlock</code> passes <code>undefined</code> where every other tile passes a name, so <code>tileLabel</code> falls through to its last resort and prints the raw id.</p>
+
+          <p class="finding"><b>src/main.ts:491</b> &#8212; tile(id, undefined, &quot;tile sm&quot;, &quot;perk&quot;)<br><b>src/main.ts:367</b> &#8212; name?.trim() ? &#8230; : `#${id}`</p>
+
+          <p><strong>No art either.</strong> Icon art for a rune comes from <code>icons.perks[id]</code>, which is built from Data Dragon&#8217;s <code>runesReforged.json</code> &#8212; and that file does not contain stat shards. The lookup misses, <code>iconUrl</code> returns null, and <code>paintIcons</code> returns early without ever inserting an image.</p>
+
+          <p class="finding"><b>src/main.ts:311</b> &#8212; const path = icons.perks[key]; return path ? &#8230; : null</p>
+
+          <p>So each shard draws as a 24px box containing the literal text <code>#5005</code> at 8px. Three of them, in a row, after the secondary runes &#8212; which reads exactly like three empty slots that should not be there.</p>
+
+          <div class="rail">
+            <i></i>
+            <div class="rail-in">
+              <h4>The comment describes behaviour the code does not have</h4>
+              <p><code>paintIcons</code> is documented as leaving shards their text label permanently, and that is the right design &#8212; a tile with no art should fall back to words. But <code>runeBlock</code> never supplies the words, so the fallback lands one step further down on <code>#&lt;id&gt;</code>. The design was sound and the wiring was never finished.</p>
+            </div>
+          </div>
+
+          <div class="rail">
+            <i></i>
+            <div class="rail-in">
+              <h4>Done &#8212; and they get real art, not just a label</h4>
+              <p>The premise that shards have no art was wrong. Data Dragon <em>does</em> serve it, at <code>perk-images/StatMods/&#8230;</code> on the same unversioned path as every other rune image and from a host the window&#8217;s policy already allows &#8212; it just omits the shards from <code>runesReforged.json</code>, which lists only styles and the runes inside their slots. So the catalogue that file produces is incomplete by construction, and <code>STAT_SHARDS</code> in <code>ddragon.rs</code> completes it. All nine URLs were checked live.</p>
+              <p>The catalogue now also carries a <em>name</em> for every rune, style and shard, which is what a tile shows when art is slow, blocked or absent. <code>paintIcons</code> fills those in when the catalogue lands, so a page rendered before it arrives corrects itself rather than keeping an id on screen.</p>
+              <p>The sizing question resolved itself honestly: a 24px tile cannot render &#8220;Adaptive Force&#8221; at any size worth having, and shrinking the type to make it fit is what produced the 9px captions the redesign removed. The label stays a fallback, the full name lives in the tile&#8217;s <code>title</code>, and art carries the meaning.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <section id="data">
+      <h2><span class="n">02</span>The crawled data is not a dataset yet</h2>
+      <p>The crawl works, has run against the live API, and has committed real output &#8212; the blueprint&#8217;s claim that this is untested is stale. What it has produced is not yet enough to stand behind. Measured directly over <code>data/builds/</code>:</p>
+
+      <div class="map">
+        <table>
+          <tr class="head"><td>Measure</td><td>Value</td></tr>
+          <tr><td class="d">Champion&#8211;role pairs covered</td><td class="l"><b>295</b> of ~850 &#183; 35%</td></tr>
+          <tr><td class="d">Champions represented</td><td class="l"><b>172</b></td></tr>
+          <tr><td class="d">Games behind a pair</td><td class="l">median <b>44</b> &#183; min 5 &#183; max 295</td></tr>
+          <tr><td class="d">Pairs under 30 games</td><td class="l warn"><b>109</b> of 295</td></tr>
+          <tr><td class="d">Games behind the <em>top core item group</em></td><td class="l warn">median <b>8</b></td></tr>
+          <tr><td class="d">Pairs whose top core group is under 20 games</td><td class="l warn"><b>249</b> of 295</td></tr>
+          <tr><td class="d">Patches present</td><td class="l"><b>16.17</b> only</td></tr>
+        </table>
+      </div>
+
+      <p>A median of eight games behind the headline recommendation is far below the threshold this project already set for itself &#8212; the crawler&#8217;s own notes call a few dozen games per pair &#8220;below the threshold at which this app is willing to call a number a statistic&#8221;. <code>RiotProvider</code> can answer; it should not yet be the one answering.</p>
+
+      <div class="rail gap">
+        <i></i>
+        <div class="rail-in">
+          <h4>The Riot key expires every 24 hours</h4>
+          <p>The crawl runs on a development key, which Riot expires a day after issue. The daily schedule therefore fails every day after the key is rotated by hand &#8212; which is what the <code>check-key</code> gate exists to catch, and it will catch it loudly and then stop. <strong>Accumulation is the entire plan for this data, and accumulation is currently not happening unless somebody rotates a key each morning.</strong> Registering a personal or production key is the single highest-leverage item on this page.</p>
+        </div>
+      </div>
+
+      <p>It also changes the arithmetic rather than just the reliability. A production key raises the rate limit, and the rate limit is what shapes the whole crawler &#8212; the 45-minute clock, the decision to buy a timeline per match, the accumulate-don&#8217;t-replace design. With a patch cycle resetting the sample roughly every two weeks by design, the open question is whether the popular pairs reach significance before the reset and the rare ones ever do. Three honest answers exist: a better key, a narrower crawl that goes deep on fewer pairs, or accepting that OP.GG stays the live provider indefinitely and the crawl is a hedge rather than a migration. That decision has not been made and is worth making explicitly.</p>
+    </section>
+
+    <section id="ship">
+      <h2><span class="n">03</span>Between a beta and something you hand a stranger</h2>
+
+      <div class="status">
+        <div><span class="k no">Missing</span><span class="v"><b>Item set and rune page imports.</b> Four buttons are permanently disabled, and the LCU client deliberately contains no code that could write. Needs the summoner id, a POST to <code>/lol-item-sets/&#8230;</code> and <code>/lol-perks/v1/pages</code>, and the button wiring. This is the only item on the page a user would call a missing feature.</span></div>
+        <div><span class="k no">Missing</span><span class="v"><b>Self-update.</b> An installed copy cannot fetch a new version; every release is a manual download. Needs <code>tauri-plugin-updater</code>, a signing keypair and a manifest endpoint.</span></div>
+        <div><span class="k part">Half done</span><span class="v"><b>Code signing.</b> macOS is already wired &#8212; adding the six <code>APPLE_*</code> secrets turns it on with no workflow edit, for $99/yr. Windows needs a certificate and has no equivalent shortcut. Until then both systems warn on first open.</span></div>
+        <div><span class="k no">Missing</span><span class="v"><b>A settings UI.</b> <code>CLAUDE.md</code> calls <code>SPELLCHECK_LOCKFILE</code> a user-facing setting on Windows, but the only ways to set it are an environment variable or a hand-edited <code>providers.json</code> in an OS config directory &#8212; which is exactly the population least equipped to do either.</span></div>
+        <div><span class="k no">Missing</span><span class="v"><b>Provider fallback.</b> If OP.GG is down or changes format the app has no answer, even though <code>data/builds</code> ships inside the bundle as a resource. The trait already makes this a small change.</span></div>
+        <div><span class="k no">Missing</span><span class="v"><b>A version-agreement check.</b> The tag must match three files and nothing verifies it; the README says so in prose. Ten lines of CI.</span></div>
+        <div><span class="k part">Unmeasured</span><span class="v"><b>Memory on Windows.</b> The under-120 MB budget was set against WKWebView; Windows renders in WebView2, which runs more processes. <code>CLAUDE.md</code> forbids repeating the macOS number for Windows until somebody measures it, and nobody has.</span></div>
+        <div><span class="k part">Unproven</span><span class="v"><b>Windows on real hardware.</b> It compiles in CI and produces an NSIS installer. No human has run it. The Mac cannot tell you otherwise &#8212; <code>ring</code> builds C, so there is no cross-compile.</span></div>
+      </div>
+    </section>
+
+    <section id="engine">
+      <h2><span class="n">04</span>Named holes in the engine</h2>
+      <p>Each of these is small, well understood, and already documented where it lives. None is urgent; all are cheap.</p>
+
+      <div class="status">
+        <div><span class="k part">Stale</span><span class="v"><b>Three untagged champions</b> &#8212; <code>Locke</code>, <code>Yunara</code>, <code>Zaahen</code>. The tag file is pinned at patch 16.17.1 and every new release joins this list. See defect 2 for why this currently costs more than it should.</span></div>
+        <div><span class="k no">Missing</span><span class="v"><b>Two answers nothing can ask for.</b> Shield reduction and crit reduction have items behind them but no champion tag that would trigger them, so Serpent&#8217;s Fang and Randuin&#8217;s Omen are never suggested. Closing this means adding a <em>champion</em> tag, not an item.</span></div>
+        <div><span class="k part">Thin</span><span class="v"><b>Check two emits one rule.</b> Widening it requires adding an <code>answers</code> entry to <code>data/meta/items.json</code> first and a rule reaching for it second. The blueprint is emphatic that inventing advice to fill the space is the failure mode here.</span></div>
+        <div><span class="k part">Fragile</span><span class="v"><b>The OP.GG vocabulary table.</b> The two OP.GG tools disagree about champion names, and every new two-word-name champion needs a manual entry. The symptom is one champion failing while every other works &#8212; which is the hardest possible symptom to notice.</span></div>
+      </div>
+    </section>
+
+    <section id="drift">
+      <h2><span class="n">05</span>The blueprint has drifted</h2>
+      <p>The README points every new reader at <code>docs/blueprint.html</code> first, so its accuracy is load-bearing. It is currently behind the code in several places:</p>
+
+      <div class="map">
+        <table>
+          <tr class="head"><td>Claim</td><td>Says</td><td>Actually</td></tr>
+          <tr><td class="d">Total lines</td><td class="l">11,750</td><td class="l"><b>15,785</b></td></tr>
+          <tr><td class="d">Screens</td><td class="l">three</td><td class="l"><b>two</b></td></tr>
+          <tr><td class="d"><code>lib.rs</code></td><td class="l">727</td><td class="l"><b>1,106</b></td></tr>
+          <tr><td class="d"><code>src/main.ts</code></td><td class="l">757</td><td class="l"><b>1,318</b></td></tr>
+          <tr><td class="d">The live crawl</td><td class="l">untested</td><td class="l"><b>has run</b></td></tr>
+          <tr><td class="d">Everything downstream of a running League</td><td class="l">untested</td><td class="l"><b>works</b></td></tr>
+        </table>
+      </div>
+
+      <p>The test count &#8212; 219 &#8212; is still exactly right. The last two rows are the ones that matter: the blueprint&#8217;s &#8220;Built vs. not built&#8221; section is the part people read to decide what to trust, and it currently understates the project.</p>
+    </section>
+
+    <section id="order">
+      <h2><span class="n">06</span>What to do first</h2>
+      <p>Ordered by what each step unblocks rather than by size.</p>
+
+      <ol class="steps">
+        <li><strong>Rotate to a non-expiring Riot key.</strong> Minutes of work, and until it is done the data plan is not running at all. Everything in section 02 waits behind it.</li>
+        <li><s>Widen <code>data/meta/items.json</code> to carry <code>gold.total</code> for every item.</s> <strong>Done.</strong> All 868 items, pricing moved to the tag layer, a latent <code>itemID</code> deserialisation bug fixed on the way, and a real captured payload committed as the regression test.</li>
+        <li><s>Re-point the stand-in client at the real payload shape.</s> <strong>Done.</strong> <code>scripts/fake-lcu.mjs</code> now mints all nine fields with real ids and real combine costs, so a scenario can no longer invent a price the parser agrees with.</li>
+        <li><s>Investigate mid-game detection.</s> <strong>Not reproduced.</strong> Four hypotheses disproven and the route driven end to end against a new <code>--mid-game</code> stand-in. One real fault fixed on the way: a failed matchup no longer takes the whole build with it.</li>
+        <li><s>Mark a finished game as finished.</s> <strong>Done.</strong> The build survives the whistle, but the header now says the game is over and the live-only blocks retire.</li>
+        <li><s>Name the stat shards.</s> <strong>Done.</strong> Nine rows in <code>ddragon.rs</code> giving them Riot&#8217;s own art and a name, plus names for every other rune so a tile without art still says what it is.</li>
+        <li><s>Sort the situational row by sample, then design the reason rendering.</s> <strong>Done.</strong> Named columns with their own numbers, ordered by sample, and the engine&#8217;s reasoning joined to them in amber without either claim borrowing the other&#8217;s authority.</li>
+        <li><strong>Get the Windows build onto real hardware and measure its memory.</strong> Two unknowns, one tester, one afternoon.</li>
+        <li><strong>Then imports.</strong> The largest genuinely missing feature, and the first thing on this list that is a project rather than a fix.</li>
+      </ol>
+
+      <div class="rail law">
+        <i></i>
+        <div class="rail-in">
+          <h4>Imports stay user-initiated, however convenient automatic would be</h4>
+          <p>When step 8 arrives: writing an item set or a rune page into the client is always a button press. Never automatic, never on a timer, never as a side effect of a lookup. The read-only LCU client is not an accident of scheduling &#8212; it is the rule expressed as an absence of code, and the first write path is where that rule stops enforcing itself.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <p class="end">Measured against the working tree on 6 September 2026, at <code>e8f495c</code>. Every line number and file reference was read from the code rather than recalled; the numbers in section 02 were computed over <code>data/builds/</code> directly. Where this page and <code>CLAUDE.md</code> disagree, the file wins and this page is stale.</p>
+
+</div>
