@@ -9,6 +9,11 @@ runes, summoners, skill order — for that pair.
 - **[docs/blueprint.html](docs/blueprint.html)** — the architecture blueprint.
   How the pieces connect, which rules are load-bearing, what is built and what
   is not, and where to start editing. Open it in a browser.
+- **[docs/roadmap.html](docs/roadmap.html)** — what is left to do. The defects
+  the first real game turned up, how thin the crawled data still is, and what
+  stands between a beta and something you would hand a stranger. A dated
+  snapshot rather than a standing description, so check its claims before
+  building on them.
 - **[CLAUDE.md](CLAUDE.md)** — the constraints themselves. This is the
   authority; the blueprint explains and connects these rules but never
   overrides them.
