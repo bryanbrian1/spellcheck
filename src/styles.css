@@ -1,31 +1,76 @@
-/* Design tokens ported verbatim from the spellcheck design canvas.
-   The colour system carries meaning and must not be recoloured casually:
-   teal = statistical, saturation encodes confidence; amber = rule-based,
-   and amber is NEVER used for a statistic. */
+/* spellcheck — v2 stylesheet.
+   Drop-in replacement for src/styles.css. Every selector main.ts emits is
+   preserved, so no render code changes: buildHtml, sugRow, standingBlock,
+   matchupBlock, runeBlock, summonerBlock, itemRowBlock, coreBlock and
+   skillBlock keep working untouched.
+
+   What changed, and why:
+   - One flat surface. Suggestions no longer sit in a box inside a rail
+     inside a card; hierarchy comes from type and space.
+   - The provenance contract is unchanged but fires ONCE instead of four
+     times: amber is carried by the rail and the suggestion's bold text.
+     Statistical rails are silent — a win rate in .meta already says
+     "measured". Amber is still never used for a statistic.
+   - Item names are readable. The 9px truncated captions were the original
+     complaint: they are 11px --text-muted now.
+   - Every number is monospace so columns align.
+   - Values come from the spellcheck design system tokens rather than
+     being invented here. Kept inline (not @import) because the product
+     ships plain CSS with no build step.
+*/
 :root{
-  --bg:#0f1216;
-  --panel:#161b21;
-  --panel-2:#1c232b;
-  --line:#252e38;
-  --ink:#e6ebf0;
-  --ink-2:#93a1b0;
-  --ink-3:#5e6d7d;
-  --stat-hi:#3ec9a7;
-  --stat-mid:#2f8d78;
-  --stat-lo:#4a5c60;
-  --rule:#e0a34b;
-  --danger:#e06a5a;
-  --radius:3px;
+  /* Neutral ramp — cool near-black */
+  --n-0:#07080a;--n-1:#0d0f13;--n-2:#14171d;--n-3:#1b1f26;--n-4:#232830;--n-5:#2e343e;
+  --n-6:#3a424e;--n-7:#4a515c;--n-8:#6d7683;--n-9:#a2abb8;--n-10:#cfd6df;--n-11:#e8ecf2;
+
+  --accent-1:#0d2f2c;--accent-2:#14554f;--accent-3:#1f8a80;--accent:#2fd4c4;--accent-hi:#6ce8dc;
+  --accent-on:#04211f;
+
+  --blue:#5b9cf8;          /* statistical / measured */
+  --amber:#f0b429;         /* rule-based / heuristic — never a statistic */
+  --red:#f2555a;
+  --green:#46c98b;
+
+  --surface-window:var(--n-1);
+  --surface-panel:var(--n-2);
+  --surface-raised:var(--n-3);
+  --surface-input:var(--n-3);
+  --line-hair:#23272f;
+  --line:#2e343e;
+
+  --text-title:var(--n-11);
+  --text-body:var(--n-10);
+  --text-muted:var(--n-9);
+  --text-faint:var(--n-8);
+
+  --font-ui:-apple-system,BlinkMacSystemFont,system-ui,"Helvetica Neue",sans-serif;
+  --font-mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+
+  --r-asset:3px;--r-control:5px;--r-panel:7px;--r-window:10px;
+  --dur-fast:110ms;
+  --ease-out:cubic-bezier(.2,.7,.3,1);
+  --t-hover:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out);
+
+  /* kept so any lingering reference resolves to the new system */
+  --bg:var(--surface-window);
+  --panel:var(--surface-panel);
+  --panel-2:var(--surface-raised);
+  --ink:var(--text-title);
+  --ink-2:var(--text-muted);
+  --ink-3:var(--text-faint);
+  --stat-hi:var(--accent);
+  --rule:var(--amber);
+  --danger:var(--red);
+  --radius:var(--r-control);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
-  background:var(--bg);
-  color:var(--ink);
-  font-family:Archivo,"Helvetica Neue",Arial,sans-serif;
+  background:var(--surface-window);
+  color:var(--text-body);
+  font-family:var(--font-ui);
   font-size:13px;
-  line-height:1.4;
-  font-variant-numeric:tabular-nums;
+  line-height:1.45;
   overflow:hidden;
   -webkit-user-select:none;
   user-select:none;
@@ -33,182 +78,190 @@ body{
 }
 #app{display:flex;flex-direction:column;height:100%}
 
-/* state switcher — the live screen switches itself on, both when champ select
-   opens and when a game starts. The strip is here because Search must work
-   with no client running at all. */
-.modes{display:flex;gap:5px;padding:8px 10px;border-bottom:1px solid var(--line);flex-shrink:0;background:#12161b}
+/* Mode strip — quiet text tabs. Two big buttons cost 56px to solve a problem
+   the Live screen solves itself; this keeps the escape hatch and drops the
+   furniture. */
+.modes{display:flex;gap:16px;padding:10px 16px 8px;flex-shrink:0;background:transparent}
 .modes button{
-  flex:1;background:#151a20;color:#8b98a6;border:1px solid #232b34;
-  padding:6px 4px;border-radius:var(--radius);font:inherit;font-size:11px;font-weight:500;cursor:default;
+  background:none;border:0;padding:0 0 4px;font:inherit;font-size:12px;font-weight:500;
+  color:var(--text-faint);cursor:default;border-bottom:2px solid transparent;transition:var(--t-hover);
 }
-.modes button[aria-pressed="true"]{background:#202932;color:var(--ink);border-color:#3a4650}
-.modes button:focus-visible{outline:2px solid var(--stat-hi);outline-offset:1px}
+.modes button:hover{color:var(--text-body)}
+.modes button[aria-pressed="true"]{color:var(--text-title);font-weight:600;border-bottom-color:var(--accent)}
+.modes button:focus-visible{outline:none;box-shadow:0 0 0 2px var(--accent-2);border-radius:2px}
 
 .screen{display:none;flex-direction:column;flex:1;min-height:0}
 .screen.on{display:flex}
 
-.hdr{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;gap:11px;align-items:center;flex-shrink:0}
+.hdr{padding:10px 16px 12px;border-bottom:1px solid var(--line-hair);display:flex;gap:10px;align-items:center;flex-shrink:0}
 .portrait{
   position:relative;overflow:hidden;
-  width:42px;height:42px;border-radius:var(--radius);background:linear-gradient(150deg,#2b3a4a,#1b242e);
-  border:1px solid #33414f;display:grid;place-items:center;font-weight:700;font-size:15px;color:#7f94a8;flex-shrink:0;
+  width:32px;height:32px;border-radius:var(--r-asset);background:var(--surface-raised);
+  border:1px solid var(--line-hair);display:grid;place-items:center;
+  font-weight:600;font-size:11px;color:var(--text-faint);flex-shrink:0;
 }
 .portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .hdr-main{min-width:0;flex:1}
-.hdr-name{font-size:16px;font-weight:600;letter-spacing:-.01em}
-.hdr-sub{color:var(--ink-2);font-size:12px}
+.hdr-name{font-size:18px;font-weight:600;letter-spacing:-.01em;color:var(--text-title);line-height:1.15}
+.hdr-sub{font-family:var(--font-mono);color:var(--text-muted);font-size:11px;line-height:1.4}
+
+/* Status reads as a dot plus a word, not a filled capsule. */
 .pill{
-  font-size:11px;font-weight:600;padding:3px 7px;border-radius:2px;
-  background:#1e2a33;color:var(--stat-hi);border:1px solid #2b3d47;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:600;color:var(--text-muted);
+  background:none;border:0;padding:0;white-space:nowrap;letter-spacing:.03em;
 }
-.pill.preview{background:#241f14;color:var(--rule);border-color:#3d3320}
-/* Not connected. Deliberately neutral rather than amber: amber means
-   "rule-based suggestion" in this app and must not come to mean anything else. */
-.pill.off{background:#1b2027;color:var(--ink-3);border-color:#2a333d}
+.pill::before{content:"";width:6px;height:6px;border-radius:999px;background:var(--accent);flex-shrink:0}
+.pill.preview::before{background:var(--amber)}
+.pill.off{color:var(--text-faint)}
+.pill.off::before{background:var(--n-7)}
 
-.body{flex:1;overflow-y:auto;padding:12px 14px 16px;display:flex;flex-direction:column;gap:13px}
-/* The track is the affordance. macOS hides overlay scrollbars until you
-   scroll, so a panel with a third of its content below the fold looked cut
-   off rather than scrollable. Styling the track makes the gutter appear
-   whenever the panel actually overflows — and only then. */
+.body{flex:1;overflow-y:auto;padding:16px 16px 20px;display:flex;flex-direction:column;gap:24px}
 .body::-webkit-scrollbar{width:8px}
-.body::-webkit-scrollbar-track{background:#1a212a;border-radius:4px}
-.body::-webkit-scrollbar-thumb{background:#4d5c6b;border-radius:4px;border:2px solid #1a212a}
-.body::-webkit-scrollbar-thumb:hover{background:#60717f}
+.body::-webkit-scrollbar-track{background:transparent}
+.body::-webkit-scrollbar-thumb{background:var(--n-5);border-radius:4px;border:2px solid var(--surface-window)}
+.body::-webkit-scrollbar-thumb:hover{background:var(--n-6)}
 
-.block{display:grid;grid-template-columns:3px 1fr;gap:11px}
-.rail{border-radius:2px;background:var(--stat-hi)}
-.rail.mid{background:var(--stat-mid)}
-.rail.lo{background:var(--stat-lo)}
-.rail.rule{background:var(--rule)}
+/* A block is a label and its rows. The rail column stays in the grid so
+   main.ts keeps emitting the same markup, but only the amber (rule) rail
+   paints — a statistical rail was redundant next to its own win rate. */
+.block{display:grid;grid-template-columns:2px 1fr;gap:10px}
+.rail{border-radius:1px;background:transparent}
+.rail.rule{background:var(--amber)}
 .block-in{min-width:0}
-.block-hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:7px}
-.block-t{font-size:13px;font-weight:600}
-.meta{font-size:11px;color:var(--ink-3);white-space:nowrap}
-.meta b{color:var(--ink-2);font-weight:600}
+.block-hd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}
+.block-t{font-size:10px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--text-muted)}
+.meta{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);white-space:nowrap}
+.meta b{color:var(--text-body);font-weight:600}
 
-.row{display:flex;gap:5px;flex-wrap:wrap}
-/* flex-shrink:0 is load-bearing. A tile is a fixed 38px square, but it sits
-   inside flex rows, and a flex item shrinks below its width by default. The
-   rows that wrap (.row, .seq) never hit it; .sug does not wrap, so without
-   this its tiles collapsed to half size and crushed their labels into an
-   unreadable stack. */
+/* Item rows, not a grid of anonymous tiles. */
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start}
 .tile{
   position:relative;
-  width:38px;height:38px;flex-shrink:0;border-radius:var(--radius);background:var(--panel-2);
-  border:1px solid #2c3742;display:grid;place-items:center;overflow:hidden;
-  font-size:10px;font-weight:600;color:#8ea0b2;text-align:center;line-height:1.05;padding:2px;
+  width:32px;height:32px;flex-shrink:0;border-radius:var(--r-asset);background:var(--surface-raised);
+  border:1px solid var(--line-hair);display:grid;place-items:center;overflow:hidden;
+  font-size:9px;font-weight:600;color:var(--text-faint);text-align:center;line-height:1.05;padding:2px;
 }
-/* Art sits *over* the label rather than replacing it, so a tile whose image
-   has not arrived, failed, or does not exist (stat shards have none) reads as
-   the words it always did instead of as an empty square. */
+/* Art sits over the label, so a tile whose image never arrives still reads
+   as the words it always did. */
 .tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:2px}
-.tile.key{width:44px;height:44px;background:#22303a;border-color:#3b5361;color:#a8c6d4}
-.tile.sm{width:30px;height:30px;font-size:9px}
-.tile.rule{border-color:#5c4a26;background:#231d12;color:#d5a95e}
-.tile.ghost{background:transparent;border-style:dashed;border-color:#2a343d;color:#4a5764}
+.tile.key{width:44px;height:44px;background:var(--accent-1);border-color:var(--accent-3);color:var(--accent)}
+.tile.sm{width:24px;height:24px;font-size:8px}
+.tile.rule{border-color:var(--amber);background:var(--surface-raised);color:var(--amber)}
+.tile.ghost{background:transparent;border-style:dashed;border-color:var(--line);color:var(--text-faint)}
 
-.seq{display:flex;gap:5px;align-items:flex-start;flex-wrap:wrap}
-.seq-i{display:flex;flex-direction:column;align-items:center;gap:4px;width:38px}
-.seq-n{font-size:10px;color:var(--ink-3);font-weight:600}
-.seq-lbl{font-size:9px;color:var(--ink-3);text-align:center;line-height:1.15;word-break:break-word}
+.seq{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.seq-i{display:flex;flex-direction:column;align-items:center;gap:5px;width:70px}
+.seq-n{font-family:var(--font-mono);font-size:10px;color:var(--text-faint);font-weight:600}
+/* The original complaint: 9px grey captions were unreadable mid-game. */
+.seq-lbl{font-size:11px;font-weight:500;color:var(--text-muted);text-align:center;line-height:1.2;overflow-wrap:break-word}
 
-.sug{background:#1a1710;border:1px solid #33291a;border-left:2px solid var(--rule);border-radius:var(--radius);padding:8px 10px;display:flex;gap:9px;align-items:flex-start}
-.sug + .sug{margin-top:6px}
-.sug-txt{font-size:12px;color:#cbb894;min-width:0}
-.sug-txt b{color:var(--rule);font-weight:600}
-.sug-why{color:#8d7c5e;font-size:11px;display:block;margin-top:1px}
+/* A suggestion is a row, not a card. Amber survives in the name only. */
+.sug{background:none;border:0;border-radius:0;padding:0;display:flex;gap:11px;align-items:flex-start}
+.sug + .sug{margin-top:12px}
+.sug-txt{font-size:13px;color:var(--text-title);min-width:0}
+.sug-txt b{color:var(--amber);font-weight:600;font-size:13px}
+.sug-why{color:var(--text-muted);font-size:12px;display:block;margin-top:2px;line-height:1.35}
 
-.split{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:6px;background:#1c232b}
+.split{display:flex;height:4px;border-radius:999px;overflow:hidden;margin-top:8px;background:var(--surface-raised)}
 .split i{display:block}
-.split .ad{background:#c96f4a}
-.split .ap{background:#5b7fd6}
-.split-lg{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-2);margin-top:5px}
+.split .ad{background:#e8654a}
+.split .ap{background:#7b8ff5}
+.split-lg{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:6px}
 
-.thin{background:#1a1d21;border:1px dashed #333c46;border-radius:var(--radius);padding:9px 10px;font-size:12px;color:var(--ink-2)}
-.thin b{color:var(--ink);font-weight:600}
-.thin.bad{border-color:#4a2f2c;color:#d8a49b}
-.thin.bad b{color:var(--danger)}
+.thin{background:none;border:0;border-left:2px solid var(--line);border-radius:0;padding:0 0 0 11px;font-size:12px;color:var(--text-muted)}
+.thin b{color:var(--text-title);font-weight:600}
+.thin.bad{border-left-color:var(--red);color:var(--text-muted)}
+.thin.bad b{color:var(--red)}
 
-.foot{border-top:1px solid var(--line);padding:9px 14px;display:flex;gap:7px;flex-shrink:0;background:#12161b;align-items:center}
-.btn{flex:1;background:#1e2831;border:1px solid #2f3d49;color:#c3d0dc;padding:8px;border-radius:var(--radius);font:inherit;font-size:12px;font-weight:500;cursor:default}
-.btn:hover:not(:disabled){background:#25313c}
-.btn:disabled{opacity:.45}
-.btn:focus-visible{outline:2px solid var(--stat-hi);outline-offset:1px}
-.btn.pri{background:#1d3a35;border-color:#2d5a50;color:#9fe0cd}
-.btn.pri:hover:not(:disabled){background:#234840}
-.src{font-size:11px;color:var(--ink-3);white-space:nowrap}
+.foot{border-top:1px solid var(--line-hair);padding:12px 16px;display:flex;gap:8px;flex-shrink:0;background:transparent;align-items:center}
+.btn{
+  flex:1;background:none;border:1px solid var(--line);color:var(--text-body);
+  height:28px;padding:0 10px;border-radius:var(--r-control);
+  font:inherit;font-size:12px;font-weight:500;cursor:default;transition:var(--t-hover);
+}
+.btn:hover:not(:disabled){background:var(--surface-raised);color:var(--text-title)}
+.btn:disabled{background:var(--surface-raised);border-color:var(--line-hair);color:var(--n-7);opacity:1}
+.btn:focus-visible{outline:none;box-shadow:0 0 0 2px var(--accent-2)}
+/* Exactly one primary per view. */
+.btn.pri{background:var(--accent);border-color:transparent;color:var(--accent-on);font-weight:600}
+.btn.pri:hover:not(:disabled){background:var(--accent-hi)}
+.src{font-family:var(--font-mono);font-size:11px;color:var(--text-faint);white-space:nowrap}
 
-.search-wrap{position:relative;padding:14px;display:flex;flex-direction:column;gap:10px;flex-shrink:0;border-bottom:1px solid var(--line)}
+.search-wrap{position:relative;padding:16px;display:flex;flex-direction:column;gap:10px;flex-shrink:0;border-bottom:0}
 
-/* Floated over the roles rather than pushing them down, so the box does not
-   jump around under the cursor while you type. */
 .suggest{
-  position:absolute;left:14px;right:14px;top:56px;z-index:5;margin:0;padding:4px;
+  position:absolute;left:16px;right:16px;top:62px;z-index:5;margin:0;padding:4px;
   list-style:none;max-height:236px;overflow-y:auto;
-  background:#151b22;border:1px solid #2f3d49;border-radius:var(--radius);
-  box-shadow:0 8px 20px rgba(0,0,0,.45);
+  background:var(--surface-panel);border:1px solid var(--line);border-radius:var(--r-panel);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 6px 18px rgba(0,0,0,.5);
 }
 .suggest li{
-  display:flex;align-items:center;gap:8px;padding:5px 7px;border-radius:2px;
-  font-size:13px;color:#c3d0dc;cursor:default;
+  display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:var(--r-asset);
+  font-size:13px;color:var(--text-body);cursor:default;transition:var(--t-hover);
 }
-.suggest li[aria-selected="true"]{background:#22303a;color:var(--ink)}
+.suggest li[aria-selected="true"]{background:var(--surface-raised);color:var(--text-title)}
 .suggest .sug-portrait{
   position:relative;overflow:hidden;width:24px;height:24px;border-radius:2px;flex-shrink:0;
-  background:var(--panel-2);border:1px solid #2c3742;
+  background:var(--surface-raised);border:1px solid var(--line-hair);
 }
 .suggest .sug-portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-/* The key, shown only when it differs from the name — which is the whole
-   reason this list exists. */
-.suggest .sug-key{margin-left:auto;font-size:10.5px;color:var(--ink-3)}
+.suggest .sug-key{margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--text-faint)}
+
 .input{
-  width:100%;background:var(--panel);border:1px solid #2b3641;color:var(--ink);
-  padding:11px 12px;border-radius:var(--radius);font:inherit;font-size:14px;
+  width:100%;background:var(--surface-input);border:1px solid var(--line);color:var(--text-title);
+  height:34px;padding:0 12px;border-radius:var(--r-control);font:inherit;font-size:15px;
+  transition:var(--t-hover);
   -webkit-user-select:text;user-select:text;cursor:text;
 }
-.input:focus{outline:none;border-color:#3f5c6b}
-.input::placeholder{color:#556372}
-.roles{display:flex;gap:5px}
-.role{flex:1;background:var(--panel);border:1px solid #2b3641;color:#7d8b99;padding:7px 4px;border-radius:var(--radius);font:inherit;font-size:11px;font-weight:500;cursor:default}
-.role[aria-pressed="true"]{background:#22303a;border-color:#3b5361;color:#a8c6d4}
-.role:focus-visible{outline:2px solid var(--stat-hi);outline-offset:1px}
+.input:focus{outline:none;border-color:var(--accent-3);box-shadow:0 0 0 2px var(--accent-2)}
+.input::placeholder{color:var(--text-faint)}
+.input.vs{height:28px;padding:0 12px;font-size:13px}
+.input.vs::placeholder{color:var(--text-faint)}
 
-.empty{flex:1;display:grid;place-items:center;padding:26px;text-align:center}
-.empty p{color:var(--ink-2);font-size:13px;max-width:26ch;line-height:1.5}
+/* Roles are underline tabs — five equal buttons read as five equal choices. */
+.roles{display:flex;gap:18px;padding:2px 2px 0}
+.role{
+  flex:0 0 auto;background:none;border:0;padding:0 0 5px;
+  font:inherit;font-size:12px;font-weight:500;color:var(--text-faint);cursor:default;
+  border-bottom:2px solid transparent;transition:var(--t-hover);
+}
+.role:hover{color:var(--text-body)}
+.role[aria-pressed="true"]{background:none;color:var(--text-title);font-weight:600;border-bottom-color:var(--accent)}
+.role:focus-visible{outline:none;box-shadow:0 0 0 2px var(--accent-2);border-radius:2px}
 
-.state{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:var(--radius);background:#1a2620;border:1px solid #274036}
-.state.behind{background:#241a1a;border-color:#452c2c}
-/* Even is not good news, so it must not wear the colour that means ahead. */
-.state.even{background:#181d23;border-color:#26313b}
-.state-n{font-size:17px;font-weight:700;color:var(--stat-hi)}
-.state.behind .state-n{color:var(--danger)}
-.state.even .state-n{color:var(--ink-2)}
-.state-t{font-size:12px;color:var(--ink-2);line-height:1.35}
-.state-t b{color:var(--ink);font-weight:600}
+/* Client-not-running is a first-class screen, never an error. */
+.empty{flex:1;display:grid;place-items:center;padding:32px 24px;text-align:center}
+.empty p{color:var(--text-faint);font-size:13px;max-width:34ch;line-height:1.55}
 
-/* The matchup banner. Like .state it wears neither rail — a source's reading
-   of a lane is not a statistic of ours and not one of our rules — so it takes
-   the same shape as the standing banner and none of the rail colours. */
-.vs-hd{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius);background:#181d23;border:1px solid #26313b}
-.vs-hd.ours{background:#1a2620;border-color:#274036}
-.vs-hd.theirs{background:#241a1a;border-color:#452c2c}
+/* Lane state. The gold delta was the largest type on screen at 17px — the
+   loudest thing in the window was bad news. It is context now, not a headline. */
+.state{display:flex;align-items:center;gap:10px;padding:0;border-radius:0;background:none;border:0}
+.state.behind,.state.even{background:none;border:0}
+.state-n{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--accent)}
+.state.behind .state-n{color:var(--red)}
+.state.even .state-n{color:var(--text-muted)}
+.state-t{font-size:12px;color:var(--text-muted);line-height:1.4}
+.state-t b{color:var(--text-title);font-weight:600}
+
+/* The matchup banner wears neither rail — a source's reading of a lane is
+   not a statistic of ours and not one of our rules. */
+.vs-hd{display:flex;align-items:center;gap:10px;padding:0 0 11px;border-radius:0;background:none;border:0;border-bottom:1px solid var(--line-hair)}
+.vs-hd.ours,.vs-hd.theirs{background:none;border:0;border-bottom:1px solid var(--line-hair)}
 .vs-portrait{
-  position:relative;overflow:hidden;width:28px;height:28px;border-radius:2px;flex-shrink:0;
-  background:var(--panel-2);border:1px solid #2c3742;
+  position:relative;overflow:hidden;width:32px;height:32px;border-radius:var(--r-asset);flex-shrink:0;
+  background:var(--surface-raised);border:1px solid var(--line-hair);
 }
 .vs-portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .vs-txt{display:flex;flex-direction:column;gap:1px;min-width:0}
-.vs-txt b{font-size:13px;font-weight:600;color:var(--ink)}
-.vs-sub{font-size:11px;color:var(--ink-2)}
-.vs-hd.ours .vs-sub{color:var(--stat-hi)}
-.vs-hd.theirs .vs-sub{color:var(--danger)}
-/* The source's own prose about the lane, attributed by sitting under its
-   banner rather than by wearing a colour that would claim it as ours. */
-.vs-tip{margin:-2px 0 0;font-size:12px;line-height:1.45;color:var(--ink-2);padding:0 2px}
+.vs-txt b{font-size:14px;font-weight:600;color:var(--text-title)}
+.vs-sub{font-size:12px;color:var(--text-muted)}
+.vs-hd.ours .vs-sub{color:var(--green)}
+.vs-hd.theirs .vs-sub{color:var(--red)}
+.vs-tip{margin:10px 0 0;font-size:13px;line-height:1.5;color:var(--text-muted);padding:0}
 
-/* The opponent box is secondary to the champion box and reads that way. */
-.input.vs{padding:8px 11px;font-size:13px}
-.input.vs::placeholder{color:var(--ink-3)}
+.note{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.5;padding:0}
 
-.note{font-size:11px;color:var(--ink-3);line-height:1.45;padding:0 2px}
+@media (prefers-reduced-motion:reduce){
+  :root{--dur-fast:0ms}
+}
