@@ -421,6 +421,40 @@ const block = (title: string, meta: string, inner: string, rail = "rail"): strin
     </div>
   </div>`;
 
+/**
+ * What the recommendation engine currently argues for, and who it argued it
+ * about.
+ *
+ * `championKey` is not bookkeeping — it is what stops a category error. The
+ * engine reasons about *your* champion against *this* enemy team: which resist
+ * answers their damage is a claim about your damage type as much as theirs. So
+ * the advice may only annotate a build for the same champion it was computed
+ * for. Looking up somebody else mid-game must show that champion's statistics
+ * unmarked rather than this champion's reasoning wearing their name.
+ */
+interface Advice {
+  championKey: string | null;
+  reasons: Map<number, Suggestion>;
+}
+
+const NO_ADVICE: Advice = { championKey: null, reasons: new Map() };
+
+/** Index suggestions by the item they name, keeping the first argument made
+ *  for each — the engine emits in priority order, so the first is the most
+ *  urgent thing it has to say about that item. */
+const adviceFrom = (championKey: string | null, ...lists: (Suggestion[] | undefined)[]): Advice => {
+  const reasons = new Map<number, Suggestion>();
+  for (const list of lists) {
+    for (const suggestion of list ?? []) {
+      // Rules only. A "stat" suggestion wearing the amber flag would be the
+      // lie the colour law exists to prevent.
+      if (suggestion.source !== "rule") continue;
+      if (!reasons.has(suggestion.itemId)) reasons.set(suggestion.itemId, suggestion);
+    }
+  }
+  return { championKey, reasons };
+};
+
 /** When the advice wants acting on. Words, not numbers — see the colour law. */
 const priorityLabels: Record<Suggestion["priority"], string> = {
   rush: "next back",
@@ -573,32 +607,90 @@ const itemTitle = (item: ItemRef, stats?: BuildStats): string => {
 };
 
 /**
- * A row of items.
+ * A row of items bought together.
  *
- * Two different shapes arrive here and they need opposite treatment.
- * "Starting items" is one group holding several items you buy together.
- * "Boots" and "Situational" are several groups of *one item each* — a menu of
- * alternatives — and rendering only the first turned a menu into a single
- * suggestion, throwing away everything the provider offered.
+ * One group holding several items — "Starting items" is the only shape that
+ * fits this, and it is genuinely one purchase: a ring and two potions is a
+ * single decision, so one win rate over the lot of them is honest.
+ *
+ * A *menu* of alternatives is a different shape and gets
+ * [`alternativesBlock`] instead.
  */
 const itemRowBlock = (title: string, groups: ItemGroup[]): string => {
   const first = groups[0];
   if (!first) return "";
 
-  const single = groups.length === 1;
-  const shown = single
-    ? first.items.map((item) => ({ item, stats: first.stats }))
-    : groups.flatMap((group) => group.items.map((item) => ({ item, stats: group.stats })));
-
-  const row = shown
-    .map(({ item, stats }) => tile(item.id, item.name, "tile", "item", itemTitle(item, stats)))
+  const row = first.items
+    .map((item) => tile(item.id, item.name, "tile", "item", itemTitle(item, first.stats)))
     .join("");
 
-  // One win rate in the header would read as covering every item beside it,
-  // which is exactly the kind of borrowed authority the colour law forbids.
-  // With alternatives, the header counts them and each tile carries its own.
-  const meta = single ? statLine(first.stats) : `${shown.length} options`;
-  return block(title, meta, `<div class="row">${row}</div>`, railFor(first.stats));
+  return block(title, statLine(first.stats), `<div class="row">${row}</div>`, railFor(first.stats));
+};
+
+/**
+ * A menu of alternatives: several groups of one item each.
+ *
+ * "Boots" and "Situational" are lists of things you pick *between*, and they
+ * used to render as anonymous 32px squares under a header that said "6
+ * options" and nothing else. Six unlabelled squares are not six times as
+ * useful as one recommendation; they are about as useful as none, because the
+ * one question a player has here — which of these, and when — went unanswered.
+ *
+ * So each option gets its own column: what it is, and how it actually
+ * performs. Two separate things are being said at once, and the colour law
+ * governs how they may sit together.
+ *
+ * The numbers are **statistics** and carry themselves. Each option shows its
+ * own win rate and its own sample, because the header cannot speak for a menu
+ * — and they are sorted by how often the item is really built, so a group
+ * seen in three games no longer sits beside one seen in forty as though the
+ * app were neutral between them.
+ *
+ * The flag is a **rule**. When the recommendation engine has independently
+ * argued for one of these items in this game, that option is marked amber and
+ * captioned with the engine's own priority wording, with its reasoning in the
+ * tooltip. It never becomes a number and never edits the statistics beside
+ * it: a win rate says how the item performs across thousands of games, the
+ * amber says this particular enemy team is why you would reach for it, and
+ * conflating those two is the exact failure the colour law exists to prevent.
+ */
+const alternativesBlock = (title: string, groups: ItemGroup[], advice: Advice): string => {
+  if (!groups.length) return "";
+
+  const options = groups
+    .flatMap((group) => group.items.map((item) => ({ item, stats: group.stats })))
+    // Most-built first. The provider's order is its own business and has no
+    // stated meaning, so leaving it alone would be presenting an arbitrary
+    // sequence as if it ranked something.
+    .sort((a, b) => (b.stats?.games ?? 0) - (a.stats?.games ?? 0));
+
+  if (!options.length) return "";
+
+  const columns = options
+    .map(({ item, stats }) => {
+      const flagged = advice.reasons.get(item.id);
+      const label = escape(item.name ?? `#${item.id}`);
+      const stat = statLine(stats);
+      // The engine's own words for when it wants the item, never new ones.
+      const why = flagged
+        ? `<span class="seq-why">${escape(priorityLabels[flagged.priority])}</span>`
+        : "";
+      return `<div class="seq-i">
+        ${tile(item.id, item.name, flagged ? "tile rule" : "tile", "item", flagged ? flagged.reason : itemTitle(item, stats))}
+        <span class="seq-lbl">${label}</span>
+        ${stat ? `<span class="seq-stat">${stat}</span>` : ""}
+        ${why}
+      </div>`;
+    })
+    .join("");
+
+  // With a menu, the header counts it rather than borrowing one option's win
+  // rate to stand for all of them — that borrowed authority is the whole
+  // reason each column carries its own numbers. With exactly one option there
+  // is nothing to be ambiguous about, so the header speaks for it as it
+  // always did.
+  const meta = options.length === 1 ? statLine(options[0]?.stats) : `${options.length} options`;
+  return block(title, meta, `<div class="seq">${columns}</div>`, railFor(options[0]?.stats));
 };
 
 const skillBlock = (skills: SkillPlan): string => {
@@ -665,14 +757,18 @@ const message = (text: string, bad = false): void => {
  *
  * Null means the provider answered with a build carrying nothing renderable.
  */
-const buildHtml = (lookup: FoundBuild): string | null => {
+const buildHtml = (lookup: FoundBuild, advice: Advice = NO_ADVICE): string | null => {
+  // Only this champion's own reasoning may mark this champion's items.
+  const mine =
+    advice.championKey && advice.championKey === lookup.champion.key ? advice : NO_ADVICE;
+
   const blocks = [
     ...(lookup.runes ?? []).slice(0, 1).map(runeBlock),
     ...(lookup.summoners ?? []).slice(0, 1).map(summonerBlock),
     itemRowBlock("Starting items", lookup.items.starters ?? []),
     ...(lookup.items.core ?? []).slice(0, 1).map(coreBlock),
-    itemRowBlock("Boots", lookup.items.boots ?? []),
-    itemRowBlock("Situational", lookup.items.situational ?? []),
+    alternativesBlock("Boots", lookup.items.boots ?? [], mine),
+    alternativesBlock("Situational", lookup.items.situational ?? [], mine),
     lookup.skills ? skillBlock(lookup.skills) : "",
   ].filter(Boolean);
 
@@ -1230,6 +1326,8 @@ const clearLive = (): void => {
   threatSlot = "";
   gapsSlot = "";
   lastGame = null;
+  liveBuild = null;
+  advice = NO_ADVICE;
 };
 
 const onStatus = (status: LcuStatus): void => {
@@ -1304,11 +1402,34 @@ const onStatus = (status: LcuStatus): void => {
   paintLive();
 };
 
+/**
+ * The last build the live screen was given, kept so it can be drawn again.
+ *
+ * The build and the reasoning about it arrive as separate events in either
+ * order — you can lock in before the enemy team is visible, or after — and the
+ * situational menu marks the items the engine argues for. Rendering once on
+ * arrival would mean whichever came second never reached the screen.
+ */
+let liveBuild: LiveBuild | null = null;
+
+/** Everything the engine currently argues, for whoever it was arguing about. */
+let advice: Advice = NO_ADVICE;
+
 const onBuild = (payload: LiveBuild): void => {
   // A build for a champion we are no longer locked into lost a race with a
   // fast swap. There is nothing to check when the game found it and we never
   // saw the champ select, which is the case this arm exists to allow.
   if (locked && payload.championKey !== locked.championKey) return;
+
+  liveBuild = payload;
+  drawLiveBuild();
+};
+
+/** Redraw the held build against the current advice. Cheap, and the only way
+ *  the two events can arrive in either order without one being lost. */
+const drawLiveBuild = (): void => {
+  const payload = liveBuild;
+  if (!payload) return;
 
   const lookup = payload.lookup;
   if (payload.error !== null) {
@@ -1325,7 +1446,8 @@ const onBuild = (payload: LiveBuild): void => {
   } else {
     buildSlot =
       (payload.inferredRole ? inferredNote(lookup) : "") +
-      (buildHtml(lookup) ?? emptyHtml(`${lookup.champion.name} came back with an empty build.`));
+      (buildHtml(lookup, advice) ??
+        emptyHtml(`${lookup.champion.name} came back with an empty build.`));
   }
 
   paintBody();
@@ -1339,6 +1461,8 @@ const onBuild = (payload: LiveBuild): void => {
 const onSuggestions = (payload: ChampSelectSuggestions): void => {
   threatSlot = suggestionBlock("Against this team", payload.threat, payload.itemNames);
   gapsSlot = suggestionBlock("For your team", payload.gaps, payload.itemNames);
+  advice = adviceFrom(locked?.championKey ?? null, payload.threat, payload.gaps);
+  drawLiveBuild();
   paintBody();
 };
 
@@ -1365,6 +1489,12 @@ const onGameState = (update: InGameUpdate): void => {
   // minute.
   const starting = playing === null;
   playing = update;
+  // The game's own reasoning replaces champ select's for the same reason the
+  // threat block does: champ select is often looking at hidden seats and a
+  // game never is. `state` comes first — being behind is the more urgent
+  // argument about an item than the enemy composition is.
+  advice = adviceFrom(update.championKey ?? null, update.state, update.threat);
+  drawLiveBuild();
   if (starting) showScreen("live");
   paintLive();
 };

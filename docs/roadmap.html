@@ -243,7 +243,7 @@ pre .p{color:var(--stat)}
       <span><b>219</b> Rust tests</span>
       <span><b>19</b> Node tests</span>
       <span><b>15,785</b> lines</span>
-      <span><b>5</b> live defects <em>3 fixed</em></span>
+      <span><b>5</b> live defects <em>4 fixed</em></span>
       <span>Crawled <b>295</b> pairs</span>
       <span>Median core sample <b>8</b> games</span>
       <span>RAM <b>65 MB</b> <em>macOS</em></span>
@@ -445,7 +445,7 @@ pre .p{color:var(--stat)}
       <div class="defect">
         <header>
           <span class="tag">Defect 4</span>
-          <h3>Situational shows several items and explains none of them</h3>
+          <h3>Situational shows several items and explains none of them &#8212; fixed</h3>
         </header>
         <div class="in">
           <p><strong>What is rendered.</strong> &#8220;Situational&#8221; arrives as several groups of one item each &#8212; a menu of alternatives &#8212; and is drawn as a row of tiles under a header that counts them. The header text is literally the count.</p>
@@ -594,7 +594,7 @@ pre .p{color:var(--stat)}
         <li><s>Investigate mid-game detection.</s> <strong>Not reproduced.</strong> Four hypotheses disproven and the route driven end to end against a new <code>--mid-game</code> stand-in. One real fault fixed on the way: a failed matchup no longer takes the whole build with it.</li>
         <li><s>Mark a finished game as finished.</s> <strong>Done.</strong> The build survives the whistle, but the header now says the game is over and the live-only blocks retire.</li>
         <li><s>Name the stat shards.</s> <strong>Done.</strong> Nine rows in <code>ddragon.rs</code> giving them Riot&#8217;s own art and a name, plus names for every other rune so a tile without art still says what it is.</li>
-        <li><strong>Sort the situational row by sample, then design the reason rendering.</strong> The first half is immediate and breaks no rule; the second half deserves thought, because the colour law constrains it.</li>
+        <li><s>Sort the situational row by sample, then design the reason rendering.</s> <strong>Done.</strong> Named columns with their own numbers, ordered by sample, and the engine&#8217;s reasoning joined to them in amber without either claim borrowing the other&#8217;s authority.</li>
         <li><strong>Get the Windows build onto real hardware and measure its memory.</strong> Two unknowns, one tester, one afternoon.</li>
         <li><strong>Then imports.</strong> The largest genuinely missing feature, and the first thing on this list that is a project rather than a fix.</li>
       </ol>
