@@ -305,14 +305,36 @@ impl BuildDataProvider for OpggProvider {
             // it reaches the endpoint as an argument too.
             validate_champion_key(opponent_key)?;
 
-            let payload = self
+            // Naming an opponent is a *request*, not a requirement — the same
+            // contract `fetch_build`'s caller documents, and the one the
+            // screen is already built for: a build with no `matchup` renders
+            // as "showing the general build instead".
+            //
+            // Until this fell back, it was a single point of failure on one
+            // route only. Champ select cannot name an opponent, so it never
+            // asked this tool; the in-game route always can, so it always
+            // did. A matchup tool that rejected one champion's spelling, went
+            // down, or simply had too few games for a pairing took the whole
+            // build with it — including the perfectly good general build that
+            // the other route would have shown for the same champion.
+            match self
                 .call_tool(
                     &self.config.matchup_tool,
                     self.matchup_arguments(request, opponent_key),
                 )
-                .await?;
-
-            return Ok(map::matchup_from_payload(&payload, request, self.label()));
+                .await
+            {
+                Ok(payload) => match map::matchup_from_payload(&payload, request, self.label()) {
+                    found @ Lookup::Found(_) => return Ok(found),
+                    // The tool answered and had nothing for this pairing,
+                    // which is ordinary for an uncommon one. The general
+                    // build is still the right answer to a narrower question.
+                    Lookup::NoData(_) => {}
+                },
+                Err(error) => {
+                    eprintln!("spellcheck: matchup lookup failed, using the general build: {error}")
+                }
+            }
         }
 
         // The endpoint answers in its own compact format rather than JSON.

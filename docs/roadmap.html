@@ -371,7 +371,7 @@ pre .p{color:var(--stat)}
       <div class="defect">
         <header>
           <span class="tag">Defect 2</span>
-          <h3>Opening the app mid-game detects nothing</h3>
+          <h3>Opening the app mid-game &#8212; not reproduced, one real fault fixed</h3>
         </header>
         <div class="in">
           <p><strong>The path exists and is deliberate.</strong> This is not a missing feature &#8212; it was built on purpose, with a comment saying so: opening the app after champ select is over is an ordinary way to use it, and the game names the same two things champ select does.</p>
@@ -382,19 +382,35 @@ pre .p{color:var(--stat)}
 
           <p class="finding"><b>src-tauri/src/lib.rs:489</b> &#8212; launcher_running.send(!matches!(&amp;event, ClientOffline))<br><b>src-tauri/src/lcu/watcher.rs:156</b> &#8212; events.send(ChampSelectEvent::ClientConnected)</p>
 
-          <p><strong>The strongest suspect is champion-key resolution.</strong> The two routes into a build resolve the champion differently, and only one of them can fail. Champ select receives the Data Dragon key from the client itself. The mid-game route has only the live API&#8217;s <em>display name</em> &#8212; <code>Wukong</code>, <code>Cho&#39;Gath</code> &#8212; and converts it through <code>champion_key_by_name</code>, which reads the hand-authored tag file. A champion the tag file has never heard of yields <code>champion_key: None</code>, and no build at all.</p>
+          <p><strong>Four hypotheses, all disproven by evidence.</strong> This entry previously blamed champion-key resolution through the tag file. That was wrong, and so was everything else tried:</p>
 
-          <p class="finding"><b>src-tauri/src/lib.rs:350</b> &#8212; tags.champion_key_by_name(&amp;player.champion_name)</p>
+          <div class="status">
+            <div><span class="k yes">Works</span><span class="v"><b>Champion resolution.</b> The captured payload runs through <code>in_game_state</code> and yields champion <code>Viktor</code>, key <code>Viktor</code>, role middle, opponent <code>Velkoz</code>. Pinned by a test.</span></div>
+            <div><span class="k yes">Works</span><span class="v"><b>The gate.</b> <code>ClientConnected</code> fires on connect and opens it, and a <code>watch</code> channel delivers a change regardless of which task races first.</span></div>
+            <div><span class="k yes">Works</span><span class="v"><b>The champ-select read.</b> A live client outside champ select answers <code>404</code>, which the client already reads as <code>Ok(None)</code> rather than an error.</span></div>
+            <div><span class="k yes">Works</span><span class="v"><b>The matchup vocabulary.</b> Checked live against the endpoint: Viktor&#8211;Vel&#8217;Koz, plus Wukong, Bel&#8217;Veth, Cho&#8217;Gath and Nunu. All five return matchup builds.</span></div>
+            <div><span class="k yes">Works</span><span class="v"><b>The whole route, end to end.</b> Driven against a stand-in serving a game with no champ select before it: the app connected, opened the gate, polled the live API and fetched a build from OP.GG unprompted.</span></div>
+          </div>
+
+          <div class="rail gap">
+            <i></i>
+            <div class="rail-in">
+              <h4>One real fault, and it is unique to this route</h4>
+              <p>Naming an opponent used to be a <strong>single point of failure</strong>. <code>fetch_build</code> called the matchup tool with <code>?</code> and had no fallback, so a matchup that errored &#8212; or simply had too few games for an uncommon pairing and returned <code>NoData</code> &#8212; took the whole build down with it.</p>
+              <p>Champ select never hit this, because the client blanks enemy positions and it cannot name an opponent. The in-game route always can, so it always asked. That is exactly one route showing nothing useful while the other works, which is the reported symptom &#8212; but it is <em>not confirmed</em> as what was seen, because it depends on the pairing and the pairing is unknown.</p>
+              <p>Fixed: a failed or empty matchup now falls back to the general build, which is what <code>commands.rs</code> already documented (&#8220;naming one is only a request&#8221;) and what the screen was already built to render.</p>
+            </div>
+          </div>
 
           <div class="rail law">
             <i></i>
             <div class="rail-in">
-              <h4>A hand-authored judgement file should not gate a lookup</h4>
-              <p><code>data/meta/champions.json</code> exists to hold opinions &#8212; damage type, sustain, dive. Missing an entry there is supposed to cost you <em>rule-based suggestions</em>, and the blueprint is explicit that an untagged champion is a hole rather than a blank. On this route it costs the entire build instead, which turns a soft degradation into a hard failure. Data Dragon is already fetched and already maps names to keys; deriving it from there decouples the two regardless of whether it turns out to be the bug.</p>
+              <h4>The route had never been exercised by anything</h4>
+              <p>Not a test, not the stand-in client, which always opens with champ select. A documented, supported way of using the app had never once been driven. <code>node scripts/fake-lcu.mjs --mid-game</code> now starts a match with no champ select before it, which is how everything above was ruled out &#8212; and is what anyone should reach for the next time this is reported.</p>
             </div>
           </div>
 
-          <p>Three champions are untagged today &#8212; <code>Locke</code>, <code>Yunara</code>, <code>Zaahen</code> &#8212; and every future release joins them until somebody edits the file. That is enough to explain a reproducible failure on some champions but not a general one, so this needs confirming against the champion that was actually played.</p>
+          <p><strong>Still open.</strong> If it recurs, the thing to capture is the champion and the lane opponent, because the fallback above is the only failure mode that fits and it is pairing-dependent.</p>
         </div>
       </div>
 
@@ -575,7 +591,7 @@ pre .p{color:var(--stat)}
         <li><strong>Rotate to a non-expiring Riot key.</strong> Minutes of work, and until it is done the data plan is not running at all. Everything in section 02 waits behind it.</li>
         <li><s>Widen <code>data/meta/items.json</code> to carry <code>gold.total</code> for every item.</s> <strong>Done.</strong> All 868 items, pricing moved to the tag layer, a latent <code>itemID</code> deserialisation bug fixed on the way, and a real captured payload committed as the regression test.</li>
         <li><s>Re-point the stand-in client at the real payload shape.</s> <strong>Done.</strong> <code>scripts/fake-lcu.mjs</code> now mints all nine fields with real ids and real combine costs, so a scenario can no longer invent a price the parser agrees with.</li>
-        <li><strong>Decouple mid-game champion resolution from the tag file.</strong> Correct regardless of whether it is defect 2&#8217;s cause, and it downgrades a class of hard failure to a soft one.</li>
+        <li><s>Investigate mid-game detection.</s> <strong>Not reproduced.</strong> Four hypotheses disproven and the route driven end to end against a new <code>--mid-game</code> stand-in. One real fault fixed on the way: a failed matchup no longer takes the whole build with it.</li>
         <li><s>Mark a finished game as finished.</s> <strong>Done.</strong> The build survives the whistle, but the header now says the game is over and the live-only blocks retire.</li>
         <li><s>Name the stat shards.</s> <strong>Done.</strong> Nine rows in <code>ddragon.rs</code> giving them Riot&#8217;s own art and a name, plus names for every other rune so a tile without art still says what it is.</li>
         <li><strong>Sort the situational row by sample, then design the reason rendering.</strong> The first half is immediate and breaks no rule; the second half deserves thought, because the colour law constrains it.</li>

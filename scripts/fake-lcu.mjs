@@ -7,7 +7,8 @@
 // dependencies. It is a development tool and never ships — nothing in src/ or
 // src-tauri/ knows it exists.
 //
-//   node scripts/fake-lcu.mjs
+//   node scripts/fake-lcu.mjs              # the whole cycle, from champ select
+//   node scripts/fake-lcu.mjs --mid-game   # a game already in progress
 //
 // It prints the command to start the app against it, then cycles forever:
 // connected, in champ select, locked, in game, left, offline, and back — so
@@ -18,6 +19,15 @@
 // server only listens while the fake game is running, which is exactly how the
 // real one behaves — and it is why the app must treat a refused connection as
 // "no game" rather than as a failure.
+//
+// `--mid-game` exists because the app supports a route nothing could exercise.
+// Opening spellcheck while a match is already running is an ordinary way to
+// use it, and it is the one path whose champion does not come from the client:
+// champ select hands over the Data Dragon key, while a game in progress offers
+// only the live API's display name. The ordinary scenario always opens with
+// champ select, so that route had never been driven by anything — not a test,
+// not this stand-in. In this mode the client is up, the game is already
+// running, and no champ select ever happens.
 //
 // What it proves, and a real client would too: the app subscribes rather than
 // polls, treats a 404 session as "not in champ select", resolves a championId
@@ -55,6 +65,9 @@ const CHAMPIONS = [
   { id: 62, alias: "MonkeyKing", name: "Wukong", position: "jungle" },
   { id: 412, alias: "Thresh", name: "Thresh", position: "utility" },
 ];
+
+/** A game already in progress, and no champ select before it. */
+const MID_GAME = process.argv.includes("--mid-game");
 
 const log = (...parts) => console.log(new Date().toTimeString().slice(0, 8), ...parts);
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -273,6 +286,9 @@ const startGame = (champion) => {
     { key: fs.readFileSync(KEY), cert: fs.readFileSync(CERT) },
     (req, res) => {
       if (req.url && req.url.startsWith("/liveclientdata/allgamedata")) {
+        // Logged because the whole question about the in-game route is
+        // whether the app ever asks. Silence here is the symptom.
+        log("GET /liveclientdata/allgamedata");
         const body = JSON.stringify(allGameData());
         res.writeHead(200, { "content-type": "application/json" });
         res.end(body);
@@ -325,6 +341,15 @@ const upgrade = async (req, socket) => {
   const push = (eventType, data) => {
     if (!socket.destroyed) socket.write(frame(sessionEvent(eventType, data)));
   };
+
+  if (MID_GAME) {
+    // Nothing to push. The client is connected and idle — exactly what it
+    // looks like from the app's side when a match is already under way — and
+    // everything the screen shows has to come from the live API alone.
+    log("mid-game mode: no champ select will happen");
+    log("expect: the app finds the running game on its own and shows a build");
+    return;
+  }
 
   await wait(4000);
   log('push: champ select opened   -> screen: "Pick your champion"');
@@ -410,5 +435,14 @@ server.listen(PORT, "127.0.0.1", () => {
   fs.writeFileSync(LOCKFILE, `LeagueClient:4242:${PORT}:${PASSWORD}:https`);
   log(`stand-in League client listening on https://127.0.0.1:${PORT}`);
   console.log(`\n  Start the app against it with:\n\n    SPELLCHECK_LOCKFILE=${LOCKFILE} npm run dev\n`);
+
+  if (MID_GAME) {
+    // Before the app is even started, so that whenever it connects the match
+    // is already under way and there is no champ select to have missed.
+    startGame(CHAMPIONS[0]);
+    log("mid-game: a match is already running; start the app now");
+    return;
+  }
+
   log("cycling: connected -> in select -> locked -> in game -> offline -> repeat");
 });

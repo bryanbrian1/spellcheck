@@ -1107,3 +1107,31 @@ mod in_game_tests {
         assert!(state.state.is_empty());
     }
 }
+
+#[cfg(test)]
+mod mid_game_tests {
+    use super::*;
+
+    const REAL_GAME: &str = include_str!("live/testdata/allgamedata.json");
+
+    /// Opening the app with a game already running is an ordinary way to use
+    /// it, and it is the one route whose champion does not come from the
+    /// client. Champ select is handed the Data Dragon key; here there is only
+    /// the live API's display name, so everything downstream depends on that
+    /// conversion working.
+    #[test]
+    fn a_running_game_names_a_champion_a_build_can_be_asked_for() {
+        let body: serde_json::Value = serde_json::from_str(REAL_GAME).expect("captured payload");
+        let snapshot = GameSnapshot::from_json(&body).expect("a real game parses");
+        let state = in_game_state(&snapshot);
+
+        assert_eq!(state.champion.as_deref(), Some("Viktor"), "who we are");
+        assert_eq!(
+            state.champion_key.as_deref(),
+            Some("Viktor"),
+            "and the key a provider is asked for — without this there is no build"
+        );
+        assert_eq!(state.role, Some(Role::Middle));
+        assert_eq!(state.opponent_key.as_deref(), Some("Velkoz"), "the lane matchup");
+    }
+}
