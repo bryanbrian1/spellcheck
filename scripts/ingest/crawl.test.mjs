@@ -123,7 +123,7 @@ function stubFetch(asked) {
 /* ---------- the run ---------- */
 
 test("a whole crawl reaches the disk, and the guard accepts what it wrote", async () => {
-  const out = mkdtempSync(join(tmpdir(), "leaguechecker-crawl-"));
+  const out = mkdtempSync(join(tmpdir(), "spellcheck-crawl-"));
   const realFetch = globalThis.fetch;
   const asked = [];
   globalThis.fetch = stubFetch(asked);

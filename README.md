@@ -1,4 +1,4 @@
-# leaguechecker
+# spellcheck
 
 A macOS and Windows app that detects the champion and role you lock into
 during League champion select, then shows the optimal build path — items,
@@ -66,5 +66,5 @@ likely on Windows, where the installer lets you pick a drive — point the app
 at the lockfile yourself:
 
 ```sh
-LEAGUECHECKER_LOCKFILE='D:\Games\League of Legends\lockfile'
+SPELLCHECK_LOCKFILE='D:\Games\League of Legends\lockfile'
 ```

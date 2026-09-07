@@ -47,7 +47,7 @@ impl McpClient {
         let client_version = env!("CARGO_PKG_VERSION").to_string();
         let http = reqwest::Client::builder()
             .timeout(timeout)
-            .user_agent(format!("leaguechecker/{client_version}"))
+            .user_agent(format!("spellcheck/{client_version}"))
             .build()
             .map_err(|error| ProviderError::transport(provider, error))?;
 
@@ -55,7 +55,7 @@ impl McpClient {
             http,
             endpoint: endpoint.into(),
             provider,
-            client_name: "leaguechecker".to_string(),
+            client_name: "spellcheck".to_string(),
             client_version,
             session: Mutex::new(Session::default()),
             next_id: AtomicU64::new(1),

@@ -1,10 +1,10 @@
-<title>leaguechecker Blueprint</title>
+<title>spellcheck Blueprint</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-/* leaguechecker blueprint.
+/* spellcheck blueprint.
    The palette is the app's own &#8212; this document is written in the product's
    colours on purpose, and the rails down the left of each block mean exactly
    what they mean inside the app. Single dark theme, deliberately: it documents
@@ -232,7 +232,7 @@ pre .p{color:var(--stat)}
 
   <header class="mast">
     <p class="eyebrow">Developer blueprint</p>
-    <h1>leaguechecker <span>&#8212; how it fits together</span></h1>
+    <h1>spellcheck <span>&#8212; how it fits together</span></h1>
     <p class="lede">A macOS and Windows app that watches League champion select and shows the build path for whatever you locked in. This is the map you need before changing anything: what exists, what doesn't, and which rules are load-bearing.</p>
     <div class="facts">
       <span>Rust <b>1.98.1</b></span>
@@ -437,7 +437,7 @@ pre .p{color:var(--stat)}
         <li>Add a variant to <strong><code>ProviderKind</code></strong> and an arm to its <code>instantiate</code> match in <code>config.rs</code>. That match is the only place in the codebase allowed to name a concrete provider.</li>
       </ol>
 
-      <p>Which one is live is a config value, not a compile-time choice. <code>providers.json</code> in the OS config directory selects it, and <code>LEAGUECHECKER_PROVIDER</code> overrides that for development.</p>
+      <p>Which one is live is a config value, not a compile-time choice. <code>providers.json</code> in the OS config directory selects it, and <code>SPELLCHECK_PROVIDER</code> overrides that for development.</p>
 
       <div class="rail law">
         <i></i>
@@ -594,7 +594,7 @@ pre .p{color:var(--stat)}
         <table>
           <tr class="head"><td>Thing</td><td>Value</td></tr>
           <tr><td class="f">Lockfile, macOS</td><td class="d"><code>/Applications/League of Legends.app/Contents/LoL/lockfile</code> &#8212; inside the installed bundle, so identical on every default install</td></tr>
-          <tr><td class="f">Lockfile, Windows</td><td class="d"><code>C:\Riot Games\League of Legends\lockfile</code> &#8212; the common default only. The installer takes a drive, so <code>LEAGUECHECKER_LOCKFILE</code> is a user-facing setting here, not just a dev one</td></tr>
+          <tr><td class="f">Lockfile, Windows</td><td class="d"><code>C:\Riot Games\League of Legends\lockfile</code> &#8212; the common default only. The installer takes a drive, so <code>SPELLCHECK_LOCKFILE</code> is a user-facing setting here, not just a dev one</td></tr>
           <tr><td class="f">Format</td><td class="d"><code>ProcessName:PID:Port:Password:Protocol</code></td></tr>
           <tr><td class="f">Auth</td><td class="d">HTTP Basic, username <code>riot</code>, password from the lockfile</td></tr>
           <tr><td class="f">Base URL</td><td class="d"><code>https://127.0.0.1:{port}</code> &#8212; self-signed, so verification is disabled <em>for localhost only</em></td></tr>

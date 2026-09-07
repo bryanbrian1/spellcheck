@@ -360,7 +360,7 @@ test("merging is stable, so an unchanged crawl produces an unchanged file", () =
 /* ---------- the guard actually accepts what we write ---------- */
 
 test("output written by the crawler passes the commit guard", () => {
-  const dir = mkdtempSync(join(tmpdir(), "leaguechecker-ingest-"));
+  const dir = mkdtempSync(join(tmpdir(), "spellcheck-ingest-"));
   try {
     const entry = tallyOf([sampleOf(), sampleOf({ win: false })]);
     const file = tallyToFile(entry, {

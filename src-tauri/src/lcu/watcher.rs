@@ -112,7 +112,7 @@ pub async fn watch(config: WatcherConfig, events: mpsc::Sender<ChampSelectEvent>
                 reported_offline = false;
                 if let Err(error) = follow_client(&lockfile, &events).await {
                     if !events.is_closed() {
-                        eprintln!("leaguechecker: {error}");
+                        eprintln!("spellcheck: {error}");
                     }
                 }
                 if events.is_closed() {
@@ -132,7 +132,7 @@ pub async fn watch(config: WatcherConfig, events: mpsc::Sender<ChampSelectEvent>
             }
             Err(error) => {
                 if !error.is_retryable() {
-                    eprintln!("leaguechecker: {error}");
+                    eprintln!("spellcheck: {error}");
                 }
                 tokio::time::sleep(config.client_check_interval).await;
             }
@@ -188,7 +188,7 @@ async fn follow_client(
             // A payload we cannot read is worth a line in the log, but it is
             // not worth dropping the connection: the next update usually
             // parses, and reconnecting would lose champ select entirely.
-            Err(error) => eprintln!("leaguechecker: {error}"),
+            Err(error) => eprintln!("spellcheck: {error}"),
             Ok(session) => {
                 if !emit(&client, &mut state, &session, events).await {
                     break;
@@ -215,7 +215,7 @@ async fn emit(
                 // Logged as well as sent: the screen tells the user their app
                 // is confused, and the terminal tells whoever is debugging
                 // which of the two shapes broke.
-                eprintln!("leaguechecker: unreadable champ select — {reason}");
+                eprintln!("spellcheck: unreadable champ select — {reason}");
                 ChampSelectEvent::Unreadable { reason }
             }
             // No id to resolve and no lookup to make: the ids go out as they
@@ -235,14 +235,14 @@ async fn emit(
                     Ok(None) => {
                         state.forget();
                         eprintln!(
-                            "leaguechecker: the client has no champion {}",
+                            "spellcheck: the client has no champion {}",
                             selection.champion_id
                         );
                         continue;
                     }
                     Err(error) => {
                         state.forget();
-                        eprintln!("leaguechecker: {error}");
+                        eprintln!("spellcheck: {error}");
                         continue;
                     }
                 }

@@ -1,4 +1,4 @@
-//! leaguechecker core.
+//! spellcheck core.
 //!
 //! The build data layer, the two layers that watch the League client and the
 //! game it launches, and the Tauri shell that hosts them. They meet at
@@ -430,7 +430,7 @@ pub fn run() {
             commands::data_dragon,
         ])
         .run(tauri::generate_context!())
-        .expect("leaguechecker failed to start");
+        .expect("spellcheck failed to start");
 }
 
 /// A broken config must not be fatal. The user still gets a working window on
@@ -439,7 +439,7 @@ fn build_service(config: &ProviderConfig) -> BuildService {
     match BuildService::from_config(config) {
         Ok(service) => service,
         Err(error) => {
-            eprintln!("leaguechecker: provider setup failed ({error}); using defaults");
+            eprintln!("spellcheck: provider setup failed ({error}); using defaults");
             BuildService::from_config(&ProviderConfig::default())
                 .expect("the default provider is always constructible")
         }
@@ -700,7 +700,7 @@ fn resolve_config(handle: &tauri::AppHandle) -> ProviderConfig {
         .unwrap_or_else(|_| PathBuf::from(CONFIG_FILE_NAME));
 
     let mut config = ProviderConfig::load(&path).unwrap_or_else(|error| {
-        eprintln!("leaguechecker: {}: {error}; using defaults", path.display());
+        eprintln!("spellcheck: {}: {error}; using defaults", path.display());
         ProviderConfig::default()
     });
 
@@ -709,7 +709,7 @@ fn resolve_config(handle: &tauri::AppHandle) -> ProviderConfig {
         // Not fatal, and not worth refusing to start over. OpggProvider does
         // not read the disk at all, and RiotProvider reports a missing build
         // the same way it reports a champion we never crawled.
-        Err(error) => eprintln!("leaguechecker: no resource directory ({error}); \
+        Err(error) => eprintln!("spellcheck: no resource directory ({error}); \
                                  leaving build data paths as configured"),
     }
 

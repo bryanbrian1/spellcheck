@@ -12,6 +12,6 @@
 
   "riot": {
     "dataRoot": "data/builds",
-    "label": "leaguechecker"
+    "label": "spellcheck"
   }
 }
