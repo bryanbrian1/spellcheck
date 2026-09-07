@@ -558,6 +558,25 @@ const standingBlock = (standing: Standing): string => {
   </div>`;
 };
 
+/** One row of a rune page: the tree it belongs to, then its tiles. */
+const runeRow = (tree: string | undefined, inner: string): string =>
+  inner
+    ? `<div class="rune-row">${tree ? `<span class="rune-tree">${escape(tree)}</span>` : ""}<div class="row">${inner}</div></div>`
+    : "";
+
+/**
+ * The rune page, in the three parts it actually has.
+ *
+ * Primary tree, secondary tree, stat shards. The secondary runes and the
+ * shards used to share a row, so a page read as four icons followed by five
+ * unrelated ones, and which tree to open for the second pair was stated
+ * nowhere on the screen at all.
+ *
+ * Both tree names come from Data Dragon by id, which is why the secondary can
+ * be named even though the provider only ever tells us the primary one. The
+ * shards keep their tiles: Data Dragon does serve their art, so a tile here is
+ * a promise the catalogue can keep.
+ */
 const runeBlock = (page: RunePage): string => {
   const keystone = page.primary?.[0];
   const rest = (page.primary ?? []).slice(1);
@@ -565,18 +584,24 @@ const runeBlock = (page: RunePage): string => {
     keystone === undefined ? "" : tile(keystone, perkName(keystone), "tile key", "perk"),
     ...rest.map((id) => tile(id, perkName(id), "tile", "perk")),
   ].join("");
-  const secondary = [
-    ...(page.secondary ?? []).map((id) => tile(id, perkName(id), "tile", "perk")),
-    // Stat shards. runesReforged.json omits them, so the catalogue completes
-    // the table itself — see STAT_SHARDS in ddragon.rs. Passing a name matters
-    // more here than for the runes above: until it did, these three drew as
-    // "#5005" in an unlabelled box and read as empty slots.
-    ...(page.shards ?? []).map((id) => tile(id, perkName(id), "tile sm", "perk")),
-  ].join("");
+  const secondary = (page.secondary ?? [])
+    .map((id) => tile(id, perkName(id), "tile", "perk"))
+    .join("");
+  // Passing a name matters more here than for the runes above: until it did,
+  // these three drew as "#5005" in an unlabelled box and read as empty slots.
+  const shards = (page.shards ?? [])
+    .map((id) => tile(id, perkName(id), "tile sm", "perk"))
+    .join("");
+
+  const treeName = (id?: number): string | undefined =>
+    id === undefined ? undefined : perkName(id);
+
   return block(
     page.label ?? "Runes",
     statLine(page.stats),
-    `<div class="row" style="margin-bottom:6px">${primary}</div><div class="row">${secondary}</div>`,
+    runeRow(treeName(page.primaryStyle), primary) +
+      runeRow(treeName(page.secondaryStyle), secondary) +
+      runeRow(shards ? "Shards" : undefined, shards),
     railFor(page.stats),
   );
 };
