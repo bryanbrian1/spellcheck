@@ -337,10 +337,15 @@ const paintIcons = (): void => {
     // A tile rendered before the catalogue arrived is still showing "#8112".
     // Correct it now — the label is what a viewer reads when art is slow,
     // blocked, or absent, and for a stat shard it used to be all there was.
-    if (kind === "perk" && holder.textContent?.startsWith("#")) {
+    //
+    // Written through the label element rather than the holder: assigning to
+    // holder.textContent would delete an <img> already prepended below, and on
+    // a second pass over a tile whose id never resolved it silently did.
+    const label = holder.querySelector<HTMLElement>(".tile-l");
+    if (kind === "perk" && label?.textContent?.startsWith("#")) {
       const name = perkName(Number(key));
       if (name) {
-        holder.textContent = tileLabelText(name);
+        label.textContent = tileLabelText(name);
         holder.title = name;
       }
     }
@@ -355,6 +360,12 @@ const paintIcons = (): void => {
     img.alt = "";
     img.loading = "lazy";
     img.addEventListener("error", () => img.remove());
+    // The label stands in for art. Once art has actually arrived it has
+    // nothing left to stand in for, and rune art is a transparent symbol
+    // rather than an opaque square, so leaving it there prints the words
+    // through the gaps. On `load` rather than eagerly: art that never
+    // arrives, or fails, must still leave the words in place.
+    img.addEventListener("load", () => holder.classList.add("has-art"));
     img.src = src;
     holder.prepend(img);
   });
@@ -372,6 +383,7 @@ const setPortrait = (holder: HTMLElement, key: string | null, fallback: string):
   holder.dataset.painted = wanted;
 
   holder.querySelector("img")?.remove();
+  holder.classList.remove("has-art");
   holder.textContent = fallback;
   if (key) holder.dataset.icon = `champ:${key}`;
   else delete holder.dataset.icon;
@@ -408,7 +420,7 @@ const tile = (
   kind: IconKind = "item",
   title?: string,
 ): string =>
-  `<div class="${cls}" data-icon="${kind}:${id}" title="${escape(title ?? name ?? String(id))}">${tileLabel(id, name)}</div>`;
+  `<div class="${cls}" data-icon="${kind}:${id}" title="${escape(title ?? name ?? String(id))}"><span class="tile-l">${tileLabel(id, name)}</span></div>`;
 
 /* ---------- blocks ---------- */
 
