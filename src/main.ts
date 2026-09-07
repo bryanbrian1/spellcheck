@@ -1066,6 +1066,20 @@ let locked: LockedChampion | null = null;
  *  Its presence is what puts this screen into its second half. */
 let playing: InGameState | null = null;
 
+/**
+ * The last reading of a game that has since ended.
+ *
+ * The build deliberately survives the final whistle — the minutes after a
+ * game are exactly when somebody reads what they should have built. But a
+ * build for the game you *played* and a build for the game you are *playing*
+ * are the same pixels making two different claims, and without this the
+ * screen quietly reverted to looking live. Holding the finished reading lets
+ * the header say which one it is showing.
+ *
+ * Cleared by [`clearLive`], so a fresh champ select never opens against it.
+ */
+let lastGame: InGameState | null = null;
+
 /** The build, whichever route found it, or what the lookup came back with
  *  instead of one. */
 let buildSlot = "";
@@ -1119,9 +1133,18 @@ const paintHeader = (): void => {
   // A game outranks the client. Once one is running the champion, the lane
   // and the clock all come from the thing actually being played, and the
   // client has nothing left to say that this screen would rather show.
-  const key = playing?.championKey ?? locked?.championKey ?? null;
-  const name = playing?.champion ?? (locked ? nameFor(locked.championKey) : null);
-  const [pill, connected] = playing ? ["In game", true] : selectPill;
+  // A finished game still names the champion and lane this screen is about,
+  // so it outranks champ select here for the same reason a running one does.
+  const game = playing ?? lastGame;
+  const key = game?.championKey ?? locked?.championKey ?? null;
+  const name = game?.champion ?? (locked ? nameFor(locked.championKey) : null);
+  const [pill, connected] = playing
+    ? ["In game", true]
+    : // Not an error state, so not the red "off" pill — the game simply
+      // finished. It reads as past tense rather than as something wrong.
+      lastGame
+      ? ["Game over", false]
+      : selectPill;
 
   setPortrait(livePortrait, key, name ? name.slice(0, 2).toUpperCase() : "\u2014");
   liveName.textContent = name ?? "Live";
@@ -1133,7 +1156,13 @@ const paintHeader = (): void => {
       ]
         .filter(Boolean)
         .join(" \u00b7 ")
-    : selectSub;
+    : lastGame
+      ? // Same shape champ select ending uses, for the same reason: the thing
+        // on screen is still worth reading, and it is over.
+        [lastGame.role ? roleLabels[lastGame.role] : null, "game ended"]
+          .filter(Boolean)
+          .join(" \u00b7 ")
+      : selectSub;
   livePill.textContent = pill;
   livePill.className = connected ? "pill" : "pill off";
 };
@@ -1147,14 +1176,24 @@ let lastBody = "";
 const paintBody = (): void => {
   const blocks: string[] = [];
 
+  // The standing and the advice beside it describe a game that is running —
+  // "Zed is five thousand gold up on you" is a fact with a tense. They hang
+  // off `playing` alone and drop out the moment it ends.
   if (playing) {
     if (playing.standing) blocks.push(standingBlock(playing.standing));
     blocks.push(suggestionBlock(stateTitle(playing.standing), playing.state, playing.itemNames));
-    // Check one runs on both sides of the handover, and the game's reading is
-    // strictly the better one: champ select is often looking at five hidden
-    // seats, a game never is. So it replaces champ select's answer rather
-    // than sitting beside it disagreeing.
-    blocks.push(suggestionBlock("Against this team", playing.threat, playing.itemNames));
+  }
+
+  // Check one is different: it describes the enemy composition, which does not
+  // change when the game ends. The game's reading is strictly the better one —
+  // champ select is often looking at five hidden seats, a game never is — so
+  // it replaces champ select's answer rather than sitting beside it
+  // disagreeing, and it goes on doing so afterwards. Reverting to the champ
+  // select reading at the final whistle would change the answer on screen
+  // while nobody was looking, for the worse.
+  const enemies = playing ?? lastGame;
+  if (enemies) {
+    blocks.push(suggestionBlock("Against this team", enemies.threat, enemies.itemNames));
   } else {
     blocks.push(threatSlot);
   }
@@ -1190,6 +1229,7 @@ const clearLive = (): void => {
   buildSlot = "";
   threatSlot = "";
   gapsSlot = "";
+  lastGame = null;
 };
 
 const onStatus = (status: LcuStatus): void => {
@@ -1308,7 +1348,13 @@ const onGameState = (update: InGameUpdate): void => {
     // must touch nothing champ select owns — it is not evidence about champ
     // select. The build in particular stays: the minutes after a game are
     // exactly when someone reads what they should have built.
+    //
+    // What does not stay is the impression that a game is still running. The
+    // standing and the in-game suggestions drop out on their own, because
+    // they hang off `playing`; the header would otherwise fall back to
+    // describing the client and read as though nothing had happened.
     if (!playing) return;
+    lastGame = playing;
     playing = null;
     paintLive();
     return;

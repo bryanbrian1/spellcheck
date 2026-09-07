@@ -243,7 +243,7 @@ pre .p{color:var(--stat)}
       <span><b>219</b> Rust tests</span>
       <span><b>19</b> Node tests</span>
       <span><b>15,785</b> lines</span>
-      <span><b>5</b> live defects <em>2 fixed</em></span>
+      <span><b>5</b> live defects <em>3 fixed</em></span>
       <span>Crawled <b>295</b> pairs</span>
       <span>Median core sample <b>8</b> games</span>
       <span>RAM <b>65 MB</b> <em>macOS</em></span>
@@ -401,7 +401,7 @@ pre .p{color:var(--stat)}
       <div class="defect">
         <header>
           <span class="tag">Defect 3</span>
-          <h3>The build never goes away after the match</h3>
+          <h3>The build never goes away after the match &#8212; fixed</h3>
         </header>
         <div class="in">
           <p><strong>This one is working as designed, and the design is wrong.</strong> The <code>noGame</code> branch deliberately leaves the build on screen, with a stated rationale.</p>
@@ -412,7 +412,17 @@ pre .p{color:var(--stat)}
 
           <p><strong>So the fix is not to clear it.</strong> Deleting the build would discard the exact case the comment is protecting. What is missing is a signal that the thing on screen is finished &#8212; a state on the header, the live pill reading something other than a live state, the standing banner retiring since it describes a game that has ended. Keep the build, mark it over.</p>
 
-          <p>Worth checking in the same pass: the <code>BuildClaim</code> that suppresses duplicate fetches is not released when a game ends, so whether the <em>next</em> game re-fetches correctly &#8212; particularly on the same champion &#8212; is unverified.</p>
+          <div class="rail">
+            <i></i>
+            <div class="rail-in">
+              <h4>Done &#8212; the build stays, the impression of a live game does not</h4>
+              <p>A finished reading is held in <code>lastGame</code>, so the header can say which game it is describing: the pill reads <strong>Game over</strong> and the subtitle <strong>&#8220;Mid &#183; game ended&#8221;</strong>, following the shape champ select ending already uses. <code>clearLive</code> drops it, so a fresh champ select still opens clean.</p>
+              <p>The blocks split on tense rather than all persisting or all vanishing. The standing and the advice beside it describe a game that is <em>running</em> &#8212; &#8220;Vel&#8217;Koz is 2,400 gold up on you&#8221; is a fact with a tense &#8212; so they drop at the whistle. Check one describes the enemy composition, which the final whistle does not change, so it stays. It now stays as the <em>game&#8217;s</em> reading too: reverting to champ select&#8217;s partial view at the end would have quietly swapped a complete answer for a worse one.</p>
+              <p>Verified by driving the built <code>main.js</code> through lock &#8594; build &#8594; playing &#8594; ended &#8594; next champ select against a stubbed bridge, rather than by reading the types.</p>
+            </div>
+          </div>
+
+          <p>The <code>BuildClaim</code> concern raised here earlier was unfounded: champ select takes the claim <em>unconditionally</em> on every lock, so the next game re-fetches even on the same champion. Nothing to release.</p>
         </div>
       </div>
 
@@ -566,8 +576,8 @@ pre .p{color:var(--stat)}
         <li><s>Widen <code>data/meta/items.json</code> to carry <code>gold.total</code> for every item.</s> <strong>Done.</strong> All 868 items, pricing moved to the tag layer, a latent <code>itemID</code> deserialisation bug fixed on the way, and a real captured payload committed as the regression test.</li>
         <li><s>Re-point the stand-in client at the real payload shape.</s> <strong>Done.</strong> <code>scripts/fake-lcu.mjs</code> now mints all nine fields with real ids and real combine costs, so a scenario can no longer invent a price the parser agrees with.</li>
         <li><strong>Decouple mid-game champion resolution from the tag file.</strong> Correct regardless of whether it is defect 2&#8217;s cause, and it downgrades a class of hard failure to a soft one.</li>
+        <li><s>Mark a finished game as finished.</s> <strong>Done.</strong> The build survives the whistle, but the header now says the game is over and the live-only blocks retire.</li>
         <li><s>Name the stat shards.</s> <strong>Done.</strong> Nine rows in <code>ddragon.rs</code> giving them Riot&#8217;s own art and a name, plus names for every other rune so a tile without art still says what it is.</li>
-        <li><strong>Mark a finished game as finished.</strong> Small, self-contained UI work, and it removes a screen that can silently assert something false.</li>
         <li><strong>Sort the situational row by sample, then design the reason rendering.</strong> The first half is immediate and breaks no rule; the second half deserves thought, because the colour law constrains it.</li>
         <li><strong>Get the Windows build onto real hardware and measure its memory.</strong> Two unknowns, one tester, one afternoon.</li>
         <li><strong>Then imports.</strong> The largest genuinely missing feature, and the first thing on this list that is a project rather than a fix.</li>

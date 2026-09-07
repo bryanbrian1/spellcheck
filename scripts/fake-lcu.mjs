@@ -374,7 +374,8 @@ const upgrade = async (req, socket) => {
   Object.assign(live, { dead: false, ourGold: 5200, theirGold: 11800, levelGap: 3, gameTime: 1500 });
 
   await wait(35000);
-  log('the game ends               -> screen: "No game"');
+  log('the game ends               -> screen: pill "Game over", sub "· game ended",');
+  log('                               the standing goes, the build stays');
   stopGame();
 
   await wait(6000);
