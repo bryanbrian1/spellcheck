@@ -1,7 +1,7 @@
 //! Which provider is live, and how each one is set up.
 //!
 //! The active provider is data, not a compile-time choice: flip
-//! `provider` in the config file (or set `LEAGUECHECKER_PROVIDER`) to move the
+//! `provider` in the config file (or set `SPELLCHECK_PROVIDER`) to move the
 //! whole app from OP.GG to our own crawl without touching the UI.
 
 use std::path::{Path, PathBuf};
@@ -15,7 +15,7 @@ use super::riot::{RiotConfig, RiotProvider};
 use super::BuildDataProvider;
 
 /// Environment override, mainly for development and for CI smoke tests.
-pub const PROVIDER_ENV_VAR: &str = "LEAGUECHECKER_PROVIDER";
+pub const PROVIDER_ENV_VAR: &str = "SPELLCHECK_PROVIDER";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -99,7 +99,7 @@ impl ProviderConfig {
         Ok(config)
     }
 
-    /// `LEAGUECHECKER_PROVIDER` wins over the file when set.
+    /// `SPELLCHECK_PROVIDER` wins over the file when set.
     pub fn apply_env_overrides(&mut self) -> Result<(), ProviderError> {
         if let Ok(raw) = std::env::var(PROVIDER_ENV_VAR) {
             if !raw.trim().is_empty() {
@@ -179,7 +179,7 @@ mod tests {
 
     #[test]
     fn a_relative_data_root_is_anchored_to_the_bundle() {
-        let base = std::env::temp_dir().join("leaguechecker-anchor-test");
+        let base = std::env::temp_dir().join("spellcheck-anchor-test");
         let builds = base.join("data/builds");
         std::fs::create_dir_all(&builds).unwrap();
 
@@ -196,9 +196,9 @@ mod tests {
         // Somebody wrote this into providers.json deliberately. Re-hanging it
         // on the bundle would silently ignore what they asked for.
         let mut config = ProviderConfig::default();
-        config.riot.data_root = PathBuf::from("/opt/leaguechecker/builds");
+        config.riot.data_root = PathBuf::from("/opt/spellcheck/builds");
         config.anchor_relative_paths(Path::new("/Applications/x.app/Contents/Resources"));
-        assert_eq!(config.riot.data_root, PathBuf::from("/opt/leaguechecker/builds"));
+        assert_eq!(config.riot.data_root, PathBuf::from("/opt/spellcheck/builds"));
     }
 
     #[test]
@@ -216,7 +216,7 @@ mod tests {
     fn provider_is_a_config_value() {
         let config: ProviderConfig = serde_json::from_str(r#"{ "provider": "riot" }"#).unwrap();
         assert_eq!(config.provider, ProviderKind::Riot);
-        assert_eq!(config.active_provider().unwrap().label(), "leaguechecker");
+        assert_eq!(config.active_provider().unwrap().label(), "spellcheck");
     }
 
     #[test]

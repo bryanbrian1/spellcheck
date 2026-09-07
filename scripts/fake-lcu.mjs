@@ -41,7 +41,7 @@ const LIVE_PORT = 2999;
 
 // Everything this writes — key, certificate, lockfile — is throwaway and lives
 // outside the repository. A self-signed key is not something to commit.
-const DIR = path.join(os.tmpdir(), "leaguechecker-fake-lcu");
+const DIR = path.join(os.tmpdir(), "spellcheck-fake-lcu");
 const LOCKFILE = path.join(DIR, "lockfile");
 const KEY = path.join(DIR, "key.pem");
 const CERT = path.join(DIR, "cert.pem");
@@ -374,6 +374,6 @@ process.on("SIGTERM", shutdown);
 server.listen(PORT, "127.0.0.1", () => {
   fs.writeFileSync(LOCKFILE, `LeagueClient:4242:${PORT}:${PASSWORD}:https`);
   log(`stand-in League client listening on https://127.0.0.1:${PORT}`);
-  console.log(`\n  Start the app against it with:\n\n    LEAGUECHECKER_LOCKFILE=${LOCKFILE} npm run dev\n`);
+  console.log(`\n  Start the app against it with:\n\n    SPELLCHECK_LOCKFILE=${LOCKFILE} npm run dev\n`);
   log("cycling: connected -> in select -> locked -> in game -> offline -> repeat");
 });

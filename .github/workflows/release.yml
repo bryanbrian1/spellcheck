@@ -182,9 +182,9 @@ jobs:
               "APPLE_PASSWORD:$NOTARY_PASSWORD" \
               "APPLE_TEAM_ID:$TEAM_ID"
             do
-              echo "${pair%%:*}<<__LEAGUECHECKER_EOF__"
+              echo "${pair%%:*}<<__SPELLCHECK_EOF__"
               echo "${pair#*:}"
-              echo "__LEAGUECHECKER_EOF__"
+              echo "__SPELLCHECK_EOF__"
             done
           } >> "$GITHUB_ENV"
           echo "Apple signing configured; this build will be signed and notarised."
@@ -196,7 +196,7 @@ jobs:
           # Only publish on a tag. A workflow_dispatch run builds the matrix
           # and uploads nothing.
           tagName: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
-          releaseName: leaguechecker ${{ github.ref_name }}
+          releaseName: spellcheck ${{ github.ref_name }}
           releaseBody: |
             Beta build. These installers are unsigned, so both systems will
             try to stop you the first time.

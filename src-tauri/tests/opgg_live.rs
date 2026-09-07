@@ -14,7 +14,7 @@
 //! the app, from "OP.GG has nothing for that pair". The unit tests pin what we
 //! send and how we read the answer; only this pins that the two still meet.
 
-use leaguechecker::{BuildLookup, BuildService, ProviderConfig};
+use spellcheck::{BuildLookup, BuildService, ProviderConfig};
 
 /// A matchup build, end to end, against the live endpoint.
 ///

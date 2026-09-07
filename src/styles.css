@@ -1,4 +1,4 @@
-/* Design tokens ported verbatim from the leaguechecker UI mockup.
+/* Design tokens ported verbatim from the spellcheck design canvas.
    The colour system carries meaning and must not be recoloured casually:
    teal = statistical, saturation encodes confidence; amber = rule-based,
    and amber is NEVER used for a statistic. */

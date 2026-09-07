@@ -1,5 +1,5 @@
 [package]
-name = "leaguechecker"
+name = "spellcheck"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.75"
@@ -7,11 +7,11 @@ description = "Champion select build lookup for League of Legends"
 publish = false
 
 [lib]
-name = "leaguechecker"
+name = "spellcheck"
 path = "src/lib.rs"
 
 [[bin]]
-name = "leaguechecker"
+name = "spellcheck"
 path = "src/main.rs"
 
 # Tauri generates the app metadata (icons, Info.plist, capabilities) at build

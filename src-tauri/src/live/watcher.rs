@@ -158,7 +158,7 @@ pub async fn watch(
             // longer true. It is not worth stopping over: the next look
             // usually succeeds, and the game is still running either way.
             Err(error) => {
-                eprintln!("leaguechecker: {error}");
+                eprintln!("spellcheck: {error}");
                 None
             }
         };

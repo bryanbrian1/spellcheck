@@ -21,7 +21,7 @@ use super::{validate_champion_key, BuildDataProvider};
 
 use file::{BuildFile, SCHEMA_VERSION};
 
-pub const PROVIDER_LABEL: &str = "leaguechecker";
+pub const PROVIDER_LABEL: &str = "spellcheck";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
@@ -132,7 +132,7 @@ impl BuildDataProvider for RiotProvider {
                 path: path.display().to_string(),
                 detail: format!(
                     "schema version {} is newer than this app understands \
-                     (it reads up to {SCHEMA_VERSION}); update leaguechecker",
+                     (it reads up to {SCHEMA_VERSION}); update spellcheck",
                     parsed.schema_version
                 ),
             });
@@ -224,7 +224,7 @@ mod tests {
         fn new() -> Scratch {
             static COUNTER: AtomicU32 = AtomicU32::new(0);
             let unique = format!(
-                "leaguechecker-test-{}-{}",
+                "spellcheck-test-{}-{}",
                 std::process::id(),
                 COUNTER.fetch_add(1, Ordering::Relaxed)
             );

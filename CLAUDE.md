@@ -1,4 +1,4 @@
-# leaguechecker
+# spellcheck
 
 Desktop app for macOS and Windows. Detects the champion and role you're
 locked into during League champion select, then shows the optimal build path
@@ -73,7 +73,7 @@ Never present a rule-based suggestion as a statistic.
 - Lockfile, macOS: `/Applications/League of Legends.app/Contents/LoL/lockfile`
 - Lockfile, Windows: `C:\Riot Games\League of Legends\lockfile`. Unlike the
   macOS path this is only the common default — the installer takes a drive and
-  regional builds differ — so `LEAGUECHECKER_LOCKFILE` is a user-facing
+  regional builds differ — so `SPELLCHECK_LOCKFILE` is a user-facing
   setting on Windows, not just a development one
 - Format: `ProcessName:PID:Port:Password:Protocol`
 - Auth: HTTP Basic, username `riot`, password from lockfile

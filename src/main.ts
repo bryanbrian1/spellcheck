@@ -1,5 +1,5 @@
 /**
- * leaguechecker UI.
+ * spellcheck UI.
  *
  * Vanilla TypeScript, no framework, no runtime dependencies. It talks to Rust
  * two ways — commands for the search box, events for the live screen — and

@@ -38,7 +38,7 @@ pub const DEFAULT_LOCKFILE_PATH: &str = "/nonexistent/league-client/lockfile";
 
 /// Points the app at a lockfile somewhere else — a non-default install, or a
 /// captured file for development on a machine with no client.
-pub const LOCKFILE_ENV_VAR: &str = "LEAGUECHECKER_LOCKFILE";
+pub const LOCKFILE_ENV_VAR: &str = "SPELLCHECK_LOCKFILE";
 
 /// The LCU authenticates every caller as this user; the password is the
 /// per-launch token from the lockfile.

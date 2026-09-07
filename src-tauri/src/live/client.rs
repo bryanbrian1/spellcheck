@@ -60,7 +60,7 @@ impl LiveClient {
             .timeout(Duration::from_secs(REQUEST_TIMEOUT_SECS))
             // Justified in the module docs: loopback, self-signed, no DNS.
             .danger_accept_invalid_certs(true)
-            .user_agent(concat!("leaguechecker/", env!("CARGO_PKG_VERSION")))
+            .user_agent(concat!("spellcheck/", env!("CARGO_PKG_VERSION")))
             .build()
             .unwrap_or_default();
 
