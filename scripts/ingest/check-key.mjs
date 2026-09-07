@@ -36,9 +36,9 @@ if (!key) {
     "The ingest job needs a Riot API key and found none.",
     "",
     "Set it as a repository secret (the value never appears in a log):",
-    "  gh secret set RIOT_API_KEY --repo bryanbrian1/leaguechecker",
+    "  gh secret set RIOT_API_KEY --repo bryanbrian1/spellcheck",
     "",
-    "Then confirm it exists with:  gh secret list --repo bryanbrian1/leaguechecker",
+    "Then confirm it exists with:  gh secret list --repo bryanbrian1/spellcheck",
   ]);
 }
 
@@ -81,7 +81,7 @@ switch (response.status) {
       "That usually means the secret holds something other than a key —",
       "an empty value, a stray newline, or quotes captured with the paste.",
       "",
-      "Re-set it:  gh secret set RIOT_API_KEY --repo bryanbrian1/leaguechecker",
+      "Re-set it:  gh secret set RIOT_API_KEY --repo bryanbrian1/spellcheck",
     ]);
     break;
 
@@ -95,7 +95,7 @@ switch (response.status) {
       "and a key from the wrong account also land here.",
       "",
       `Regenerate at ${DEV_PORTAL} and re-set the secret:`,
-      "  gh secret set RIOT_API_KEY --repo bryanbrian1/leaguechecker",
+      "  gh secret set RIOT_API_KEY --repo bryanbrian1/spellcheck",
       "",
       "If this keeps happening on a schedule, a 24-hour key is the wrong tool:",
       "apply for a Personal or Production key, which do not expire daily.",
