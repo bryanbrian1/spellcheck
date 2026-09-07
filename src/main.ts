@@ -207,6 +207,8 @@ interface DataDragon {
   champions: Champion[];
   spells: Record<string, string>;
   perks: Record<string, string>;
+  /** Perk id to display name, stat shards included. The label under the art. */
+  perkNames: Record<string, string>;
 }
 
 /** `withGlobalTauri` puts the bridge on window, so we need no npm package. */
@@ -326,11 +328,25 @@ const iconUrl = (kind: IconKind, key: string): string | null => {
 const paintIcons = (): void => {
   if (!icons) return;
   document.querySelectorAll<HTMLElement>("[data-icon]").forEach((holder) => {
-    if (holder.querySelector("img")) return;
     const raw = holder.dataset.icon ?? "";
     const split = raw.indexOf(":");
     if (split < 0) return;
-    const src = iconUrl(raw.slice(0, split) as IconKind, raw.slice(split + 1));
+    const kind = raw.slice(0, split) as IconKind;
+    const key = raw.slice(split + 1);
+
+    // A tile rendered before the catalogue arrived is still showing "#8112".
+    // Correct it now — the label is what a viewer reads when art is slow,
+    // blocked, or absent, and for a stat shard it used to be all there was.
+    if (kind === "perk" && holder.textContent?.startsWith("#")) {
+      const name = perkName(Number(key));
+      if (name) {
+        holder.textContent = tileLabelText(name);
+        holder.title = name;
+      }
+    }
+
+    if (holder.querySelector("img")) return;
+    const src = iconUrl(kind, key);
     if (!src) return;
 
     const img = document.createElement("img");
@@ -362,9 +378,28 @@ const setPortrait = (holder: HTMLElement, key: string | null, fallback: string):
   paintIcons();
 };
 
+/**
+ * A rune, style or stat shard's display name, once the catalogue has arrived.
+ *
+ * `undefined` before it does, which is ordinary rather than a problem: the
+ * tile draws its id placeholder and `paintIcons` fills the real label in when
+ * the catalogue lands, the same way it fills in the art.
+ */
+const perkName = (id: number): string | undefined => icons?.perkNames?.[String(id)];
+
+/**
+ * How much of a name a tile can show.
+ *
+ * A 24px shard tile cannot render "Adaptive Force" at any honest size, and
+ * pretending otherwise by shrinking the type is what produced the 9px
+ * captions the redesign already removed. The label is a fallback for when art
+ * is missing; the full name always lives in the tile's `title`.
+ */
+const tileLabelText = (name: string): string => name.trim().slice(0, 9);
+
 /** Providers may or may not resolve names; ids are the guaranteed field. */
 const tileLabel = (id: number, name?: string): string =>
-  escape(name && name.trim() ? name.trim().slice(0, 9) : `#${id}`);
+  escape(name && name.trim() ? tileLabelText(name) : `#${id}`);
 
 const tile = (
   id: number,
@@ -481,14 +516,16 @@ const runeBlock = (page: RunePage): string => {
   const keystone = page.primary?.[0];
   const rest = (page.primary ?? []).slice(1);
   const primary = [
-    keystone === undefined ? "" : tile(keystone, undefined, "tile key", "perk"),
-    ...rest.map((id) => tile(id, undefined, "tile", "perk")),
+    keystone === undefined ? "" : tile(keystone, perkName(keystone), "tile key", "perk"),
+    ...rest.map((id) => tile(id, perkName(id), "tile", "perk")),
   ].join("");
   const secondary = [
-    ...(page.secondary ?? []).map((id) => tile(id, undefined, "tile", "perk")),
-    // Stat shards are not in runesReforged.json and have no art, so these
-    // keep their text label.
-    ...(page.shards ?? []).map((id) => tile(id, undefined, "tile sm", "perk")),
+    ...(page.secondary ?? []).map((id) => tile(id, perkName(id), "tile", "perk")),
+    // Stat shards. runesReforged.json omits them, so the catalogue completes
+    // the table itself — see STAT_SHARDS in ddragon.rs. Passing a name matters
+    // more here than for the runes above: until it did, these three drew as
+    // "#5005" in an unlabelled box and read as empty slots.
+    ...(page.shards ?? []).map((id) => tile(id, perkName(id), "tile sm", "perk")),
   ].join("");
   return block(
     page.label ?? "Runes",

@@ -70,7 +70,41 @@ pub struct DataDragon {
     pub spells: HashMap<u32, String>,
     /// Rune and rune-style id to its unversioned image path.
     pub perks: HashMap<u32, String>,
+    /// Rune, rune-style and stat-shard id to its display name.
+    ///
+    /// Every tile draws its label before any art arrives and keeps it
+    /// underneath, so this is what the page shows when an image is slow, has
+    /// failed, or does not exist. Without it a tile falls back to printing a
+    /// raw id, which is what stat shards did on screen for three slots.
+    pub perk_names: HashMap<u32, String>,
 }
+
+/// The nine stat shards: id, art, and name.
+///
+/// Data Dragon serves the art — `perk-images/StatMods/…`, on the same
+/// unversioned path as every other rune image — but omits the shards from
+/// `runesReforged.json` entirely, which lists only the styles and the runes
+/// inside their slots. So the catalogue that file produces is incomplete by
+/// construction and this completes it.
+///
+/// Hardcoded because there is no documented endpoint that lists them, and
+/// `CLAUDE.md` allows no third-party source that does. They are stable: nine
+/// rows that change when Riot reworks the shard system, which is roughly
+/// never and is a patch note when it happens.
+const STAT_SHARDS: [(u32, &str, &str); 9] = [
+    (5001, "StatModsHealthScalingIcon.png", "Health (scaling)"),
+    (5002, "StatModsArmorIcon.png", "Armor"),
+    (5003, "StatModsMagicResIcon.png", "Magic Resist"),
+    (5005, "StatModsAttackSpeedIcon.png", "Attack Speed"),
+    (5007, "StatModsCDRScalingIcon.png", "Ability Haste"),
+    (5008, "StatModsAdaptiveForceIcon.png", "Adaptive Force"),
+    (5010, "StatModsMovementSpeedIcon.png", "Move Speed"),
+    (5011, "StatModsHealthPlusIcon.png", "Health"),
+    (5013, "StatModsTenacityIcon.png", "Tenacity"),
+];
+
+/// Where the shard art sits under the unversioned rune image root.
+const STAT_SHARD_DIR: &str = "perk-images/StatMods";
 
 #[derive(Debug, thiserror::Error)]
 pub enum DataDragonError {
@@ -122,6 +156,8 @@ struct RuneStyle {
     #[serde(default)]
     icon: String,
     #[serde(default)]
+    name: String,
+    #[serde(default)]
     slots: Vec<RuneSlot>,
 }
 
@@ -137,6 +173,8 @@ struct Rune {
     id: u32,
     #[serde(default)]
     icon: String,
+    #[serde(default)]
+    name: String,
 }
 
 impl DataDragon {
@@ -170,17 +208,30 @@ impl DataDragon {
         // Styles and the runes inside them share one table: the UI asks for a
         // perk id without knowing or caring which of the two it is.
         let mut perks = HashMap::new();
+        let mut perk_names = HashMap::new();
         for style in styles {
             if !style.icon.is_empty() {
                 perks.insert(style.id, style.icon);
+            }
+            if !style.name.is_empty() {
+                perk_names.insert(style.id, style.name);
             }
             for slot in style.slots {
                 for rune in slot.runes {
                     if !rune.icon.is_empty() {
                         perks.insert(rune.id, rune.icon);
                     }
+                    if !rune.name.is_empty() {
+                        perk_names.insert(rune.id, rune.name);
+                    }
                 }
             }
+        }
+
+        // The shards are not in that file, so neither table has them yet.
+        for (id, icon, name) in STAT_SHARDS {
+            perks.insert(id, format!("{STAT_SHARD_DIR}/{icon}"));
+            perk_names.insert(id, name.to_string());
         }
 
         let mut champions: Vec<Champion> = champion_file
@@ -199,6 +250,7 @@ impl DataDragon {
             champions,
             spells,
             perks,
+            perk_names,
         })
     }
 
@@ -289,15 +341,19 @@ mod tests {
 
     const RUNES: &str = r#"[
       {
-        "id": 8100, "key": "Domination", "icon": "perk-images/Styles/7200_Domination.png",
+        "id": 8100, "key": "Domination", "name": "Domination",
+        "icon": "perk-images/Styles/7200_Domination.png",
         "slots": [
           { "runes": [
-              { "id": 8112, "key": "Electrocute", "icon": "perk-images/Styles/Domination/Electrocute/Electrocute.png" },
-              { "id": 8124, "key": "Predator", "icon": "perk-images/Styles/Domination/Predator/Predator.png" }
+              { "id": 8112, "key": "Electrocute", "name": "Electrocute",
+                "icon": "perk-images/Styles/Domination/Electrocute/Electrocute.png" },
+              { "id": 8124, "key": "Predator", "name": "Predator",
+                "icon": "perk-images/Styles/Domination/Predator/Predator.png" }
           ] }
         ]
       },
-      { "id": 8000, "key": "Precision", "icon": "perk-images/Styles/7201_Precision.png", "slots": [] }
+      { "id": 8000, "key": "Precision", "name": "Precision",
+        "icon": "perk-images/Styles/7201_Precision.png", "slots": [] }
     ]"#;
 
     #[test]
@@ -330,7 +386,8 @@ mod tests {
             Some("perk-images/Styles/Domination/Electrocute/Electrocute.png"),
             "a keystone inside it"
         );
-        assert_eq!(catalog.perks.len(), 4);
+        // Four from the payload, plus the nine shards the payload omits.
+        assert_eq!(catalog.perks.len(), 4 + STAT_SHARDS.len());
     }
 
     #[test]
@@ -367,6 +424,49 @@ mod tests {
         // An empty-but-valid file is not an error: Riot could legitimately
         // ship one, and the UI simply falls back to text.
         let empty = DataDragon::parse("16.17.1".into(), r#"{"data":{}}"#, r#"{"data":{}}"#, "[]").unwrap();
-        assert!(empty.spells.is_empty() && empty.perks.is_empty());
+        assert!(empty.spells.is_empty());
+        // The shards survive an empty rune file, and should: they are a
+        // compiled-in constant rather than anything Riot sent us, so there is
+        // nothing for an empty payload to have taken away.
+        assert_eq!(empty.perks.len(), STAT_SHARDS.len());
+        assert!(empty.perks.keys().all(|id| (5001..=5013).contains(id)));
+    }
+
+    /// The shards are the reason this table is completed by hand.
+    ///
+    /// `runesReforged.json` lists styles and the runes in their slots and
+    /// stops there, so before this the three shard tiles on a rune page had
+    /// neither art nor a name and drew as "#5005" — three boxes that read as
+    /// empty slots. Riot serves the art; only the index is missing.
+    #[test]
+    fn stat_shards_carry_art_and_a_name_although_riot_omits_them() {
+        let catalog = DataDragon::parse("16.17.1".into(), CHAMPIONS, SUMMONERS, RUNES).unwrap();
+
+        assert_eq!(
+            catalog.perks.get(&5008).map(String::as_str),
+            Some("perk-images/StatMods/StatModsAdaptiveForceIcon.png"),
+            "the unversioned rune path, same as every other perk image"
+        );
+        assert_eq!(
+            catalog.perk_names.get(&5008).map(String::as_str),
+            Some("Adaptive Force")
+        );
+
+        // Every shard the crawled data actually contains.
+        for id in [5001, 5005, 5007, 5008, 5010, 5011, 5013] {
+            assert!(catalog.perks.contains_key(&id), "{id} has no art");
+            assert!(catalog.perk_names.contains_key(&id), "{id} has no name");
+        }
+    }
+
+    /// Runes carry a name too, so a tile whose art is slow, blocked or
+    /// missing says what it is rather than printing an id.
+    #[test]
+    fn runes_and_styles_are_named_not_just_illustrated() {
+        let catalog = DataDragon::parse("16.17.1".into(), CHAMPIONS, SUMMONERS, RUNES).unwrap();
+
+        assert_eq!(catalog.perk_names.get(&8100).map(String::as_str), Some("Domination"));
+        assert_eq!(catalog.perk_names.get(&8112).map(String::as_str), Some("Electrocute"));
+        assert_eq!(catalog.perk_names.get(&8000).map(String::as_str), Some("Precision"));
     }
 }

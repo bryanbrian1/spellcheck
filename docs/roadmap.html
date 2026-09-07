@@ -243,7 +243,7 @@ pre .p{color:var(--stat)}
       <span><b>219</b> Rust tests</span>
       <span><b>19</b> Node tests</span>
       <span><b>15,785</b> lines</span>
-      <span><b>5</b> live defects <em>1 fixed</em></span>
+      <span><b>5</b> live defects <em>2 fixed</em></span>
       <span>Crawled <b>295</b> pairs</span>
       <span>Median core sample <b>8</b> games</span>
       <span>RAM <b>65 MB</b> <em>macOS</em></span>
@@ -444,7 +444,7 @@ pre .p{color:var(--stat)}
       <div class="defect">
         <header>
           <span class="tag">Defect 5</span>
-          <h3>Three empty slots on the rune page</h3>
+          <h3>Three empty slots on the rune page &#8212; fixed</h3>
         </header>
         <div class="in">
           <p>They are not extra slots. <strong>They are the stat shards</strong>, and they are the best-understood defect on this page &#8212; two lines explain the whole thing.</p>
@@ -467,9 +467,15 @@ pre .p{color:var(--stat)}
             </div>
           </div>
 
-          <p><strong>The fix is a small table.</strong> There are nine stat shards in the game and their ids are stable: adaptive force, attack speed, ability haste, move speed, health, health scaling, tenacity, armour, magic resist. Data Dragon does not serve them and <code>CLAUDE.md</code> permits no third-party source, so a compiled-in table is the correct answer here &#8212; the same shape as <code>data/meta/items.json</code>, which is already committed rather than fetched. Nine rows removes the defect completely.</p>
-
-          <p>Worth fixing in the same pass: at 8px in a 24px box, a real name like &#8220;Adaptive Force&#8221; will not fit either. The redesign already raised item captions from 9px to 11px for exactly this reason, so the shard tile needs the same treatment or an abbreviation chosen deliberately rather than by <code>slice(0, 9)</code>.</p>
+          <div class="rail">
+            <i></i>
+            <div class="rail-in">
+              <h4>Done &#8212; and they get real art, not just a label</h4>
+              <p>The premise that shards have no art was wrong. Data Dragon <em>does</em> serve it, at <code>perk-images/StatMods/&#8230;</code> on the same unversioned path as every other rune image and from a host the window&#8217;s policy already allows &#8212; it just omits the shards from <code>runesReforged.json</code>, which lists only styles and the runes inside their slots. So the catalogue that file produces is incomplete by construction, and <code>STAT_SHARDS</code> in <code>ddragon.rs</code> completes it. All nine URLs were checked live.</p>
+              <p>The catalogue now also carries a <em>name</em> for every rune, style and shard, which is what a tile shows when art is slow, blocked or absent. <code>paintIcons</code> fills those in when the catalogue lands, so a page rendered before it arrives corrects itself rather than keeping an id on screen.</p>
+              <p>The sizing question resolved itself honestly: a 24px tile cannot render &#8220;Adaptive Force&#8221; at any size worth having, and shrinking the type to make it fit is what produced the 9px captions the redesign removed. The label stays a fallback, the full name lives in the tile&#8217;s <code>title</code>, and art carries the meaning.</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -560,7 +566,7 @@ pre .p{color:var(--stat)}
         <li><s>Widen <code>data/meta/items.json</code> to carry <code>gold.total</code> for every item.</s> <strong>Done.</strong> All 868 items, pricing moved to the tag layer, a latent <code>itemID</code> deserialisation bug fixed on the way, and a real captured payload committed as the regression test.</li>
         <li><s>Re-point the stand-in client at the real payload shape.</s> <strong>Done.</strong> <code>scripts/fake-lcu.mjs</code> now mints all nine fields with real ids and real combine costs, so a scenario can no longer invent a price the parser agrees with.</li>
         <li><strong>Decouple mid-game champion resolution from the tag file.</strong> Correct regardless of whether it is defect 2&#8217;s cause, and it downgrades a class of hard failure to a soft one.</li>
-        <li><strong>Name the stat shards.</strong> Nine rows in a compiled-in table, and the only defect on this page whose fix is fully specified before anybody opens an editor. Do it while the rune code is already open.</li>
+        <li><s>Name the stat shards.</s> <strong>Done.</strong> Nine rows in <code>ddragon.rs</code> giving them Riot&#8217;s own art and a name, plus names for every other rune so a tile without art still says what it is.</li>
         <li><strong>Mark a finished game as finished.</strong> Small, self-contained UI work, and it removes a screen that can silently assert something false.</li>
         <li><strong>Sort the situational row by sample, then design the reason rendering.</strong> The first half is immediate and breaks no rule; the second half deserves thought, because the colour law constrains it.</li>
         <li><strong>Get the Windows build onto real hardware and measure its memory.</strong> Two unknowns, one tester, one afternoon.</li>
