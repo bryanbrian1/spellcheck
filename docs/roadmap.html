@@ -238,12 +238,12 @@ pre .p{color:var(--stat)}
   <header class="mast">
     <p class="eyebrow">Developer roadmap &#183; 6 September 2026</p>
     <h1>spellcheck <span>&#8212; what is left</span></h1>
-    <p class="lede">The app has now been run against a real League client, and it works. That retires the largest risk in the project and replaces it with four specific defects. This page is what remains: the defects first, then the data, then the things that stand between a beta and something you would hand a stranger.</p>
+    <p class="lede">The app has now been run against a real League client, and it works. That retires the largest risk in the project and replaces it with five specific defects. This page is what remains: the defects first, then the data, then the things that stand between a beta and something you would hand a stranger.</p>
     <div class="facts">
       <span><b>219</b> Rust tests</span>
       <span><b>19</b> Node tests</span>
       <span><b>15,785</b> lines</span>
-      <span><b>4</b> live defects</span>
+      <span><b>5</b> live defects</span>
       <span>Crawled <b>295</b> pairs</span>
       <span>Median core sample <b>8</b> games</span>
       <span>RAM <b>65 MB</b> <em>macOS</em></span>
@@ -253,7 +253,7 @@ pre .p{color:var(--stat)}
   <nav class="index" aria-label="Sections">
     <p>Contents</p>
     <a href="#read">How to read this</a>
-    <a href="#live">Four defects</a>
+    <a href="#live">Five defects</a>
     <a href="#data">The data</a>
     <a href="#ship">Ship gaps</a>
     <a href="#engine">Holes in the engine</a>
@@ -285,14 +285,14 @@ pre .p{color:var(--stat)}
         <i></i>
         <div class="rail-in">
           <h4>The unknown that dominated this project is gone</h4>
-          <p>Until now every layer that touches a running game &#8212; the LCU client, the champ select socket, the live data poll, the suggestions, the matchup path &#8212; was unit-tested and had never met League. That was the single largest source of risk, and it has been discharged by playing a game. What replaced it is four ordinary bugs, which is a far better position.</p>
+          <p>Until now every layer that touches a running game &#8212; the LCU client, the champ select socket, the live data poll, the suggestions, the matchup path &#8212; was unit-tested and had never met League. That was the single largest source of risk, and it has been discharged by playing a game. What replaced it is five ordinary bugs, which is a far better position.</p>
         </div>
       </div>
     </section>
 
     <section id="live">
-      <h2><span class="n">01</span>Four defects from the first real game</h2>
-      <p>All four came out of one session against the real client. Three are traced to a specific line; the fourth needs a captured payload before anybody writes a fix. They are listed hardest-to-diagnose first, not most-severe first.</p>
+      <h2><span class="n">01</span>Five defects from the first real game</h2>
+      <p>All five came out of one session against the real client. Four are traced to a specific line; the gold one needs a captured payload before anybody writes a fix. They are listed hardest-to-diagnose first, not most-severe first.</p>
 
       <div class="defect">
         <header>
@@ -399,6 +399,38 @@ pre .p{color:var(--stat)}
           <p>The cheaper half is available immediately and breaks no rule: the provider&#8217;s own numbers can order the row, and a group played in 3 games out of 98 probably should not sit beside one played in 40 as though the app were neutral between them. Saturation already encodes confidence elsewhere via <code>railFor()</code>; the same idea applies per tile.</p>
         </div>
       </div>
+      <div class="defect">
+        <header>
+          <span class="tag">Defect 5</span>
+          <h3>Three empty slots on the rune page</h3>
+        </header>
+        <div class="in">
+          <p>They are not extra slots. <strong>They are the stat shards</strong>, and they are the best-understood defect on this page &#8212; two lines explain the whole thing.</p>
+
+          <p><strong>No name.</strong> <code>runeBlock</code> passes <code>undefined</code> where every other tile passes a name, so <code>tileLabel</code> falls through to its last resort and prints the raw id.</p>
+
+          <p class="finding"><b>src/main.ts:491</b> &#8212; tile(id, undefined, &quot;tile sm&quot;, &quot;perk&quot;)<br><b>src/main.ts:367</b> &#8212; name?.trim() ? &#8230; : `#${id}`</p>
+
+          <p><strong>No art either.</strong> Icon art for a rune comes from <code>icons.perks[id]</code>, which is built from Data Dragon&#8217;s <code>runesReforged.json</code> &#8212; and that file does not contain stat shards. The lookup misses, <code>iconUrl</code> returns null, and <code>paintIcons</code> returns early without ever inserting an image.</p>
+
+          <p class="finding"><b>src/main.ts:311</b> &#8212; const path = icons.perks[key]; return path ? &#8230; : null</p>
+
+          <p>So each shard draws as a 24px box containing the literal text <code>#5005</code> at 8px. Three of them, in a row, after the secondary runes &#8212; which reads exactly like three empty slots that should not be there.</p>
+
+          <div class="rail">
+            <i></i>
+            <div class="rail-in">
+              <h4>The comment describes behaviour the code does not have</h4>
+              <p><code>paintIcons</code> is documented as leaving shards their text label permanently, and that is the right design &#8212; a tile with no art should fall back to words. But <code>runeBlock</code> never supplies the words, so the fallback lands one step further down on <code>#&lt;id&gt;</code>. The design was sound and the wiring was never finished.</p>
+            </div>
+          </div>
+
+          <p><strong>The fix is a small table.</strong> There are nine stat shards in the game and their ids are stable: adaptive force, attack speed, ability haste, move speed, health, health scaling, tenacity, armour, magic resist. Data Dragon does not serve them and <code>CLAUDE.md</code> permits no third-party source, so a compiled-in table is the correct answer here &#8212; the same shape as <code>data/meta/items.json</code>, which is already committed rather than fetched. Nine rows removes the defect completely.</p>
+
+          <p>Worth fixing in the same pass: at 8px in a 24px box, a real name like &#8220;Adaptive Force&#8221; will not fit either. The redesign already raised item captions from 9px to 11px for exactly this reason, so the shard tile needs the same treatment or an abbreviation chosen deliberately rather than by <code>slice(0, 9)</code>.</p>
+        </div>
+      </div>
+
     </section>
 
     <section id="data">
@@ -486,6 +518,7 @@ pre .p{color:var(--stat)}
         <li><strong>Capture one real <code>allgamedata</code> body to a file.</strong> One game. It confirms or kills the gold diagnosis, and it gives this layer its first fixture drawn from reality rather than from the documentation &#8212; which is what let defect 1 survive 219 tests.</li>
         <li><strong>Fix the gold, and re-point the stand-in client at the real payload shape.</strong> The fixture makes the fix verifiable; widening <code>scripts/fake-lcu.mjs</code> to match the real item shape is what stops the next defect of this kind.</li>
         <li><strong>Decouple mid-game champion resolution from the tag file.</strong> Correct regardless of whether it is defect 2&#8217;s cause, and it downgrades a class of hard failure to a soft one.</li>
+        <li><strong>Name the stat shards.</strong> Nine rows in a compiled-in table, and the only defect on this page whose fix is fully specified before anybody opens an editor. Do it while the rune code is already open.</li>
         <li><strong>Mark a finished game as finished.</strong> Small, self-contained UI work, and it removes a screen that can silently assert something false.</li>
         <li><strong>Sort the situational row by sample, then design the reason rendering.</strong> The first half is immediate and breaks no rule; the second half deserves thought, because the colour law constrains it.</li>
         <li><strong>Get the Windows build onto real hardware and measure its memory.</strong> Two unknowns, one tester, one afternoon.</li>
