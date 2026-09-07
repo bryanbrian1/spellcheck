@@ -152,6 +152,15 @@ body{
    so art that never arrives leaves the label exactly where it was. The full
    name is on the tile's title either way. */
 .tile.has-art .tile-l{display:none}
+/* A rune page is three things, not two: primary tree, secondary tree, shards.
+   The secondary runes and the shards used to run together in one row, which
+   read as five unrelated icons. The tree name leads each row — which tree to
+   open for the second pair was stated nowhere before. */
+.rune-row + .rune-row{margin-top:8px}
+.rune-tree{
+  display:block;margin-bottom:4px;font-size:9.5px;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);
+}
 .tile.key{width:44px;height:44px;background:var(--accent-1);border-color:var(--accent-3);color:var(--accent)}
 .tile.sm{width:24px;height:24px;font-size:8px}
 .tile.rule{border-color:var(--amber);background:var(--surface-raised);color:var(--amber)}
