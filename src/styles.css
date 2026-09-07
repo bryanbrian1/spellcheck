@@ -186,6 +186,11 @@ body{
 /* Exactly one primary per view. */
 .btn.pri{background:var(--accent);border-color:transparent;color:var(--accent-on);font-weight:600}
 .btn.pri:hover:not(:disabled){background:var(--accent-hi)}
+/* .btn.pri would otherwise beat .btn:disabled on source order alone, and
+   both import buttons are disabled until a press can actually import
+   something — an accent fill nobody can click is the loudest thing on the
+   screen promising the least. */
+.btn.pri:disabled{background:var(--surface-raised);border-color:var(--line-hair);color:var(--n-7)}
 .src{font-family:var(--font-mono);font-size:11px;color:var(--text-faint);white-space:nowrap}
 
 .search-wrap{position:relative;padding:16px;display:flex;flex-direction:column;gap:10px;flex-shrink:0;border-bottom:0}
