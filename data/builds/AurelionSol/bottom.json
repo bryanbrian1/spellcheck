@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "updatedAt": "2026-09-07T15:48:40.459Z",
   "stats": {
-    "games": 5,
-    "winRate": 0.8
+    "games": 12,
+    "winRate": 0.5833
   },
   "items": {
     "starters": [
@@ -21,8 +21,8 @@
           1056,
           2003
         ],
-        "games": 5,
-        "winRate": 0.8
+        "games": 12,
+        "winRate": 0.5833
       }
     ],
     "boots": [
@@ -30,8 +30,8 @@
         "items": [
           1001
         ],
-        "games": 5,
-        "winRate": 0.8
+        "games": 12,
+        "winRate": 0.5833
       }
     ],
     "core": [
@@ -41,23 +41,23 @@
           3116,
           3157
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 1
+      },
+      {
+        "items": [
+          3116,
+          6653,
+          8010
+        ],
+        "games": 3,
+        "winRate": 0.6667
       },
       {
         "items": [
           3116,
           6653,
           3102
-        ],
-        "games": 1,
-        "winRate": 1
-      },
-      {
-        "items": [
-          3116,
-          6653,
-          3157
         ],
         "games": 1,
         "winRate": 1
@@ -66,21 +66,21 @@
     "situational": [
       {
         "items": [
-          3089
-        ],
-        "games": 1,
-        "winRate": 1
-      },
-      {
-        "items": [
           3102
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       },
       {
         "items": [
           3157
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3089
         ],
         "games": 1,
         "winRate": 1
@@ -144,15 +144,15 @@
         4,
         12
       ],
-      "games": 3,
-      "winRate": 0.6667
+      "games": 9,
+      "winRate": 0.4444
     },
     {
       "spells": [
         3,
         4
       ],
-      "games": 2,
+      "games": 3,
       "winRate": 1
     }
   ],
@@ -164,8 +164,8 @@
     ],
     "order": [
       "Q",
-      "W",
       "E",
+      "W",
       "Q",
       "Q"
     ]

@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "updatedAt": "2026-09-07T15:48:40.459Z",
   "stats": {
-    "games": 23,
-    "winRate": 0.4783
+    "games": 33,
+    "winRate": 0.4545
   },
   "items": {
     "starters": [
@@ -21,16 +21,16 @@
           1055,
           2003
         ],
-        "games": 20,
-        "winRate": 0.45
+        "games": 28,
+        "winRate": 0.4643
       },
       {
         "items": [
           1036,
           2031
         ],
-        "games": 2,
-        "winRate": 1
+        "games": 3,
+        "winRate": 0.6667
       }
     ],
     "boots": [
@@ -38,14 +38,14 @@
         "items": [
           1001
         ],
-        "games": 22,
-        "winRate": 0.5
+        "games": 31,
+        "winRate": 0.4839
       },
       {
         "items": [
           3008
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 0
       }
     ],
@@ -65,7 +65,7 @@
           2517,
           6333
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 1
       },
       {
@@ -83,28 +83,28 @@
         "items": [
           3156
         ],
-        "games": 6,
-        "winRate": 0.6667
+        "games": 7,
+        "winRate": 0.5714
       },
       {
         "items": [
           3026
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 1
       },
       {
         "items": [
           6695
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 1
       },
       {
         "items": [
           2517
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       }
     ]
@@ -128,8 +128,8 @@
         5008,
         5001
       ],
-      "games": 16,
-      "winRate": 0.5
+      "games": 25,
+      "winRate": 0.48
     },
     {
       "primaryStyle": 8000,
@@ -159,8 +159,8 @@
         4,
         14
       ],
-      "games": 23,
-      "winRate": 0.4783
+      "games": 33,
+      "winRate": 0.4545
     }
   ],
   "skills": {

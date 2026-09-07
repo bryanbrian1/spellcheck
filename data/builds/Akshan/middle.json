@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "updatedAt": "2026-09-07T15:48:40.459Z",
   "stats": {
-    "games": 15,
-    "winRate": 0.4
+    "games": 25,
+    "winRate": 0.36
   },
   "items": {
     "starters": [
@@ -21,8 +21,8 @@
           1055,
           2003
         ],
-        "games": 14,
-        "winRate": 0.3571
+        "games": 24,
+        "winRate": 0.3333
       },
       {
         "items": [
@@ -39,15 +39,15 @@
         "items": [
           1001
         ],
-        "games": 11,
-        "winRate": 0.3636
+        "games": 18,
+        "winRate": 0.3333
       },
       {
         "items": [
           3006
         ],
-        "games": 4,
-        "winRate": 0.5
+        "games": 7,
+        "winRate": 0.4286
       }
     ],
     "core": [
@@ -56,8 +56,15 @@
           6676,
           3036
         ],
-        "games": 4,
-        "winRate": 0.75
+        "games": 6,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          6676
+        ],
+        "games": 5,
+        "winRate": 0.4
       },
       {
         "items": [
@@ -65,15 +72,8 @@
           3031,
           3036
         ],
-        "games": 3,
-        "winRate": 0.3333
-      },
-      {
-        "items": [
-          6676
-        ],
-        "games": 2,
-        "winRate": 0.5
+        "games": 5,
+        "winRate": 0.4
       }
     ],
     "situational": [
@@ -81,8 +81,8 @@
         "items": [
           3094
         ],
-        "games": 3,
-        "winRate": 0.3333
+        "games": 7,
+        "winRate": 0.2857
       }
     ]
   },
@@ -105,8 +105,8 @@
         5008,
         5011
       ],
-      "games": 11,
-      "winRate": 0.4545
+      "games": 20,
+      "winRate": 0.4
     },
     {
       "primaryStyle": 8000,
@@ -136,15 +136,15 @@
         4,
         14
       ],
-      "games": 12,
-      "winRate": 0.5
+      "games": 19,
+      "winRate": 0.4737
     },
     {
       "spells": [
-        3,
-        4
+        4,
+        12
       ],
-      "games": 1,
+      "games": 2,
       "winRate": 0
     }
   ],

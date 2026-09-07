@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "updatedAt": "2026-09-07T15:48:40.459Z",
   "stats": {
-    "games": 87,
-    "winRate": 0.5747
+    "games": 137,
+    "winRate": 0.5474
   },
   "items": {
     "starters": [
@@ -20,8 +20,8 @@
         "items": [
           2003
         ],
-        "games": 86,
-        "winRate": 0.5698
+        "games": 136,
+        "winRate": 0.5441
       }
     ],
     "boots": [
@@ -29,12 +29,19 @@
         "items": [
           1001
         ],
-        "games": 86,
-        "winRate": 0.5814
+        "games": 134,
+        "winRate": 0.5597
       },
       {
         "items": [
           3009
+        ],
+        "games": 2,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3158
         ],
         "games": 1,
         "winRate": 0
@@ -46,20 +53,20 @@
           3190,
           3109
         ],
-        "games": 12,
-        "winRate": 0.5833
+        "games": 18,
+        "winRate": 0.6667
       },
       {
         "items": [
           3190
         ],
-        "games": 11,
-        "winRate": 0.6364
+        "games": 17,
+        "winRate": 0.4706
       },
       {
         "items": [
           3190,
-          3107
+          3050
         ],
         "games": 4,
         "winRate": 0.75
@@ -70,7 +77,7 @@
         "items": [
           2524
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       },
       {
@@ -101,8 +108,8 @@
         5010,
         5011
       ],
-      "games": 28,
-      "winRate": 0.6786
+      "games": 37,
+      "winRate": 0.6216
     },
     {
       "primaryStyle": 8300,
@@ -130,25 +137,25 @@
     {
       "spells": [
         4,
-        7
+        14
       ],
-      "games": 43,
-      "winRate": 0.5814
+      "games": 68,
+      "winRate": 0.5441
     },
     {
       "spells": [
         4,
-        14
+        7
       ],
-      "games": 39,
-      "winRate": 0.5641
+      "games": 62,
+      "winRate": 0.5484
     }
   ],
   "skills": {
     "priority": [
       "Q",
-      "W",
-      "E"
+      "E",
+      "W"
     ],
     "order": [
       "Q",

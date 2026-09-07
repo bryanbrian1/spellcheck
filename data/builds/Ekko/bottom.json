@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "updatedAt": "2026-09-07T15:48:40.459Z",
   "stats": {
-    "games": 6,
-    "winRate": 0.3333
+    "games": 12,
+    "winRate": 0.25
   },
   "items": {
     "starters": [
@@ -21,15 +21,15 @@
           1056,
           2003
         ],
-        "games": 5,
-        "winRate": 0.4
+        "games": 10,
+        "winRate": 0.3
       },
       {
         "items": [
           1082,
           2031
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 0
       }
     ],
@@ -38,34 +38,34 @@
         "items": [
           1001
         ],
-        "games": 5,
+        "games": 10,
         "winRate": 0.2
       },
       {
         "items": [
           3020
         ],
-        "games": 1,
-        "winRate": 1
+        "games": 2,
+        "winRate": 0.5
       }
     ],
     "core": [
       {
         "items": [
           2510,
-          4645
+          4645,
+          3089
         ],
-        "games": 2,
-        "winRate": 0.5
+        "games": 5,
+        "winRate": 0.2
       },
       {
         "items": [
           2510,
-          4645,
-          3089
+          4645
         ],
-        "games": 2,
-        "winRate": 0
+        "games": 3,
+        "winRate": 0.3333
       },
       {
         "items": [
@@ -82,14 +82,14 @@
         "items": [
           3135
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 0
       },
       {
         "items": [
           4646
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 0
       }
     ]
@@ -113,24 +113,24 @@
         5008,
         5011
       ],
-      "games": 5,
-      "winRate": 0.2
+      "games": 9,
+      "winRate": 0.1111
     },
     {
       "primaryStyle": 8100,
-      "secondaryStyle": 8300,
+      "secondaryStyle": 8000,
       "primary": [
         9923,
         8143,
         8140,
-        8106
+        8105
       ],
       "secondary": [
-        8313,
-        8304
+        8017,
+        9105
       ],
       "shards": [
-        5005,
+        5008,
         5008,
         5011
       ],
@@ -144,8 +144,8 @@
         4,
         12
       ],
-      "games": 6,
-      "winRate": 0.3333
+      "games": 12,
+      "winRate": 0.25
     }
   ],
   "skills": {

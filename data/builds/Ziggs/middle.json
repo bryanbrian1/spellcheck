@@ -9,9 +9,9 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "updatedAt": "2026-09-07T15:48:40.459Z",
   "stats": {
-    "games": 5,
+    "games": 10,
     "winRate": 0.8
   },
   "items": {
@@ -21,7 +21,7 @@
           1056,
           2003
         ],
-        "games": 5,
+        "games": 10,
         "winRate": 0.8
       }
     ],
@@ -30,14 +30,14 @@
         "items": [
           1001
         ],
-        "games": 4,
+        "games": 8,
         "winRate": 0.75
       },
       {
         "items": [
           3020
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       }
     ],
@@ -48,7 +48,7 @@
           4628,
           4645
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       },
       {
@@ -56,7 +56,7 @@
           6655,
           3089
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       },
       {
@@ -64,21 +64,21 @@
           6655,
           4645
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       }
     ],
     "situational": [
       {
         "items": [
-          3089
+          3157
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       },
       {
         "items": [
-          3157
+          3089
         ],
         "games": 1,
         "winRate": 1
@@ -86,6 +86,27 @@
     ]
   },
   "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8229,
+        8226,
+        8210,
+        8236
+      ],
+      "secondary": [
+        8017,
+        9105
+      ],
+      "shards": [
+        5008,
+        5010,
+        5001
+      ],
+      "games": 2,
+      "winRate": 1
+    },
     {
       "primaryStyle": 8200,
       "secondaryStyle": 8000,
@@ -106,27 +127,6 @@
       ],
       "games": 2,
       "winRate": 0.5
-    },
-    {
-      "primaryStyle": 8200,
-      "secondaryStyle": 8000,
-      "primary": [
-        8229,
-        8226,
-        8210,
-        8236
-      ],
-      "secondary": [
-        8017,
-        9105
-      ],
-      "shards": [
-        5008,
-        5010,
-        5001
-      ],
-      "games": 1,
-      "winRate": 1
     }
   ],
   "summoners": [
@@ -135,7 +135,7 @@
         4,
         12
       ],
-      "games": 5,
+      "games": 10,
       "winRate": 0.8
     }
   ],
@@ -148,8 +148,8 @@
     "order": [
       "Q",
       "W",
-      "E",
       "Q",
+      "E",
       "Q"
     ]
   }

@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "updatedAt": "2026-09-07T15:48:40.459Z",
   "stats": {
-    "games": 8,
-    "winRate": 0.375
+    "games": 13,
+    "winRate": 0.3077
   },
   "items": {
     "starters": [
@@ -21,8 +21,8 @@
           1055,
           2003
         ],
-        "games": 6,
-        "winRate": 0.5
+        "games": 11,
+        "winRate": 0.3636
       },
       {
         "items": [
@@ -38,11 +38,20 @@
         "items": [
           1001
         ],
-        "games": 8,
-        "winRate": 0.375
+        "games": 13,
+        "winRate": 0.3077
       }
     ],
     "core": [
+      {
+        "items": [
+          6672,
+          6631,
+          6333
+        ],
+        "games": 2,
+        "winRate": 1
+      },
       {
         "items": [
           6672,
@@ -58,15 +67,6 @@
         ],
         "games": 1,
         "winRate": 1
-      },
-      {
-        "items": [
-          6672,
-          6631,
-          6333
-        ],
-        "games": 1,
-        "winRate": 1
       }
     ],
     "situational": [
@@ -74,7 +74,7 @@
         "items": [
           3053
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       }
     ]
@@ -98,15 +98,15 @@
         5008,
         5001
       ],
-      "games": 2,
-      "winRate": 0.5
+      "games": 3,
+      "winRate": 0.6667
     },
     {
       "primaryStyle": 8000,
       "secondaryStyle": 8400,
       "primary": [
         8008,
-        8009,
+        9111,
         9104,
         8299
       ],
@@ -115,12 +115,12 @@
         8453
       ],
       "shards": [
-        5008,
+        5005,
         5008,
         5011
       ],
-      "games": 1,
-      "winRate": 1
+      "games": 2,
+      "winRate": 0
     }
   ],
   "summoners": [
@@ -129,8 +129,8 @@
         4,
         21
       ],
-      "games": 7,
-      "winRate": 0.4286
+      "games": 12,
+      "winRate": 0.3333
     },
     {
       "spells": [
@@ -149,8 +149,8 @@
     ],
     "order": [
       "Q",
-      "W",
       "E",
+      "W",
       "W",
       "W"
     ]

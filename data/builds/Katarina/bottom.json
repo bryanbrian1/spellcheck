@@ -9,9 +9,9 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "updatedAt": "2026-09-07T15:48:40.459Z",
   "stats": {
-    "games": 15,
+    "games": 20,
     "winRate": 0.6
   },
   "items": {
@@ -21,15 +21,15 @@
           1055,
           2003
         ],
-        "games": 13,
-        "winRate": 0.5385
+        "games": 16,
+        "winRate": 0.5625
       },
       {
         "items": [
           1036,
           2031
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 1
       }
     ],
@@ -38,14 +38,14 @@
         "items": [
           1001
         ],
-        "games": 11,
-        "winRate": 0.6364
+        "games": 15,
+        "winRate": 0.6
       },
       {
         "items": [
           3111
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 1
       },
       {
@@ -63,8 +63,8 @@
           3302,
           6333
         ],
-        "games": 8,
-        "winRate": 0.375
+        "games": 9,
+        "winRate": 0.4444
       },
       {
         "items": [
@@ -72,7 +72,7 @@
           3153,
           3302
         ],
-        "games": 3,
+        "games": 4,
         "winRate": 1
       },
       {
@@ -81,7 +81,7 @@
           6672,
           3302
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 1
       }
     ],
@@ -90,14 +90,14 @@
         "items": [
           6333
         ],
-        "games": 3,
+        "games": 4,
         "winRate": 1
       },
       {
         "items": [
           3091
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 1
       },
       {
@@ -135,7 +135,7 @@
         5008,
         5011
       ],
-      "games": 8,
+      "games": 10,
       "winRate": 0.5
     },
     {
@@ -156,7 +156,7 @@
         5008,
         5011
       ],
-      "games": 2,
+      "games": 3,
       "winRate": 1
     }
   ],
@@ -174,8 +174,8 @@
         3,
         4
       ],
-      "games": 2,
-      "winRate": 1
+      "games": 4,
+      "winRate": 0.75
     }
   ],
   "skills": {

@@ -9,9 +9,9 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "updatedAt": "2026-09-07T15:48:40.459Z",
   "stats": {
-    "games": 14,
+    "games": 18,
     "winRate": 0.5
   },
   "items": {
@@ -21,8 +21,8 @@
           1086,
           2003
         ],
-        "games": 12,
-        "winRate": 0.4167
+        "games": 16,
+        "winRate": 0.4375
       },
       {
         "items": [
@@ -38,21 +38,21 @@
         "items": [
           1001
         ],
-        "games": 7,
-        "winRate": 0.2857
+        "games": 8,
+        "winRate": 0.25
       },
       {
         "items": [
           3006
         ],
-        "games": 5,
+        "games": 7,
         "winRate": 1
       },
       {
         "items": [
           3008
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 0
       }
     ],
@@ -63,7 +63,16 @@
           3085,
           3031
         ],
-        "games": 4,
+        "games": 5,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3032,
+          3085,
+          3139
+        ],
+        "games": 2,
         "winRate": 1
       },
       {
@@ -74,15 +83,6 @@
         ],
         "games": 2,
         "winRate": 1
-      },
-      {
-        "items": [
-          3032,
-          3085,
-          3139
-        ],
-        "games": 1,
-        "winRate": 1
       }
     ],
     "situational": [
@@ -90,15 +90,15 @@
         "items": [
           3036
         ],
-        "games": 6,
-        "winRate": 0.6667
+        "games": 8,
+        "winRate": 0.625
       },
       {
         "items": [
           3031
         ],
-        "games": 3,
-        "winRate": 0.3333
+        "games": 5,
+        "winRate": 0.4
       },
       {
         "items": [
@@ -149,7 +149,7 @@
         5008,
         5001
       ],
-      "games": 1,
+      "games": 2,
       "winRate": 1
     }
   ],
@@ -159,23 +159,23 @@
         4,
         6
       ],
-      "games": 6,
-      "winRate": 0.3333
+      "games": 8,
+      "winRate": 0.25
     },
     {
       "spells": [
         3,
         4
       ],
-      "games": 5,
-      "winRate": 0.6
+      "games": 7,
+      "winRate": 0.7143
     }
   ],
   "skills": {
     "priority": [
+      "W",
       "E",
-      "Q",
-      "W"
+      "Q"
     ],
     "order": [
       "E",

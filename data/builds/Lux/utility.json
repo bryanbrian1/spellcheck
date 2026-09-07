@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-06T13:37:45.941Z",
+  "updatedAt": "2026-09-07T15:48:40.459Z",
   "stats": {
-    "games": 26,
-    "winRate": 0.5
+    "games": 40,
+    "winRate": 0.45
   },
   "items": {
     "starters": [
@@ -20,8 +20,8 @@
         "items": [
           2003
         ],
-        "games": 26,
-        "winRate": 0.5
+        "games": 40,
+        "winRate": 0.45
       }
     ],
     "boots": [
@@ -29,15 +29,22 @@
         "items": [
           1001
         ],
-        "games": 19,
-        "winRate": 0.5263
+        "games": 27,
+        "winRate": 0.4444
       },
       {
         "items": [
           3158
         ],
-        "games": 7,
-        "winRate": 0.4286
+        "games": 12,
+        "winRate": 0.4167
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 1,
+        "winRate": 1
       }
     ],
     "core": [
@@ -51,18 +58,17 @@
       },
       {
         "items": [
+          6655
+        ],
+        "games": 3,
+        "winRate": 0
+      },
+      {
+        "items": [
           2065
         ],
         "games": 2,
         "winRate": 1
-      },
-      {
-        "items": [
-          4005,
-          2065
-        ],
-        "games": 2,
-        "winRate": 0
       }
     ],
     "situational": []
@@ -86,8 +92,8 @@
         5008,
         5001
       ],
-      "games": 3,
-      "winRate": 0.3333
+      "games": 7,
+      "winRate": 0.2857
     },
     {
       "primaryStyle": 8200,
@@ -107,8 +113,8 @@
         5008,
         5001
       ],
-      "games": 2,
-      "winRate": 1
+      "games": 4,
+      "winRate": 0.75
     }
   ],
   "summoners": [
@@ -117,16 +123,16 @@
         4,
         7
       ],
-      "games": 22,
+      "games": 32,
       "winRate": 0.5
     },
     {
       "spells": [
-        4,
-        14
+        3,
+        4
       ],
-      "games": 2,
-      "winRate": 1
+      "games": 3,
+      "winRate": 0
     }
   ],
   "skills": {
