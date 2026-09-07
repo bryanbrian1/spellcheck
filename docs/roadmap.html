@@ -292,35 +292,67 @@ pre .p{color:var(--stat)}
 
     <section id="live">
       <h2><span class="n">01</span>Five defects from the first real game</h2>
-      <p>All five came out of one session against the real client. Four are traced to a specific line; the gold one needs a captured payload before anybody writes a fix. They are listed hardest-to-diagnose first, not most-severe first.</p>
+      <p>All five came out of one session against the real client. Four are traced to a specific line; the gold one has since been diagnosed from a captured game and its fix is fully specified. They are listed hardest-to-diagnose first, not most-severe first.</p>
 
       <div class="defect">
         <header>
           <span class="tag">Defect 1</span>
-          <h3>The gold number is wrong</h3>
+          <h3>The gold number is wrong &#8212; solved</h3>
         </header>
         <div class="in">
-          <p>Spent gold is the whole basis of check three &#8212; behind, even or ahead is a comparison of two item totals &#8212; so a wrong number here does not degrade the feature, it inverts it.</p>
-
-          <p><strong>What the code does.</strong> <code>Player::from_raw</code> sums <code>price &#215; count</code> over every entry in a player&#8217;s inventory. <code>RawItem</code> deserialises exactly three fields: <code>itemId</code>, <code>price</code>, <code>count</code>.</p>
-
-          <p class="finding"><b>src-tauri/src/live/game.rs:29</b> &#8212; RawItem { item_id, price, count }<br><b>src-tauri/src/live/game.rs:140</b> &#8212; .map(|item| item.price.saturating_mul(item.count.max(1))).sum()</p>
-
-          <p><strong>The first thing to check.</strong> The live payload carries more per item than that &#8212; notably a <code>consumable</code> boolean, and a <code>slot</code> (the trinket sits in slot 6). The comment above <code>item_gold</code> justifies counting consumables by asserting that &#8220;the API gives no reliable way to tell them apart&#8221;. That assertion looks wrong, and it is load-bearing: it is the reason potions, control wards and elixirs are being counted as permanent spend. A support buying a control ward every trip reads as richer than they are, and the error compounds asymmetrically between the two players being compared.</p>
-
-          <p class="finding"><b>src-tauri/src/live/game.rs:118</b> &#8212; the comment that justifies the behaviour<br><b>src-tauri/src/live/game.rs:392</b> &#8212; a test asserting 4 &#215; Health Potion = 200 gold of &#8220;spend&#8221;</p>
-
-          <p><strong>Why no test caught it.</strong> The stand-in client models an item as <code>{ itemID, price, count, displayName }</code> &#8212; a strict subset of the real payload. Every test and every hand-driven session was therefore run against a shape that <em>cannot express the problem</em>. The behaviour is not merely untested, it is pinned as correct by a passing assertion.</p>
-
-          <p class="finding"><b>scripts/fake-lcu.mjs:179</b> &#8212; const item = (price) =&gt; ({ itemID: 3020, price, count: 1, &#8230; })</p>
-
-          <p><strong>A second, deeper question.</strong> Summing a current inventory misses everything already sold or consumed, so the figure drifts further from true spend the longer the game runs. That is inherent to the approach rather than a bug, but it means &#8220;spent gold&#8221; may be the wrong label for what is being computed. Worth settling before fixing the arithmetic, because the answer changes what the fix should be.</p>
+          <p><strong>Diagnosed from a captured game, 6 September.</strong> 81 samples across one 40-minute match, taken on the app&#8217;s own 30-second cadence. The earlier guess on this page &#8212; that consumables and trinkets were inflating the total &#8212; was <strong>wrong</strong>, and is recorded here rather than deleted because the way it was wrong is instructive. The captured game ended with no consumables in either inventory at all, so that theory could not have explained anything.</p>
 
           <div class="rail gap">
             <i></i>
             <div class="rail-in">
-              <h4>Capture a real payload before writing the fix</h4>
-              <p>None of the above is confirmed as <em>the</em> cause of the number that was actually seen. The one cheap, decisive step is to save an <code>allgamedata</code> body from a real game to a file and diff the computed total against the scoreboard. That capture also becomes the first honest fixture this layer has ever had &#8212; which is worth more than the fix.</p>
+              <h4>The live API&#8217;s <code>price</code> is the combine cost, not the item&#8217;s cost</h4>
+              <p>It is exactly Data Dragon&#8217;s <code>gold.base</code>, never <code>gold.total</code>. Summing it counts only the <em>last</em> purchase in each item&#8217;s build path and silently discards every component already consumed into it.</p>
+            </div>
+          </div>
+
+          <p>Three readings from the capture settle it beyond argument, checked against Data Dragon 16.17.1:</p>
+
+          <div class="map">
+            <table>
+              <tr class="head"><td>Item</td><td>API <code>price</code></td><td>gold.base</td><td>gold.total</td></tr>
+              <tr><td class="d">B. F. Sword <em>&#8212; a base component</em></td><td class="l"><b>1300</b></td><td class="l">1300</td><td class="l">1300</td></tr>
+              <tr><td class="d">Blackfire Torch</td><td class="l"><b>700</b></td><td class="l">700</td><td class="l">2800</td></tr>
+              <tr><td class="d">Void Staff</td><td class="l"><b>1050</b></td><td class="l">1050</td><td class="l">3000</td></tr>
+              <tr><td class="d">Rabadon&#8217;s Deathcap</td><td class="l"><b>1100</b></td><td class="l">1100</td><td class="l">3500</td></tr>
+              <tr><td class="d">Chainlaced Crushers <em>&#8212; finished boots</em></td><td class="l warn"><b>0</b></td><td class="l">0</td><td class="l">1100</td></tr>
+            </table>
+          </div>
+
+          <p>A base component reports its true cost, because for a base item the combine cost <em>is</em> the total &#8212; which is precisely why this survived review. Every completed item reports only its final step, and a finished pair of boots reports <strong>zero</strong>. A full six-item Viktor build summed to 3,950 gold.</p>
+
+          <h3>What it did to the feature</h3>
+
+          <div class="status">
+            <div><span class="k no">46%</span><span class="v">Your spend was counted at <b>46% of its real value</b>, averaged across the game.</span></div>
+            <div><span class="k no">37%</span><span class="v">The standing disagreed with the truth in <b>30 of 81 samples</b> &#8212; behind, even or ahead was simply the wrong word.</span></div>
+            <div><span class="k no">18%</span><span class="v">You were <b>genuinely behind and the app said nothing</b> for 15 samples. Behind is the only footing that produces advice, so the check was silent in exactly the window it exists to serve.</span></div>
+            <div><span class="k no">16&#215;</span><span class="v">It reported <b>ahead when you were not</b> in 16 samples &#8212; the reading that tells a player to keep doing what they are doing.</span></div>
+          </div>
+
+          <div class="rail law">
+            <i></i>
+            <div class="rail-in">
+              <h4>The error is biased, not noisy</h4>
+              <p>It does not average out. A player holding raw components is counted near-correctly; a player who has finished their items is counted at a quarter of the truth. So the comparison systematically favours <strong>whoever has completed fewer items</strong> &#8212; which is usually the player who is behind. The check was not merely inaccurate, it was leaning the wrong way, and worst exactly when the gap was widest: 2,950 gold of error at 31 minutes.</p>
+            </div>
+          </div>
+
+          <h3>The fix</h3>
+
+          <p>The app needs <code>gold.total</code> per item, which the live payload never carries. <code>data/meta/items.json</code> already holds a committed <code>cost</code> field derived from Data Dragon &#8212; exactly the right shape and already compiled in with <code>include_str!</code> &#8212; but it covers only the 75 items in the defensive vocabulary, and none of the five above are among them. <strong>Widening that table to all 868 items is the whole fix</strong>, and it needs no new network call, no new dependency, and no change to how the tags already ship.</p>
+
+          <p>Two things to settle while doing it. Sold and consumed purchases are still missing from any inventory sum, so &#8220;spent gold&#8221; remains an approximation even once the arithmetic is right &#8212; worth deciding whether the label should say so. And an item absent from the table must count as <em>unknown</em> rather than zero, or a future item will reintroduce this bug in miniature and just as quietly.</p>
+
+          <div class="rail">
+            <i></i>
+            <div class="rail-in">
+              <h4>Why 219 passing tests never saw it</h4>
+              <p>The stand-in client mints items as <code>{ itemID, price, count }</code> with a price the test itself chooses, so every assertion agreed with an arithmetic that was never in question. The real payload carries nine fields per item &#8212; <code>canUse</code>, <code>consumable</code>, <code>count</code>, <code>displayName</code>, <code>itemID</code>, <code>price</code>, <code>rawDescription</code>, <code>rawDisplayName</code>, <code>slot</code> &#8212; and the bug lives entirely in what <code>price</code> <em>means</em>, which no fixture invented by the same person who wrote the parser could ever contradict. A captured payload is the only thing that could have caught this, and now there is one.</p>
             </div>
           </div>
         </div>
@@ -515,8 +547,8 @@ pre .p{color:var(--stat)}
 
       <ol class="steps">
         <li><strong>Rotate to a non-expiring Riot key.</strong> Minutes of work, and until it is done the data plan is not running at all. Everything in section 02 waits behind it.</li>
-        <li><strong>Capture one real <code>allgamedata</code> body to a file.</strong> One game. It confirms or kills the gold diagnosis, and it gives this layer its first fixture drawn from reality rather than from the documentation &#8212; which is what let defect 1 survive 219 tests.</li>
-        <li><strong>Fix the gold, and re-point the stand-in client at the real payload shape.</strong> The fixture makes the fix verifiable; widening <code>scripts/fake-lcu.mjs</code> to match the real item shape is what stops the next defect of this kind.</li>
+        <li><strong>Widen <code>data/meta/items.json</code> to carry <code>gold.total</code> for every item.</strong> This is the gold fix, and it is now fully specified &#8212; see defect 1. The capture that diagnosed it should land beside it as the first fixture this layer has ever had that was drawn from reality rather than from the documentation.</li>
+        <li><strong>Re-point the stand-in client at the real payload shape.</strong> <code>scripts/fake-lcu.mjs</code> mints items with a price it chooses itself, which is why no test could contradict the parser. Matching the real nine-field shape is what stops the next defect of this kind.</li>
         <li><strong>Decouple mid-game champion resolution from the tag file.</strong> Correct regardless of whether it is defect 2&#8217;s cause, and it downgrades a class of hard failure to a soft one.</li>
         <li><strong>Name the stat shards.</strong> Nine rows in a compiled-in table, and the only defect on this page whose fix is fully specified before anybody opens an editor. Do it while the rune code is already open.</li>
         <li><strong>Mark a finished game as finished.</strong> Small, self-contained UI work, and it removes a screen that can silently assert something false.</li>
