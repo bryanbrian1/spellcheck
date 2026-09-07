@@ -6,7 +6,7 @@ anything not listed here was never downloadable.
 
 Dates are the day the tag was pushed. Numbers in brackets are pull requests.
 
-## 0.1.1 — unreleased
+## 0.1.1 — 2026-09-06
 
 The app is called spellcheck now, and the companion window was redesigned.
 Both are visible the moment you open it, so this is not a drop-in
