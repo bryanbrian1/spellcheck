@@ -236,16 +236,16 @@ pre .p{color:var(--stat)}
 <div class="wrap">
 
   <header class="mast">
-    <p class="eyebrow">Developer roadmap &#183; 6 September 2026</p>
+    <p class="eyebrow">Developer roadmap &#183; 7 September 2026</p>
     <h1>spellcheck <span>&#8212; what is left</span></h1>
-    <p class="lede">The app has now been run against a real League client, and it works. That retires the largest risk in the project and replaces it with five specific defects. This page is what remains: the defects first, then the data, then the things that stand between a beta and something you would hand a stranger.</p>
+    <p class="lede">The app has been run against a real League client. Five defects surfaced from that first game and are closed; a sixth was found on 7 September in the fix to the fifth, and its own fix is open. Beyond them, what is left is no longer a bug list. It is one open decision about whether the crawled data can ever become the dataset it is meant to be, two things about Windows that nobody has measured, and one genuinely missing feature.</p>
     <div class="facts">
-      <span><b>219</b> Rust tests</span>
+      <span><b>223</b> Rust tests</span>
       <span><b>19</b> Node tests</span>
-      <span><b>15,785</b> lines</span>
-      <span><b>5</b> live defects <em>4 fixed</em></span>
-      <span>Crawled <b>295</b> pairs</span>
-      <span>Median core sample <b>8</b> games</span>
+      <span><b>15,244</b> lines</span>
+      <span><b>6</b> defects <em>4 fixed &#183; 1 open &#183; 1 not reproduced</em></span>
+      <span>Crawled <b>306</b> pairs</span>
+      <span>Median core sample <b>10</b> games</span>
       <span>RAM <b>65 MB</b> <em>macOS</em></span>
     </div>
   </header>
@@ -253,7 +253,7 @@ pre .p{color:var(--stat)}
   <nav class="index" aria-label="Sections">
     <p>Contents</p>
     <a href="#read">How to read this</a>
-    <a href="#live">Five defects</a>
+    <a href="#live">Six defects</a>
     <a href="#data">The data</a>
     <a href="#ship">Ship gaps</a>
     <a href="#engine">Holes in the engine</a>
@@ -277,7 +277,7 @@ pre .p{color:var(--stat)}
         <i></i>
         <div class="rail-in">
           <h4>This page is a snapshot; the other two are the authority</h4>
-          <p><code>CLAUDE.md</code> holds the constraints and outranks everything. The blueprint describes the architecture. This page describes only the <strong>remaining work</strong>, measured on 6 September 2026, and it goes stale the moment any of it is done &#8212; so treat a claim here as a lead to verify, not a fact to build on.</p>
+          <p><code>CLAUDE.md</code> holds the constraints and outranks everything. The blueprint describes the architecture. This page describes only the <strong>remaining work</strong>, measured on 7 September 2026, and it goes stale the moment any of it is done &#8212; so treat a claim here as a lead to verify, not a fact to build on.</p>
         </div>
       </div>
 
@@ -285,14 +285,14 @@ pre .p{color:var(--stat)}
         <i></i>
         <div class="rail-in">
           <h4>The unknown that dominated this project is gone</h4>
-          <p>Until now every layer that touches a running game &#8212; the LCU client, the champ select socket, the live data poll, the suggestions, the matchup path &#8212; was unit-tested and had never met League. That was the single largest source of risk, and it has been discharged by playing a game. What replaced it is five ordinary bugs, which is a far better position.</p>
+          <p>Until now every layer that touches a running game &#8212; the LCU client, the champ select socket, the live data poll, the suggestions, the matchup path &#8212; was unit-tested and had never met League. That was the single largest source of risk, and it has been discharged by playing a game. What replaced it is five ordinary bugs, which is a far better position. A sixth has since come out of fixing one of them.</p>
         </div>
       </div>
     </section>
 
     <section id="live">
-      <h2><span class="n">01</span>Five defects from the first real game</h2>
-      <p>All five came out of one session against the real client. Four are traced to a specific line; the gold one has since been diagnosed from a captured game and its fix is fully specified. They are listed hardest-to-diagnose first, not most-severe first.</p>
+      <h2><span class="n">01</span>Six defects, five from the first real game</h2>
+      <p>The first five came out of one session against the real client. Four are traced to a specific line; the gold one was diagnosed from a captured game. They are listed hardest-to-diagnose first, not most-severe first. The sixth arrived differently &#8212; it was found on 7 September while auditing an abandoned branch, and the fix to defect 5 is what made it visible.</p>
 
       <div class="defect">
         <header>
@@ -504,6 +504,53 @@ pre .p{color:var(--stat)}
           </div>
         </div>
       </div>
+      <div class="defect">
+        <header>
+          <span class="tag">Defect 6</span>
+          <h3>The rune labels print through the art &#8212; fix open</h3>
+        </header>
+        <div class="in">
+          <p>A tile paints its image over its label so that art which never arrives leaves the words it stood in for. That is deliberate, and it is stated in the stylesheet. It is also only true of items, whose art is an opaque square that covers the words underneath.</p>
+
+          <p class="finding"><b>src/styles.css:147</b> &#8212; .tile img{position:absolute;inset:0;&#8230;object-fit:cover}<br><b>src/styles.css:145</b> &#8212; /* Art sits over the label, so a tile whose image never arrives still reads as the words it always did. */</p>
+
+          <p><strong>Rune art is a transparent symbol, not an opaque square.</strong> So the label never stopped showing &#8212; it printed through the gaps in the glyph, and the tile read as a rendering fault rather than as a rune. <code>paintIcons</code> carries an <code>error</code> handler that removes a broken image, but nothing that retires the label when one succeeds, so the words stay behind the art forever.</p>
+
+          <p class="finding"><b>src/main.ts:357</b> &#8212; img.addEventListener(&quot;error&quot;, () =&gt; img.remove())  &#8212; and no &quot;load&quot; beside it</p>
+
+          <p><strong>Defect 5 did not cause this. It made it impossible to miss.</strong> Giving the stat shards real art put nine transparent PNGs onto 24px tiles whose labels are still underneath, and a shard glyph leaves most of its tile empty. Measured on the asset Data Dragon actually serves:</p>
+
+          <div class="map">
+            <table>
+              <tr class="head"><td>StatModsAdaptiveForceIcon.png</td><td>Value</td></tr>
+              <tr><td class="d">Fully transparent pixels</td><td class="l warn"><b>83%</b> of 32&#215;32</td></tr>
+              <tr><td class="d">Fully transparent across the band where a centred label sits</td><td class="l warn"><b>57%</b></td></tr>
+            </table>
+          </div>
+
+          <p>So the three shards read as tiles with garbage behind them &#8212; <code>Adapti</code>, <code>Attack Sp</code>, <code>Armor</code>. Every rune tile has this, the keystone included; the shards are only where it stopped being deniable. Confirmed in champ select against a running client, not just in a harness.</p>
+
+          <div class="rail gap">
+            <i></i>
+            <div class="rail-in">
+              <h4>An abandoned branch had already diagnosed it, on 5 September</h4>
+              <p><code>rune-page-shape</code> names the cause exactly &#8212; &#8220;item art is an opaque square and hides the label; rune art is a transparent symbol, so the words behind it came through the gaps&#8221; &#8212; and carries the fix. It was never merged because its other half was wrong: it claimed the shards have no art anywhere, which defect 5 later disproved. <strong>The correct diagnosis went down with the incorrect one</strong>, and the bug it described was then widened by the commit that superseded it.</p>
+              <p>That is the cost of judging a branch by its weakest claim. Nothing was re-derived here that had not already been written down two days earlier.</p>
+            </div>
+          </div>
+
+          <div class="rail">
+            <i></i>
+            <div class="rail-in">
+              <h4>Fix open in #28 &#8212; not merged</h4>
+              <p>The label stands down once art has <em>actually</em> loaded, on <code>load</code> rather than eagerly, so art that fails or never comes still leaves the words exactly where they were. That path was checked by pointing a tile at a 404: the image removes itself, the flag is never set, the label keeps its full height. The full name is on the tile&#8217;s <code>title</code> either way, which is what defect 5&#8217;s sizing decision already assumed.</p>
+              <p>It needed the label to be an element rather than a bare text node, and wrapping it closed a latent bug on the way. <code>paintIcons</code> corrects a tile still showing <code>#8112</code> by assigning to <code>holder.textContent</code>, which deletes every child &#8212; including an <code>&lt;img&gt;</code> prepended by an earlier pass. Any second pass over a tile whose id had not resolved silently threw its art away.</p>
+              <p class="finding"><b>src/main.ts:343</b> &#8212; holder.textContent = tileLabelText(name)  &#8212; wipes a prepended image</p>
+              <p><strong>No test covers it.</strong> The repo has no frontend harness &#8212; the ingest tests are Node, everything else is Rust &#8212; and building one means a DOM dependency that <code>CLAUDE.md</code> asks be justified before adding. It was verified by hand against the real client and against the compiled <code>dist/styles.css</code>, and that limitation is recorded rather than left implied.</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </section>
 
@@ -514,27 +561,32 @@ pre .p{color:var(--stat)}
       <div class="map">
         <table>
           <tr class="head"><td>Measure</td><td>Value</td></tr>
-          <tr><td class="d">Champion&#8211;role pairs covered</td><td class="l"><b>295</b> of ~850 &#183; 35%</td></tr>
+          <tr><td class="d">Champion&#8211;role pairs covered</td><td class="l"><b>306</b> of ~850 &#183; 36%</td></tr>
           <tr><td class="d">Champions represented</td><td class="l"><b>172</b></td></tr>
-          <tr><td class="d">Games behind a pair</td><td class="l">median <b>44</b> &#183; min 5 &#183; max 295</td></tr>
-          <tr><td class="d">Pairs under 30 games</td><td class="l warn"><b>109</b> of 295</td></tr>
-          <tr><td class="d">Games behind the <em>top core item group</em></td><td class="l warn">median <b>8</b></td></tr>
-          <tr><td class="d">Pairs whose top core group is under 20 games</td><td class="l warn"><b>249</b> of 295</td></tr>
+          <tr><td class="d">Games behind a pair</td><td class="l">median <b>63.5</b> &#183; min 5 &#183; max 452</td></tr>
+          <tr><td class="d">Pairs under 30 games</td><td class="l warn"><b>95</b> of 306</td></tr>
+          <tr><td class="d">Games behind the <em>top core item group</em></td><td class="l warn">median <b>10</b></td></tr>
+          <tr><td class="d">Pairs whose top core group is under 20 games</td><td class="l warn"><b>217</b> of 306</td></tr>
+          <tr><td class="d">Pairs clearing <em>both</em> &#8212; 30 pair games and 20 behind the top group</td><td class="l warn"><b>89</b> of 306 &#183; 29%</td></tr>
           <tr><td class="d">Patches present</td><td class="l"><b>16.17</b> only</td></tr>
         </table>
       </div>
 
-      <p>A median of eight games behind the headline recommendation is far below the threshold this project already set for itself &#8212; the crawler&#8217;s own notes call a few dozen games per pair &#8220;below the threshold at which this app is willing to call a number a statistic&#8221;. <code>RiotProvider</code> can answer; it should not yet be the one answering.</p>
+      <p>A median of ten games behind the headline recommendation is still far below the threshold this project already set for itself &#8212; the crawler&#8217;s own notes call a few dozen games per pair &#8220;below the threshold at which this app is willing to call a number a statistic&#8221;. Fewer than a third of pairs clear both bars. <code>RiotProvider</code> can answer; it should not yet be the one answering.</p>
 
-      <div class="rail gap">
+      <p>The direction, though, is right. One overnight crawl moved the median pair from 44 games to 63.5 and the top core group from 8 to 10, and cut the pairs under 30 games from 109 to 95. Accumulation works and is running unattended; the only question left is arithmetic, not plumbing.</p>
+
+      <div class="rail">
         <i></i>
         <div class="rail-in">
-          <h4>The Riot key expires every 24 hours</h4>
-          <p>The crawl runs on a development key, which Riot expires a day after issue. The daily schedule therefore fails every day after the key is rotated by hand &#8212; which is what the <code>check-key</code> gate exists to catch, and it will catch it loudly and then stop. <strong>Accumulation is the entire plan for this data, and accumulation is currently not happening unless somebody rotates a key each morning.</strong> Registering a personal or production key is the single highest-leverage item on this page.</p>
+          <h4>The key does not expire daily &#8212; and never did</h4>
+          <p>This page previously called a daily-expiring development key <strong>the single highest-leverage item on it</strong>, and said accumulation could not happen unless somebody rotated a key each morning. That was wrong, and it is corrected here rather than deleted because the shape of the error matters: it was inferred from how the crawler was built, never measured against the running system.</p>
+          <p>The secret was set once, on <strong>4 September 23:31 UTC</strong>, and its <code>updated_at</code> did not move again for three days. Scheduled crawls succeeded on 5, 6 and 7 September regardless. A 24-hour development key cannot do that, and nobody was rotating one by hand. A non-expiring key was already in place.</p>
+          <p>The key was rotated anyway on <strong>7 September</strong> as hygiene, and verified live: <code>check-key.mjs</code> passed against the new secret on a dispatched run before the crawl was cancelled. Nothing downstream was ever waiting on any of this.</p>
         </div>
       </div>
 
-      <p>It also changes the arithmetic rather than just the reliability. A production key raises the rate limit, and the rate limit is what shapes the whole crawler &#8212; the 45-minute clock, the decision to buy a timeline per match, the accumulate-don&#8217;t-replace design. With a patch cycle resetting the sample roughly every two weeks by design, the open question is whether the popular pairs reach significance before the reset and the rare ones ever do. Three honest answers exist: a better key, a narrower crawl that goes deep on fewer pairs, or accepting that OP.GG stays the live provider indefinitely and the crawl is a hedge rather than a migration. That decision has not been made and is worth making explicitly.</p>
+      <p>What the key never fixed is the arithmetic. The rate limit is what shapes the whole crawler &#8212; the 45-minute clock, the decision to buy a timeline per match, the accumulate-don&#8217;t-replace design. With a patch cycle resetting the sample roughly every two weeks by design, the open question is whether the popular pairs reach significance before the reset and the rare ones ever do. Three honest answers exist: a narrower crawl that goes deep on fewer pairs, accepting that OP.GG stays the live provider indefinitely and the crawl is a hedge rather than a migration, or letting one full patch cycle accumulate and deciding on the evidence. <strong>The third is now the cheap one</strong> &#8212; the crawl runs unattended, so the cost of waiting is nothing but time, and it is the only option that answers the question rather than guessing at it. That decision has not been made and is worth making explicitly.</p>
     </section>
 
     <section id="ship">
@@ -571,16 +623,19 @@ pre .p{color:var(--stat)}
       <div class="map">
         <table>
           <tr class="head"><td>Claim</td><td>Says</td><td>Actually</td></tr>
-          <tr><td class="d">Total lines</td><td class="l">11,750</td><td class="l"><b>15,785</b></td></tr>
+          <tr><td class="d">Total lines <em>&#183; app source</em></td><td class="l">11,750</td><td class="l"><b>15,244</b></td></tr>
           <tr><td class="d">Screens</td><td class="l">three</td><td class="l"><b>two</b></td></tr>
-          <tr><td class="d"><code>lib.rs</code></td><td class="l">727</td><td class="l"><b>1,106</b></td></tr>
-          <tr><td class="d"><code>src/main.ts</code></td><td class="l">757</td><td class="l"><b>1,318</b></td></tr>
+          <tr><td class="d"><code>lib.rs</code></td><td class="l">727</td><td class="l"><b>1,137</b></td></tr>
+          <tr><td class="d"><code>src/main.ts</code></td><td class="l">757</td><td class="l"><b>1,531</b></td></tr>
+          <tr><td class="d">Rust tests</td><td class="l">219</td><td class="l"><b>223</b></td></tr>
           <tr><td class="d">The live crawl</td><td class="l">untested</td><td class="l"><b>has run</b></td></tr>
           <tr><td class="d">Everything downstream of a running League</td><td class="l">untested</td><td class="l"><b>works</b></td></tr>
         </table>
       </div>
 
-      <p>The test count &#8212; 219 &#8212; is still exactly right. The last two rows are the ones that matter: the blueprint&#8217;s &#8220;Built vs. not built&#8221; section is the part people read to decide what to trust, and it currently understates the project.</p>
+      <p>The test count has moved too, so the previous edition of this page saying &#8220;219 is still exactly right&#8221; is itself now stale: <code>cargo test</code> reports <strong>223 passing</strong> (3 ignored) and <code>npm run test:ingest</code> <strong>19 passing</strong>, both run rather than counted. The last two rows are still the ones that matter: the blueprint&#8217;s &#8220;Built vs. not built&#8221; section is the part people read to decide what to trust, and it understates the project.</p>
+
+      <p>The total-lines row is measured over the application source &#8212; <code>src/</code>, <code>src-tauri/src/</code> and <code>scripts/</code>, extensions <code>.ts .rs .mjs .css</code>. The previous edition of this page reported 15,785 without stating a file set, and no set reproduces that figure at the commit it cites, so the number is restated here with its method rather than carried forward. It is not a shrinking codebase; it is a different ruler.</p>
     </section>
 
     <section id="order">
@@ -588,14 +643,16 @@ pre .p{color:var(--stat)}
       <p>Ordered by what each step unblocks rather than by size.</p>
 
       <ol class="steps">
-        <li><strong>Rotate to a non-expiring Riot key.</strong> Minutes of work, and until it is done the data plan is not running at all. Everything in section 02 waits behind it.</li>
+        <li><s>Rotate to a non-expiring Riot key.</s> <strong>Was never blocking.</strong> The key had not been expiring daily since at least 4 September and three unattended crawls prove it; it was rotated on 7 September as hygiene and verified live through the <code>check-key</code> gate. Nothing in section 02 was waiting behind it, which makes the open question there a decision to take, not a task to schedule.</li>
         <li><s>Widen <code>data/meta/items.json</code> to carry <code>gold.total</code> for every item.</s> <strong>Done.</strong> All 868 items, pricing moved to the tag layer, a latent <code>itemID</code> deserialisation bug fixed on the way, and a real captured payload committed as the regression test.</li>
         <li><s>Re-point the stand-in client at the real payload shape.</s> <strong>Done.</strong> <code>scripts/fake-lcu.mjs</code> now mints all nine fields with real ids and real combine costs, so a scenario can no longer invent a price the parser agrees with.</li>
         <li><s>Investigate mid-game detection.</s> <strong>Not reproduced.</strong> Four hypotheses disproven and the route driven end to end against a new <code>--mid-game</code> stand-in. One real fault fixed on the way: a failed matchup no longer takes the whole build with it.</li>
         <li><s>Mark a finished game as finished.</s> <strong>Done.</strong> The build survives the whistle, but the header now says the game is over and the live-only blocks retire.</li>
         <li><s>Name the stat shards.</s> <strong>Done.</strong> Nine rows in <code>ddragon.rs</code> giving them Riot&#8217;s own art and a name, plus names for every other rune so a tile without art still says what it is.</li>
         <li><s>Sort the situational row by sample, then design the reason rendering.</s> <strong>Done.</strong> Named columns with their own numbers, ordered by sample, and the engine&#8217;s reasoning joined to them in amber without either claim borrowing the other&#8217;s authority.</li>
-        <li><strong>Get the Windows build onto real hardware and measure its memory.</strong> Two unknowns, one tester, one afternoon.</li>
+        <li><s>Stop the rune labels printing through the art.</s> <strong>Fix open in #28.</strong> Found on 7 September, not in the first game &#8212; defect 5&#8217;s art made it visible, and an abandoned branch had diagnosed it two days earlier. Hand-verified against the live client; no test, because there is no frontend harness to put one in.</li>
+        <li><strong>Get the Windows build onto real hardware and measure its memory.</strong> Two unknowns, one tester, one afternoon. With the defect list closed this is now the top item, and it is the only thing standing between the current state and an honest beta claim.</li>
+        <li><strong>Clear the cheap backlog in section 04.</strong> Under an hour together: the version-agreement CI check (all three files currently agree at <code>0.1.1</code> and match tag <code>v0.1.1</code>, so this is preventive rather than a live break) and the three untagged champions, still <code>Locke</code>, <code>Yunara</code> and <code>Zaahen</code>, re-verified against the crawl on 7 September.</li>
         <li><strong>Then imports.</strong> The largest genuinely missing feature, and the first thing on this list that is a project rather than a fix.</li>
       </ol>
 
@@ -610,6 +667,6 @@ pre .p{color:var(--stat)}
 
   </main>
 
-  <p class="end">Measured against the working tree on 6 September 2026, at <code>e8f495c</code>. Every line number and file reference was read from the code rather than recalled; the numbers in section 02 were computed over <code>data/builds/</code> directly. Where this page and <code>CLAUDE.md</code> disagree, the file wins and this page is stale.</p>
+  <p class="end">Measured against <code>origin/main</code> on 7 September 2026, at <code>d3004a1</code>. Every line number and file reference was read from the code rather than recalled; the numbers in section 02 were computed over <code>data/builds/</code> directly, and the test counts come from running both suites rather than counting attributes. Line totals cover <code>src/</code>, <code>src-tauri/src/</code> and <code>scripts/</code> at <code>.ts .rs .mjs .css</code> &#8212; stated because the previous edition did not state its own. Where this page and <code>CLAUDE.md</code> disagree, the file wins and this page is stale.</p>
 
 </div>
