@@ -176,7 +176,38 @@ const session = (championId, position, phase, enemiesShown = 0) => ({
 /** Mutated by the scenario; read by every request to the live server. */
 let live = null;
 
-const item = (price) => ({ itemID: 3020, price, count: 1, displayName: "an item" });
+// The real payload's item shape, all nine fields, and the two that matter are
+// the ones this stand-in used to get wrong.
+//
+// `itemID` capitalises both letters — it is the only field in the payload
+// shaped that way, and a parser deriving it from camelCase silently reads zero.
+//
+// `price` is the *combine* cost, not what the item is worth: a finished
+// Rabadon's Deathcap reports 1100 against a real 3500, and finished boots
+// report zero. This stand-in used to mint a price the scenario chose, which is
+// how the app spent months summing combine costs while every test agreed with
+// it. Ids here are real, and what they cost is data/meta/items.json's business.
+const HELD = [
+  { itemID: 3020, price: 350, slot: 0, displayName: "Sorcerer's Shoes" },
+  { itemID: 3165, price: 800, slot: 1, displayName: "Morellonomicon" },
+  { itemID: 3157, price: 1000, slot: 2, displayName: "Zhonya's Hourglass" },
+  { itemID: 3089, price: 1100, slot: 3, displayName: "Rabadon's Deathcap" },
+];
+
+const item = (entry, count = 1) => ({
+  canUse: false,
+  consumable: false,
+  count,
+  displayName: entry.displayName,
+  itemID: entry.itemID,
+  price: entry.price,
+  rawDescription: "GeneratedTip_Item_" + entry.itemID + "_Description",
+  rawDisplayName: "Item_" + entry.itemID + "_Name",
+  slot: entry.slot,
+});
+
+/** A plausible inventory. `depth` picks how far into the build they are. */
+const inventory = (depth) => HELD.slice(0, Math.max(0, Math.min(depth, HELD.length))).map((e) => item(e));
 
 const livePlayer = (name, team, position, gold, level, dead = false) => ({
   championName: name,
@@ -187,7 +218,10 @@ const livePlayer = (name, team, position, gold, level, dead = false) => ({
   respawnTimer: dead ? 12.5 : 0,
   riotId: `${name}#EUW`,
   summonerName: name,
-  items: gold ? [item(gold)] : [],
+  // `gold` is the scenario's shorthand for "how far along are they", not a
+  // number the payload carries: the live API never reports what a player has
+  // spent, only what they hold.
+  items: inventory(Math.round(gold / 1200)),
   scores: { kills: 2, deaths: 4, assists: 3, creepScore: 118, wardScore: 9 },
 });
 

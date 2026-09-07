@@ -1,0 +1,860 @@
+{
+ "activePlayer": {
+  "currentGold": 433.69158935546875,
+  "level": 18,
+  "riotId": "Player3#TEST",
+  "riotIdGameName": "daejon love",
+  "riotIdTagLine": "007",
+  "summonerName": "Player3#TEST",
+  "teamRelativeColors": true
+ },
+ "allPlayers": [
+  {
+   "championName": "Teemo",
+   "isBot": false,
+   "isDead": true,
+   "items": [
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Statikk Shiv",
+     "itemID": 3087,
+     "price": 625,
+     "slot": 0
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Boots of Swiftness",
+     "itemID": 3009,
+     "price": 700,
+     "slot": 1
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Nashor's Tooth",
+     "itemID": 3115,
+     "price": 500,
+     "slot": 2
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Terminus",
+     "itemID": 3302,
+     "price": 1100,
+     "slot": 3
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Kraken Slayer",
+     "itemID": 6672,
+     "price": 325,
+     "slot": 4
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Lich Bane",
+     "itemID": 3100,
+     "price": 250,
+     "slot": 5
+    },
+    {
+     "canUse": true,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Stealth Ward",
+     "itemID": 3340,
+     "price": 0,
+     "slot": 6
+    }
+   ],
+   "level": 20,
+   "position": "TOP",
+   "respawnTimer": 16.241947174072266,
+   "riotId": "Player1#TEST",
+   "scores": {
+    "assists": 6,
+    "creepScore": 330,
+    "deaths": 8,
+    "kills": 5,
+    "wardScore": 26.004154205322266
+   },
+   "skinID": 2,
+   "summonerName": "Player1#TEST",
+   "team": "ORDER"
+  },
+  {
+   "championName": "Shen",
+   "isBot": false,
+   "isDead": true,
+   "items": [
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Protoplasm Harness",
+     "itemID": 2525,
+     "price": 900,
+     "slot": 0
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Abyssal Mask",
+     "itemID": 8020,
+     "price": 1000,
+     "slot": 1
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Hollow Radiance",
+     "itemID": 6664,
+     "price": 650,
+     "slot": 2
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Mercury's Treads",
+     "itemID": 3111,
+     "price": 550,
+     "slot": 3
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Chain Vest",
+     "itemID": 1031,
+     "price": 500,
+     "slot": 4
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Kindlegem",
+     "itemID": 3067,
+     "price": 150,
+     "slot": 5
+    },
+    {
+     "canUse": true,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Oracle Lens",
+     "itemID": 3364,
+     "price": 0,
+     "slot": 6
+    }
+   ],
+   "level": 17,
+   "position": "JUNGLE",
+   "respawnTimer": 4.454559326171875,
+   "riotId": "Player2#TEST",
+   "scores": {
+    "assists": 15,
+    "creepScore": 220,
+    "deaths": 8,
+    "kills": 1,
+    "wardScore": 40.17908477783203
+   },
+   "skinID": 40,
+   "summonerName": "Player2#TEST",
+   "team": "ORDER"
+  },
+  {
+   "championName": "Viktor",
+   "isBot": false,
+   "isDead": true,
+   "items": [
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Chainlaced Crushers",
+     "itemID": 3173,
+     "price": 0,
+     "slot": 0
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Blackfire Torch",
+     "itemID": 2503,
+     "price": 700,
+     "slot": 1
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Liandry's Torment",
+     "itemID": 6653,
+     "price": 800,
+     "slot": 2
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Rabadon's Deathcap",
+     "itemID": 3089,
+     "price": 1100,
+     "slot": 3
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Void Staff",
+     "itemID": 3135,
+     "price": 1050,
+     "slot": 4
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Cloth Armor",
+     "itemID": 1029,
+     "price": 300,
+     "slot": 5
+    },
+    {
+     "canUse": true,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Farsight Alteration",
+     "itemID": 3363,
+     "price": 0,
+     "slot": 6
+    }
+   ],
+   "level": 18,
+   "position": "MIDDLE",
+   "respawnTimer": 19.287940979003906,
+   "riotId": "Player3#TEST",
+   "scores": {
+    "assists": 9,
+    "creepScore": 210,
+    "deaths": 10,
+    "kills": 13,
+    "wardScore": 26.32908821105957
+   },
+   "skinID": 14,
+   "summonerName": "Player3#TEST",
+   "team": "ORDER"
+  },
+  {
+   "championName": "Tristana",
+   "isBot": false,
+   "isDead": true,
+   "items": [
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Bloodthirster",
+     "itemID": 3072,
+     "price": 325,
+     "slot": 0
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Yun Tal Wildarrows",
+     "itemID": 3032,
+     "price": 750,
+     "slot": 1
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Infinity Edge",
+     "itemID": 3031,
+     "price": 725,
+     "slot": 2
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Navori Flickerblade",
+     "itemID": 6675,
+     "price": 950,
+     "slot": 3
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Lord Dominik's Regards",
+     "itemID": 3036,
+     "price": 550,
+     "slot": 4
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Hexoptics C44",
+     "itemID": 2523,
+     "price": 275,
+     "slot": 5
+    },
+    {
+     "canUse": true,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Stealth Ward",
+     "itemID": 3340,
+     "price": 0,
+     "slot": 6
+    }
+   ],
+   "level": 18,
+   "position": "BOTTOM",
+   "respawnTimer": 20.997379302978516,
+   "riotId": "Player4#TEST",
+   "scores": {
+    "assists": 5,
+    "creepScore": 320,
+    "deaths": 7,
+    "kills": 11,
+    "wardScore": 45.633113861083984
+   },
+   "skinID": 0,
+   "summonerName": "Player4#TEST",
+   "team": "ORDER"
+  },
+  {
+   "championName": "Seraphine",
+   "isBot": false,
+   "isDead": true,
+   "items": [
+    {
+     "canUse": true,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Dream Maker",
+     "itemID": 3870,
+     "price": 0,
+     "slot": 0
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Echoes of Helia",
+     "itemID": 6620,
+     "price": 500,
+     "slot": 1
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Diadem of Songs",
+     "itemID": 2530,
+     "price": 2250,
+     "slot": 2
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Ionian Boots of Lucidity",
+     "itemID": 3158,
+     "price": 350,
+     "slot": 3
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Moonstone Renewer",
+     "itemID": 6617,
+     "price": 500,
+     "slot": 4
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Giant's Belt",
+     "itemID": 1011,
+     "price": 500,
+     "slot": 5
+    },
+    {
+     "canUse": true,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Oracle Lens",
+     "itemID": 3364,
+     "price": 0,
+     "slot": 6
+    }
+   ],
+   "level": 16,
+   "position": "UTILITY",
+   "respawnTimer": 11.737579345703125,
+   "riotId": "Player5#TEST",
+   "scores": {
+    "assists": 13,
+    "creepScore": 60,
+    "deaths": 7,
+    "kills": 2,
+    "wardScore": 96.40621948242188
+   },
+   "skinID": 0,
+   "summonerName": "Player5#TEST",
+   "team": "ORDER"
+  },
+  {
+   "championName": "Cho'Gath",
+   "isBot": false,
+   "isDead": false,
+   "items": [
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Jak'Sho, The Protean",
+     "itemID": 6665,
+     "price": 650,
+     "slot": 0
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Heartsteel",
+     "itemID": 3084,
+     "price": 400,
+     "slot": 1
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Mercury's Treads",
+     "itemID": 3111,
+     "price": 550,
+     "slot": 2
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Hollow Radiance",
+     "itemID": 6664,
+     "price": 650,
+     "slot": 3
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Thornmail",
+     "itemID": 3075,
+     "price": 450,
+     "slot": 4
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Unending Despair",
+     "itemID": 2502,
+     "price": 800,
+     "slot": 5
+    },
+    {
+     "canUse": true,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Stealth Ward",
+     "itemID": 3340,
+     "price": 0,
+     "slot": 6
+    }
+   ],
+   "level": 20,
+   "position": "TOP",
+   "respawnTimer": 0.0,
+   "riotId": "Player6#TEST",
+   "scores": {
+    "assists": 15,
+    "creepScore": 280,
+    "deaths": 4,
+    "kills": 7,
+    "wardScore": 51.58184051513672
+   },
+   "skinID": 4,
+   "summonerName": "Player6#TEST",
+   "team": "CHAOS"
+  },
+  {
+   "championName": "Viego",
+   "isBot": false,
+   "isDead": true,
+   "items": [
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "The Collector",
+     "itemID": 6676,
+     "price": 525,
+     "slot": 0
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Hubris",
+     "itemID": 6697,
+     "price": 750,
+     "slot": 1
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Lord Dominik's Regards",
+     "itemID": 3036,
+     "price": 550,
+     "slot": 2
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Gluttonous Greaves",
+     "itemID": 3008,
+     "price": 700,
+     "slot": 3
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Infinity Edge",
+     "itemID": 3031,
+     "price": 725,
+     "slot": 4
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Immortal Shieldbow",
+     "itemID": 6673,
+     "price": 825,
+     "slot": 5
+    },
+    {
+     "canUse": true,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Oracle Lens",
+     "itemID": 3364,
+     "price": 0,
+     "slot": 6
+    }
+   ],
+   "level": 18,
+   "position": "JUNGLE",
+   "respawnTimer": 16.08182144165039,
+   "riotId": "Player7#TEST",
+   "scores": {
+    "assists": 7,
+    "creepScore": 120,
+    "deaths": 6,
+    "kills": 16,
+    "wardScore": 31.87680435180664
+   },
+   "skinID": 43,
+   "summonerName": "Player7#TEST",
+   "team": "CHAOS"
+  },
+  {
+   "championName": "Vel'Koz",
+   "isBot": false,
+   "isDead": false,
+   "items": [
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Spellslinger's Shoes",
+     "itemID": 3175,
+     "price": 0,
+     "slot": 0
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Luden's Echo",
+     "itemID": 6655,
+     "price": 450,
+     "slot": 1
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Shadowflame",
+     "itemID": 4645,
+     "price": 900,
+     "slot": 2
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Oblivion Orb",
+     "itemID": 3916,
+     "price": 400,
+     "slot": 3
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Banshee's Veil",
+     "itemID": 3102,
+     "price": 200,
+     "slot": 4
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Needlessly Large Rod",
+     "itemID": 1058,
+     "price": 1200,
+     "slot": 5
+    },
+    {
+     "canUse": true,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Oracle Lens",
+     "itemID": 3364,
+     "price": 0,
+     "slot": 6
+    }
+   ],
+   "level": 17,
+   "position": "MIDDLE",
+   "respawnTimer": 0.0,
+   "riotId": "Player8#TEST",
+   "scores": {
+    "assists": 7,
+    "creepScore": 190,
+    "deaths": 16,
+    "kills": 9,
+    "wardScore": 60.24306106567383
+   },
+   "skinID": 2,
+   "summonerName": "Player9#TEST",
+   "team": "CHAOS"
+  },
+  {
+   "championName": "Jinx",
+   "isBot": false,
+   "isDead": false,
+   "items": [
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Runaan's Hurricane",
+     "itemID": 3085,
+     "price": 850,
+     "slot": 0
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Infinity Edge",
+     "itemID": 3031,
+     "price": 725,
+     "slot": 1
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Bloodthirster",
+     "itemID": 3072,
+     "price": 325,
+     "slot": 2
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Hexoptics C44",
+     "itemID": 2523,
+     "price": 275,
+     "slot": 3
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Steel Sigil",
+     "itemID": 2019,
+     "price": 150,
+     "slot": 4
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Lord Dominik's Regards",
+     "itemID": 3036,
+     "price": 550,
+     "slot": 5
+    },
+    {
+     "canUse": true,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Farsight Alteration",
+     "itemID": 3363,
+     "price": 0,
+     "slot": 6
+    }
+   ],
+   "level": 18,
+   "position": "BOTTOM",
+   "respawnTimer": 0.0,
+   "riotId": "Player10#TEST",
+   "scores": {
+    "assists": 16,
+    "creepScore": 340,
+    "deaths": 5,
+    "kills": 7,
+    "wardScore": 35.26513671875
+   },
+   "skinID": 12,
+   "summonerName": "Player10#TEST",
+   "team": "CHAOS"
+  },
+  {
+   "championName": "Karma",
+   "isBot": false,
+   "isDead": false,
+   "items": [
+    {
+     "canUse": true,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Dream Maker",
+     "itemID": 3870,
+     "price": 0,
+     "slot": 0
+    },
+    {
+     "canUse": true,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Mikael's Blessing",
+     "itemID": 3222,
+     "price": 900,
+     "slot": 1
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Moonstone Renewer",
+     "itemID": 6617,
+     "price": 500,
+     "slot": 2
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Ionian Boots of Lucidity",
+     "itemID": 3158,
+     "price": 350,
+     "slot": 3
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Echoes of Helia",
+     "itemID": 6620,
+     "price": 500,
+     "slot": 4
+    },
+    {
+     "canUse": false,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Bandleglass Mirror",
+     "itemID": 4642,
+     "price": 50,
+     "slot": 5
+    },
+    {
+     "canUse": true,
+     "consumable": false,
+     "count": 1,
+     "displayName": "Oracle Lens",
+     "itemID": 3364,
+     "price": 0,
+     "slot": 6
+    }
+   ],
+   "level": 17,
+   "position": "UTILITY",
+   "respawnTimer": 0.0,
+   "riotId": "Player11#TEST",
+   "scores": {
+    "assists": 19,
+    "creepScore": 70,
+    "deaths": 1,
+    "kills": 1,
+    "wardScore": 105.55339813232422
+   },
+   "skinID": 52,
+   "summonerName": "Player11#TEST",
+   "team": "CHAOS"
+  }
+ ],
+ "gameData": {
+  "gameMode": "CLASSIC",
+  "gameTime": 2433.290771484375,
+  "mapName": "Map11",
+  "mapNumber": 11,
+  "mapTerrain": "Default"
+ }
+}

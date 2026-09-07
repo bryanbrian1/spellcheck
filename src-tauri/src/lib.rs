@@ -352,7 +352,7 @@ fn in_game_state(snapshot: &GameSnapshot) -> InGameState {
         role: us.and_then(|player| player.position),
         level: us.map(|player| player.level).unwrap_or(0),
         game_time: snapshot.game_time,
-        standing: standing(snapshot),
+        standing: standing(tags, snapshot),
         opponent_key: snapshot
             .lane_opponent()
             .and_then(|player| tags.champion_key_by_name(&player.champion_name))
@@ -998,7 +998,10 @@ mod in_game_tests {
             json!({
                 "championName": name, "team": team, "position": position,
                 "riotId": format!("{name}#EUW"), "level": 11, "isDead": false,
-                "items": [{ "itemID": 1, "price": gold, "count": 1 }],
+                // A real id the committed table can price, stacked to reach
+                // the total. Id 1 with an invented price used to work here and
+                // no longer can, which is the point of the change.
+                "items": [{ "itemID": 2003, "count": gold / 50 }],
                 "scores": { "kills": 2, "deaths": 4, "assists": 1, "creepScore": 90 },
             })
         };

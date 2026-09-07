@@ -22,7 +22,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::live::GameSnapshot;
+use crate::live::{GameSnapshot, Player};
 
 use super::tags::{Answer, DamageType, Tags};
 use super::{pick, Priority, Suggestion};
@@ -69,17 +69,42 @@ pub struct Standing {
     pub gold_in_hand: u32,
 }
 
+/// What an inventory is worth, from the committed item table.
+///
+/// `None` when the table has never heard of something they are carrying. That
+/// is the same rule an untagged champion follows: a missing entry is a hole,
+/// not a zero. Pricing an unknown item at nothing would quietly understate
+/// whoever is holding it, which is precisely the failure this whole function
+/// exists to correct — so the honest answer is to decline to total it.
+///
+/// The table ships with the binary and covers the whole Data Dragon
+/// catalogue, so in practice this is `Some` for every item on the patch the
+/// build was cut for, and `None` only once the game has moved ahead of it.
+fn inventory_gold(tags: &Tags, player: &Player) -> Option<u32> {
+    let mut total: u32 = 0;
+    for held in &player.items {
+        let item = tags.item(held.item_id)?;
+        total = total.saturating_add(item.cost.saturating_mul(held.count));
+    }
+    Some(total)
+}
+
 /// Compare the local player to whoever is standing in their lane.
 ///
 /// `None` whenever the comparison would be dishonest: we are spectating, the
-/// mode assigns no lanes, or nobody is opposite us. There is no fallback to
-/// "the enemy mid laner probably" — a confident number about the wrong player
-/// is worse than no number.
-pub fn standing(snapshot: &GameSnapshot) -> Option<Standing> {
+/// mode assigns no lanes, nobody is opposite us, or either inventory holds an
+/// item this build cannot price. There is no fallback to "the enemy mid laner
+/// probably" — a confident number about the wrong player is worse than no
+/// number, and so is a confident number about the wrong gold.
+pub fn standing(tags: &Tags, snapshot: &GameSnapshot) -> Option<Standing> {
     let us = snapshot.local_player()?;
     let them = snapshot.lane_opponent()?;
 
-    let gold_delta = i64::from(us.item_gold) - i64::from(them.item_gold);
+    // Either side unpriceable means there is no honest comparison to draw.
+    let ours = inventory_gold(tags, us)?;
+    let theirs = inventory_gold(tags, them)?;
+
+    let gold_delta = i64::from(ours) - i64::from(theirs);
     let footing = if gold_delta <= -MEANINGFUL_GOLD {
         Footing::Behind
     } else if gold_delta >= MEANINGFUL_GOLD {
@@ -102,7 +127,7 @@ pub fn standing(snapshot: &GameSnapshot) -> Option<Standing> {
 /// Empty is the common and correct answer: an even game changes nothing, and
 /// a winning one has no advice this vocabulary can express.
 pub fn game_state(tags: &Tags, snapshot: &GameSnapshot) -> Vec<Suggestion> {
-    let Some(standing) = standing(snapshot) else {
+    let Some(standing) = standing(tags, snapshot) else {
         return Vec::new();
     };
     if standing.footing != Footing::Behind {
@@ -168,12 +193,20 @@ mod tests {
     }
 
     /// A game where we are `us` at `our_gold`, against `them` at `their_gold`.
+    ///
+    /// Gold is expressed as a stack of Health Potions, which the committed
+    /// table prices at 50 each. Reaching a total through a *real* id is the
+    /// point: a fixture that invents its own price is what let the old
+    /// arithmetic agree with itself while disagreeing with the game.
     fn game(us: &str, our_gold: u32, our_level: u32, them: &str, their_gold: u32, their_level: u32) -> GameSnapshot {
+        const HEALTH_POTION: u32 = 2003;
+        const POTION_COST: u32 = 50;
         let player = |name: &str, team: &str, gold: u32, level: u32| {
+            assert_eq!(gold % POTION_COST, 0, "test gold must divide by {POTION_COST}");
             json!({
                 "championName": name, "team": team, "position": "MIDDLE",
                 "riotId": format!("{name}#EUW"), "level": level, "isDead": false,
-                "items": [{ "itemID": 1, "price": gold, "count": 1 }],
+                "items": [{ "itemID": HEALTH_POTION, "count": gold / POTION_COST }],
                 "scores": {},
             })
         };
@@ -188,10 +221,65 @@ mod tests {
         .unwrap()
     }
 
+    /// A real `allgamedata` body, captured from a live game and scrubbed of
+    /// player names. Nothing else in this crate is built from a payload the
+    /// author did not invent.
+    const REAL_GAME: &str = include_str!("../live/testdata/allgamedata.json");
+
+    /// The regression that the whole item table exists for.
+    ///
+    /// This one fixture would have failed the old code, and no fixture written
+    /// by hand ever could have: the bug was not in the arithmetic but in what
+    /// the API's `price` field *means*, so any payload invented alongside the
+    /// parser agreed with it by construction.
+    ///
+    /// The exact totals move whenever Riot reprices one of the seven items in
+    /// this capture. That is fine and the failure is informative — regenerate
+    /// the table, then update the numbers here.
+    #[test]
+    fn a_real_payload_is_priced_from_the_table_and_not_from_its_own_price_field() {
+        let body: serde_json::Value = serde_json::from_str(REAL_GAME).expect("captured payload");
+        let snapshot = GameSnapshot::from_json(&body).expect("a real game parses");
+
+        let found = standing(tags(), &snapshot).expect("a mid lane with an opponent");
+        assert_eq!(found.opponent, "Vel'Koz");
+        assert_eq!(found.gold_delta, 1_800, "priced from gold.total");
+        assert_eq!(found.footing, Footing::Ahead);
+
+        // And now the part that makes this a regression test rather than a
+        // snapshot: the same payload, summed the way the app used to sum it,
+        // produces a materially different answer. If this ever stops being
+        // true the fixture has lost the property it was captured for.
+        let naive: i64 = {
+            let sum_for = |riot_id: &str| -> i64 {
+                body["allPlayers"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .find(|p| p["riotId"] == riot_id)
+                    .unwrap()["items"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|i| {
+                        i["price"].as_i64().unwrap_or(0)
+                            * i["count"].as_i64().unwrap_or(1).max(1)
+                    })
+                    .sum()
+            };
+            sum_for("Player3#TEST") - sum_for("Player8#TEST")
+        };
+        assert_eq!(naive, 800, "the old arithmetic, preserved for contrast");
+        assert!(
+            naive.abs() < found.gold_delta.abs(),
+            "the combine-cost sum understates the real gap"
+        );
+    }
+
     #[test]
     fn a_gold_gap_is_measured_against_the_player_in_your_lane() {
         let snapshot = game("Ahri", 3000, 11, "Syndra", 7000, 13);
-        let found = standing(&snapshot).expect("Syndra is mid");
+        let found = standing(tags(), &snapshot).expect("Syndra is mid");
 
         assert_eq!(found.footing, Footing::Behind);
         assert_eq!(found.opponent, "Syndra");
@@ -203,7 +291,7 @@ mod tests {
     #[test]
     fn a_small_gap_is_an_even_game_rather_than_a_losing_one() {
         let snapshot = game("Ahri", 3000, 11, "Syndra", 3400, 11);
-        let found = standing(&snapshot).unwrap();
+        let found = standing(tags(), &snapshot).unwrap();
         assert_eq!(
             found.footing,
             Footing::Even,
@@ -215,7 +303,7 @@ mod tests {
     #[test]
     fn being_ahead_is_reported_but_suggests_nothing() {
         let snapshot = game("Ahri", 8000, 14, "Syndra", 3000, 11);
-        let found = standing(&snapshot).unwrap();
+        let found = standing(tags(), &snapshot).unwrap();
         assert_eq!(found.footing, Footing::Ahead);
         assert!(found.gold_delta > 0);
 
@@ -268,7 +356,7 @@ mod tests {
     fn an_untagged_opponent_produces_no_advice_rather_than_a_guess() {
         let snapshot = game("Ahri", 2000, 10, "NotAChampion", 7000, 13);
         // The standing is still honest: gold is gold whoever is holding it.
-        assert_eq!(standing(&snapshot).unwrap().footing, Footing::Behind);
+        assert_eq!(standing(tags(), &snapshot).unwrap().footing, Footing::Behind);
         assert!(game_state(tags(), &snapshot).is_empty());
     }
 
@@ -284,7 +372,7 @@ mod tests {
         }))
         .unwrap();
 
-        assert!(standing(&aram).is_none());
+        assert!(standing(tags(), &aram).is_none());
         assert!(game_state(tags(), &aram).is_empty());
     }
 
@@ -296,7 +384,7 @@ mod tests {
         }))
         .unwrap();
 
-        assert!(standing(&spectated).is_none());
+        assert!(standing(tags(), &spectated).is_none());
         assert!(game_state(tags(), &spectated).is_empty());
     }
 

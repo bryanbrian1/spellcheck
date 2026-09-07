@@ -28,5 +28,5 @@ pub mod watcher;
 
 pub use client::{LiveClient, ALL_GAME_DATA_PATH, LIVE_CLIENT_PORT};
 pub use error::LiveError;
-pub use game::{GameSnapshot, Player, Team};
+pub use game::{GameSnapshot, InventoryItem, Player, Team};
 pub use watcher::{watch, GameEvent, LiveWatcherConfig};

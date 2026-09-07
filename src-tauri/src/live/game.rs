@@ -24,11 +24,29 @@ pub enum Team {
     Unknown,
 }
 
+/// One inventory entry.
+///
+/// **`price` is deliberately not read**, and that is the whole lesson of this
+/// struct. The live API's `price` is Data Dragon's `gold.base` — the *combine*
+/// cost — not `gold.total`. Summing it counts only the last purchase in each
+/// item's build path and silently discards every component already consumed
+/// into it: a finished Rabadon's Deathcap reports 1100 against a real 3500,
+/// and a finished pair of boots reports zero.
+///
+/// It reads correctly for a base component, because there combine cost *is*
+/// the total, which is exactly why the mistake survived a hundred tests and a
+/// hand-driven stand-in client. What a player is holding is worth what the
+/// committed item table says it is worth; see [`crate::recommend::state`].
 #[derive(Debug, Clone, Default, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 struct RawItem {
+    /// `itemID`, with both letters capitalised, and it is the only field in
+    /// this payload shaped that way — `camelCase` renders it `itemId` and the
+    /// value silently defaults to zero. That went unnoticed for as long as
+    /// nothing read it; the moment gold started coming from the item table
+    /// instead of from `price`, every item became unpriceable at once.
+    #[serde(rename = "itemID")]
     item_id: u32,
-    price: u32,
     count: u32,
 }
 
@@ -100,6 +118,15 @@ struct RawAllGameData {
     game_data: RawGameData,
 }
 
+/// One thing in a player's inventory, and how many of it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InventoryItem {
+    pub item_id: u32,
+    /// Stack size. Consumables stack; everything else is one.
+    pub count: u32,
+}
+
 /// One player, as the third check reads them.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -113,12 +140,13 @@ pub struct Player {
     pub is_dead: bool,
     /// Seconds until respawn. Zero when alive.
     pub respawn_timer: f64,
-    /// What their inventory cost, ignoring what they are holding — enemy gold
-    /// is not visible to us, so spent gold is the only comparable number.
-    /// Trinkets and consumables are counted the same as anything else,
-    /// because the API gives no reliable way to tell them apart and the sums
-    /// are being compared against each other rather than against a budget.
-    pub item_gold: u32,
+    /// What they are carrying, as ids and stack sizes.
+    ///
+    /// Deliberately not a gold total. Pricing an inventory needs the committed
+    /// item table, which lives a layer up in [`crate::recommend`], and this
+    /// layer may not reach for it. Handing out ids keeps the one place that
+    /// knows what an item costs the only place that can say.
+    pub items: Vec<InventoryItem>,
     pub kills: u32,
     pub deaths: u32,
     pub assists: u32,
@@ -134,11 +162,15 @@ impl Player {
             level: raw.level,
             is_dead: raw.is_dead,
             respawn_timer: raw.respawn_timer,
-            item_gold: raw
+            items: raw
                 .items
                 .iter()
-                .map(|item| item.price.saturating_mul(item.count.max(1)))
-                .sum(),
+                .map(|item| InventoryItem {
+                    item_id: item.item_id,
+                    // A stack the API reports as zero is still one thing held.
+                    count: item.count.max(1),
+                })
+                .collect(),
             kills: raw.scores.kills,
             deaths: raw.scores.deaths,
             assists: raw.scores.assists,
@@ -255,7 +287,10 @@ mod tests {
             "summonerName": name,
             "items": items
                 .iter()
-                .map(|(id, price)| json!({ "itemID": id, "price": price, "count": 1 }))
+                // No `price`. The real payload carries one and it is a
+                // combine cost; a fixture that invents a price is how the old
+                // arithmetic stayed green while being wrong. See RawItem.
+                .map(|(id, count)| json!({ "itemID": id, "count": count }))
                 .collect::<Vec<_>>(),
             "scores": { "kills": 1, "deaths": 2, "assists": 3, "creepScore": 100 },
         })
@@ -265,9 +300,9 @@ mod tests {
         json!({
             "activePlayer": { "currentGold": 1340.7, "level": 11, "riotId": "Ahri#EUW", "summonerName": "Ahri" },
             "allPlayers": [
-                player("Ahri", "ORDER", "MIDDLE", 11, &[(3020, 1100), (3165, 2850)]),
-                player("Leona", "ORDER", "UTILITY", 9, &[(3190, 2200)]),
-                player("Syndra", "CHAOS", "MIDDLE", 12, &[(3020, 1100), (3165, 2850), (3157, 3250)]),
+                player("Ahri", "ORDER", "MIDDLE", 11, &[(3020, 1), (3165, 1)]),
+                player("Leona", "ORDER", "UTILITY", 9, &[(3190, 1)]),
+                player("Syndra", "CHAOS", "MIDDLE", 12, &[(3020, 1), (3165, 1), (3157, 1)]),
                 player("Thresh", "CHAOS", "UTILITY", 10, &[]),
             ],
             "gameData": { "gameTime": 1104.5, "gameMode": "CLASSIC", "mapName": "Map11" },
@@ -285,11 +320,18 @@ mod tests {
         let us = snapshot.local_player().expect("we are in the game");
         assert_eq!(us.champion_name, "Ahri");
         assert_eq!(us.position, Some(Role::Middle));
-        assert_eq!(us.item_gold, 3950);
+        assert_eq!(
+            us.items,
+            vec![
+                InventoryItem { item_id: 3020, count: 1 },
+                InventoryItem { item_id: 3165, count: 1 },
+            ],
+            "ids and stacks come through; pricing them is the tag layer's job"
+        );
 
         let opponent = snapshot.lane_opponent().expect("Syndra is mid");
         assert_eq!(opponent.champion_name, "Syndra");
-        assert_eq!(opponent.item_gold, 7200);
+        assert_eq!(opponent.items.len(), 3);
         assert_eq!(opponent.level, 12);
     }
 
@@ -389,14 +431,18 @@ mod tests {
             "allPlayers": [{
                 "championName": "Ahri", "team": "ORDER", "position": "MIDDLE",
                 "riotId": "Ahri#EUW",
-                "items": [{ "itemID": 2003, "price": 50, "count": 4 }],
+                "items": [{ "itemID": 2003, "count": 4 }],
                 "scores": {},
             }],
             "gameData": {},
         });
 
         let snapshot = GameSnapshot::from_json(&stacked).unwrap();
-        assert_eq!(snapshot.local_player().unwrap().item_gold, 200);
+        assert_eq!(
+            snapshot.local_player().unwrap().items,
+            vec![InventoryItem { item_id: 2003, count: 4 }],
+            "a stack keeps its size, so the tag layer can price it four times"
+        );
     }
 
     #[test]
