@@ -41,6 +41,10 @@ RIOT_API_KEY=RGAPI-... node scripts/ingest/index.mjs   # a real crawl
 
 ## Releases
 
+[CHANGELOG.md](CHANGELOG.md) records every released version and what changed
+in it. A tag is the only thing that ships a build, so the changelog entry and
+the version bump belong in the same run-up to a tag as the tag itself.
+
 Tagging `v*` builds both platforms and publishes them as a GitHub prerelease.
 The tag must match the version in `package.json`, `src-tauri/tauri.conf.json`
 and `src-tauri/Cargo.toml` — nothing checks this automatically. Run the
