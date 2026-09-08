@@ -28,7 +28,7 @@
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDcyOUEyNDEzNDNGMkEyQzcKUldUSG92SkRFeVNhY3A0RDJzRkw0WjZmNVdGOGVHMUFUWEtYTjdpVlZ3ZXoxczlFUkc1L0RvelIK",
       "endpoints": [
-        "https://updates.spellcheck.gg/latest.json"
+        "https://pub-7d8d63aa0eec43f5a16598403866eed1.r2.dev/latest.json"
       ],
       "windows": {
         "installMode": "passive"
