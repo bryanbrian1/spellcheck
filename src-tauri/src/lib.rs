@@ -15,6 +15,7 @@ pub mod ddragon;
 pub mod lcu;
 pub mod live;
 pub mod recommend;
+pub mod updater;
 
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -413,6 +414,11 @@ impl BuildClaim {
 /// at startup and never re-examined by anything downstream.
 pub fn run() {
     tauri::Builder::default()
+        // The only plugin in the app. It is never reached from the page —
+        // `commands::check_update` and `commands::install_update` are the
+        // whole of its exposure — so the window's capability file still
+        // grants the webview nothing but `core:default`.
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
             let config = resolve_config(app.handle());
             let service = Arc::new(build_service(&config));
@@ -428,6 +434,8 @@ pub fn run() {
             commands::source_label,
             commands::fetch_build,
             commands::data_dragon,
+            commands::check_update,
+            commands::install_update,
         ])
         .run(tauri::generate_context!())
         .expect("spellcheck failed to start");

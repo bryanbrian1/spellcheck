@@ -56,6 +56,50 @@ and `src-tauri/Cargo.toml` — nothing checks this automatically. Run the
 workflow manually (`workflow_dispatch`) to prove a change builds on Windows
 without publishing anything.
 
+## Updates
+
+An installed copy checks for a new version once at launch and, if there is
+one, offers a bar with a button. It never installs on its own — the same rule
+`CLAUDE.md` sets for item set and rune imports, for the same reason.
+
+The source repository is private, and GitHub does not serve a private repo's
+release assets to anonymous clients. An installed app is an anonymous client,
+and the alternative — shipping it a token — would put a credential that reads
+this repository inside a binary anyone can run `strings` on. So the installers
+and the update manifest live in a Cloudflare R2 bucket instead, and the
+GitHub prerelease stays as our own record of what was built.
+
+Two signatures are involved and they are not substitutes for each other:
+
+- **The updater signature** is a minisign keypair. The plugin verifies every
+  download against the public key baked into `src-tauri/tauri.conf.json`, the
+  check cannot be disabled, and it is the only reason serving these files
+  from a public bucket is safe. Generate one with
+  `npx tauri signer generate -w ~/.tauri/spellcheck.key`. **Lose the private
+  key and no installed copy can ever be updated again** — there is no
+  recovery, only a new key and a new manual install for everybody.
+- **OS code signing** is separate, still absent, and is what Gatekeeper and
+  SmartScreen care about.
+
+The release workflow needs these set:
+
+| Name | Kind | What it is |
+| --- | --- | --- |
+| `TAURI_SIGNING_PRIVATE_KEY` | secret | contents of `~/.tauri/spellcheck.key` |
+| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | secret | empty unless you set one |
+| `R2_ACCOUNT_ID` | secret | Cloudflare account id |
+| `R2_ACCESS_KEY_ID` | secret | R2 API token |
+| `R2_SECRET_ACCESS_KEY` | secret | R2 API token |
+| `R2_BUCKET` | secret | bucket name |
+| `R2_PUBLIC_URL` | variable | public base URL, no trailing slash |
+
+`R2_PUBLIC_URL` is a repository *variable* rather than a secret because it is
+public by definition — it is compiled into every binary. It must match the
+`endpoints` entry in `src-tauri/tauri.conf.json`, and **that URL cannot be
+changed for copies already installed**: a shipped binary only ever looks where
+it was built to look. Changing it strands every existing install on the old
+address.
+
 ## Installing a beta build
 
 The betas are unsigned, so both systems will try to stop you once. This is

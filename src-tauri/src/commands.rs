@@ -1,6 +1,6 @@
 //! The frontend's entire surface area.
 //!
-//! Three commands, all thin. None of them names a provider: the UI asks for a
+//! Five commands, all thin. None of them names a provider: the UI asks for a
 //! build and gets [`BuildLookup`] back, whether that came from OP.GG or from
 //! our own crawl. Swapping sources is a config change, invisible from here.
 
@@ -9,6 +9,7 @@ use std::sync::Arc;
 use tauri::State;
 
 use crate::ddragon::{DataDragon, DataDragonState};
+use crate::updater::UpdateInfo;
 use crate::{BuildLookup, BuildService};
 
 /// Attribution string for whichever source is live. The UI renders it
@@ -66,4 +67,27 @@ pub async fn data_dragon(ddragon: State<'_, Arc<DataDragonState>>) -> Result<Dat
         .await
         .cloned()
         .map_err(|error| error.to_string())
+}
+
+/// Is a newer version waiting?
+///
+/// `None` means the app is current. A failure to reach the manifest comes
+/// back as an error the page is expected to drop on the floor: this app
+/// spends most of its life next to a League client that is not running, and
+/// being offline is not news worth putting on screen.
+#[tauri::command]
+pub async fn check_update(app: tauri::AppHandle) -> Result<Option<UpdateInfo>, String> {
+    crate::updater::check(&app).await
+}
+
+/// Install the waiting update and relaunch.
+///
+/// Only ever called from a button. Nothing in the app installs on its own.
+///
+/// `false` means there was nothing to install after all, which is what a
+/// second press looks like. The page retires the bar rather than reporting
+/// it, because the user asked for a state they are already in.
+#[tauri::command]
+pub async fn install_update(app: tauri::AppHandle) -> Result<bool, String> {
+    crate::updater::install(&app).await
 }
