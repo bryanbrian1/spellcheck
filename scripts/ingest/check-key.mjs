@@ -76,9 +76,21 @@ switch (response.status) {
     break;
 
   case 401:
+    // A key issued seconds ago can 401 before it has reached Riot's edge, so
+    // the first advice here is to wait rather than to re-paste. Seen on
+    // 7 September 2026: a run 10s after the secret was set got 401, and the
+    // next run 40s later got 200 from the same unchanged secret. Telling
+    // someone their key is malformed in that window sends them to replace a
+    // key that was always fine.
     fail("Riot rejected the key outright (401)", [
       "The key was sent but Riot did not recognise it at all.",
-      "That usually means the secret holds something other than a key —",
+      "",
+      "If you have just issued this key, wait a minute and re-run before",
+      "changing anything. A new key can be rejected until it propagates, and",
+      "that has happened here: a check 10 seconds after the secret was set",
+      "failed, and the same secret passed 40 seconds later.",
+      "",
+      "Otherwise the secret probably holds something other than a key —",
       "an empty value, a stray newline, or quotes captured with the paste.",
       "",
       "Re-set it:  gh secret set RIOT_API_KEY --repo bryanbrian1/spellcheck",
