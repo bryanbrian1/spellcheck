@@ -57,6 +57,12 @@ reqwest = { version = "0.12", default-features = false, features = ["json", "rus
 # system WebView (WKWebView on macOS), so no browser engine ships in the
 # binary. That is what keeps us inside the 120MB budget.
 tauri = { version = "2", features = [] }
+# Self-update: checks a manifest on our own bucket, verifies the archive's
+# signature against the public key in tauri.conf.json, and swaps the app.
+# Pulled in for the whole updater stack rather than hand-rolled because the
+# signature verification is the load-bearing part and is not worth
+# reimplementing.
+tauri-plugin-updater = "2"
 # The champ select listener. The client pushes changes over a WebSocket and
 # reqwest cannot speak that protocol, so this is the one new stack the LCU
 # layer needs. It is configured against rustls, which reqwest already pulls

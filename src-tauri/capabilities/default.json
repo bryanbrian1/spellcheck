@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Baseline permissions for the single app window. No plugins, no filesystem, no shell — the frontend only calls our own commands.",
+  "description": "Baseline permissions for the single app window. No filesystem, no shell — the frontend only calls our own commands. The updater plugin is linked, but the page never reaches it directly: it goes through commands::check_update and commands::install_update like everything else, so nothing here has to be granted to the webview.",
   "windows": ["main"],
   "permissions": ["core:default"]
 }
