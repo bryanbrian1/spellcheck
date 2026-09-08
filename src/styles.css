@@ -305,6 +305,11 @@ body{
    than about whichever screen is open. Amber would be wrong here: the
    provenance contract reserves it for rule-based advice, and this is neither
    advice nor a statistic. Accent, used flat. */
+/* Setting display at all defeats the hidden attribute — author CSS beats the
+   UA stylesheet's [hidden]{display:none}, so the bar rendered from launch
+   with empty text and a live button. Every other hideable element here
+   (.suggest) sets no display and needs no such rule. */
+.update[hidden]{display:none}
 .update{
   display:flex;align-items:center;gap:12px;
   padding:9px 16px;flex-shrink:0;
