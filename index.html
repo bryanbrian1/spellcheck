@@ -9,6 +9,15 @@
 <body>
 <div id="app">
 
+  <!-- Shown only when the manifest offers a version newer than this one, and
+       never on its own initiative after that: the install is a button press.
+       Hidden entirely when the app is current, offline, or the endpoint is
+       unreachable — none of which is news. -->
+  <div class="update" id="update" hidden>
+    <span class="update-text" id="update-text"></span>
+    <button class="btn pri" id="update-install">Install and restart</button>
+  </div>
+
   <!-- Two screens, not three. Champ select and the game are one run of
        League and one screen here: it fills in when you lock a champion and
        keeps going once the match starts, adding to what is already there

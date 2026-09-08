@@ -1565,4 +1565,46 @@ void invoke<string>("source_label")
     /* the footer simply carries no attribution if the bridge is unavailable */
   });
 
+/* ---------- self-update ----------
+
+   Checked once, at launch. Not on a timer: a new version appearing five
+   minutes into a game is not something to interrupt anybody about, and the
+   next launch is soon enough.
+
+   Every failure path here is silent. The endpoint being unreachable is
+   indistinguishable from being offline, and this app is designed around
+   spending most of its life beside a League client that is not running. */
+
+interface UpdateInfo {
+  version: string;
+  notes: string;
+}
+
+const updateBar = el<HTMLDivElement>("update");
+const updateText = el<HTMLSpanElement>("update-text");
+const updateInstall = el<HTMLButtonElement>("update-install");
+
+updateInstall.addEventListener("click", () => {
+  // The button is the only route to an install, so it has to stop being one
+  // the moment it is pressed — the download takes long enough to click twice.
+  updateInstall.disabled = true;
+  updateText.textContent = "Downloading\u2026";
+  void invoke<void>("install_update").catch((error: unknown) => {
+    // Failing here is worth saying, unlike failing to check: the user asked
+    // for this one and is waiting on it.
+    updateInstall.disabled = false;
+    updateText.textContent = `Update failed: ${String(error)}`;
+  });
+});
+
+void invoke<UpdateInfo | null>("check_update")
+  .then((info) => {
+    if (!info) return;
+    updateText.textContent = `Version ${info.version} is available.`;
+    updateBar.hidden = false;
+  })
+  .catch(() => {
+    /* offline, or the manifest is unreachable; either way, not worth saying */
+  });
+
 export {};

@@ -299,3 +299,21 @@ body{
 @media (prefers-reduced-motion:reduce){
   :root{--dur-fast:0ms}
 }
+
+/* ---------- update bar ----------
+   Sits above the mode strip so it reads as a statement about the app rather
+   than about whichever screen is open. Amber would be wrong here: the
+   provenance contract reserves it for rule-based advice, and this is neither
+   advice nor a statistic. Accent, used flat. */
+.update{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 16px;flex-shrink:0;
+  background:var(--accent-1);
+  border-bottom:1px solid var(--accent-2);
+}
+.update-text{
+  flex:1;min-width:0;
+  font-size:12.5px;color:var(--text-body);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.update .btn{flex-shrink:0}
