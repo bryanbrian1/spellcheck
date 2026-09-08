@@ -1,19 +1,37 @@
-# Builds the downloadable app for both platforms and publishes it as a
-# GitHub prerelease.
+# Builds the downloadable app for both platforms, publishes it as a GitHub
+# prerelease for our own records, and pushes the installers and the update
+# manifest to the R2 bucket that installed copies actually read.
 #
-# Two things about this workflow are deliberate and easy to undo by accident.
+# Three things about this workflow are deliberate and easy to undo by accident.
 #
 # First, it runs on a Windows runner. Not for convenience — the app cannot be
 # cross-compiled. `ring`, underneath rustls, builds C, and there is no MSVC
 # toolchain on a Mac, so the Windows installer can only be produced on
 # Windows. The matrix is a requirement, not an optimisation.
 #
-# Second, every artifact here is UNSIGNED. macOS marks a downloaded unsigned
-# app as quarantined and Windows shows a SmartScreen warning, so testers need
-# the install notes in the README to get past both. That is an acceptable
-# trade for a beta and a bad one for a public launch. Adding the six Apple
-# secrets to the repo turns signing on without editing this file — but see
-# the signing step for why they cannot simply be listed as build env.
+# Second, two different signatures are in play here and they are not
+# alternatives to each other:
+#
+#   - The updater signature (minisign, TAURI_SIGNING_PRIVATE_KEY) is what an
+#     installed copy verifies before accepting an update. It is mandatory —
+#     the plugin cannot be told to skip it — and it is what makes serving
+#     these files from a bucket anybody can read safe.
+#   - OS code signing (the APPLE_* secrets, and a certificate on Windows) is
+#     what stops Gatekeeper and SmartScreen. It is still absent.
+#
+# So the artifacts here are signed for the updater and UNSIGNED for the
+# operating system: testers still need the install notes in the README. On
+# Windows that is worse than it sounds, because the updater runs the
+# downloaded NSIS installer, so SmartScreen fires on every update rather than
+# only on first install. Adding the six Apple secrets turns macOS code
+# signing on without editing this file — but see the signing step for why
+# they cannot simply be listed as build env.
+#
+# Third, the source repository is private, which is why the publish job
+# exists at all: GitHub will not serve a private repo's release assets to an
+# anonymous client, and an installed app is an anonymous client. Handing it a
+# token instead would ship a credential that reads this repository inside a
+# binary anybody can run `strings` on.
 name: release
 
 on:
@@ -192,6 +210,13 @@ jobs:
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Signs the updater archives. This is NOT code signing — it is the
+          # minisign keypair the updater verifies against, and it is what
+          # makes serving these files from a bucket anybody can read safe.
+          # Without it the build still produces installers, but no .sig, and
+          # an installed copy will refuse every update it is offered.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           # Only publish on a tag. A workflow_dispatch run builds the matrix
           # and uploads nothing.
@@ -217,3 +242,92 @@ jobs:
           # testers this workflow exists to serve.
           releaseDraft: false
           args: ${{ matrix.platform == 'macos-latest' && '--target universal-apple-darwin' || '' }}
+
+      # The updater artifacts have to outlive this job: the manifest names
+      # both platforms and neither runner can see the other's output, so they
+      # meet in the publish job below rather than here.
+      - name: Keep the updater artifacts
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v4
+        with:
+          name: updater-${{ matrix.platform }}
+          if-no-files-found: error
+          path: |
+            src-tauri/target/**/release/bundle/macos/*.app.tar.gz
+            src-tauri/target/**/release/bundle/macos/*.app.tar.gz.sig
+            src-tauri/target/release/bundle/nsis/*-setup.exe
+            src-tauri/target/release/bundle/nsis/*-setup.exe.sig
+
+  # Distribution. The source repository is private, so its release assets are
+  # not downloadable without a GitHub account that can see them — which an
+  # installed copy of the app does not have and must never be given. The
+  # binaries therefore live in an R2 bucket that answers anonymously, and the
+  # GitHub prerelease above stays as our own record of what was built.
+  publish:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      # The manifest carries the signature itself, not a path or a URL to it,
+      # so each .sig is read into the JSON here.
+      - name: Build the update manifest
+        id: manifest
+        env:
+          PUBLIC_URL: ${{ vars.R2_PUBLIC_URL }}
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          mkdir -p upload
+
+          mac=$(find artifacts -name '*.app.tar.gz' | head -1)
+          win=$(find artifacts -name '*-setup.exe' | head -1)
+          for f in "$mac" "$win"; do
+            if [ -z "$f" ] || [ ! -f "$f.sig" ]; then
+              echo "missing artifact or signature for $f" >&2
+              exit 1
+            fi
+            cp "$f" "$f.sig" upload/
+          done
+
+          jq -n \
+            --arg version "$version" \
+            --arg pub_date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg notes "spellcheck $GITHUB_REF_NAME" \
+            --arg mac_url "$PUBLIC_URL/$(basename "$mac")" \
+            --arg mac_sig "$(cat "$mac.sig")" \
+            --arg win_url "$PUBLIC_URL/$(basename "$win")" \
+            --arg win_sig "$(cat "$win.sig")" \
+            '{
+              version: $version,
+              notes: $notes,
+              pub_date: $pub_date,
+              platforms: {
+                "darwin-universal": { signature: $mac_sig, url: $mac_url },
+                "darwin-aarch64":   { signature: $mac_sig, url: $mac_url },
+                "darwin-x86_64":    { signature: $mac_sig, url: $mac_url },
+                "windows-x86_64":   { signature: $win_sig, url: $win_url }
+              }
+            }' > latest.json
+          cat latest.json
+
+      # Binaries first, manifest last, and never in one sweep. A manifest
+      # that lands before the file it names is a manifest that sends every
+      # installed copy at a 404.
+      - name: Upload to R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+          BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          set -euo pipefail
+          aws s3 cp upload/ "s3://$BUCKET/" --recursive --endpoint-url "$ENDPOINT"
+          aws s3 cp latest.json "s3://$BUCKET/latest.json" \
+            --cache-control 'no-cache' --endpoint-url "$ENDPOINT"
