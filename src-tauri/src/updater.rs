@@ -52,6 +52,11 @@ pub async fn check(app: &AppHandle) -> Result<Option<UpdateInfo>, String> {
 
 /// Download the waiting update, install it, and relaunch into it.
 ///
+/// `Ok(false)` means there was nothing left to install by the time the button
+/// was pressed — the ordinary way to reach that is pressing it twice, since
+/// the first press restarts into a version the second one then finds current.
+/// It is a no-op, not a failure, and the page must not report it as one.
+///
 /// The check runs again here rather than the handle from [`check`] being held
 /// in app state. That costs one more request to a few hundred bytes of
 /// manifest, and buys not having to keep a live download handle alive across
@@ -62,14 +67,16 @@ pub async fn check(app: &AppHandle) -> Result<Option<UpdateInfo>, String> {
 /// compiled into `tauri.conf.json` before anything is written. That check is
 /// the plugin's, it cannot be turned off, and it is the only reason serving
 /// these files from a bucket anybody can read is safe.
-pub async fn install(app: &AppHandle) -> Result<(), String> {
-    let update = app
+pub async fn install(app: &AppHandle) -> Result<bool, String> {
+    let Some(update) = app
         .updater()
         .map_err(|error| error.to_string())?
         .check()
         .await
         .map_err(|error| error.to_string())?
-        .ok_or_else(|| "no update to install".to_string())?;
+    else {
+        return Ok(false);
+    };
 
     update
         .download_and_install(|_chunk, _total| {}, || {})

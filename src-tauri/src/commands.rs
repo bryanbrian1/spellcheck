@@ -83,7 +83,11 @@ pub async fn check_update(app: tauri::AppHandle) -> Result<Option<UpdateInfo>, S
 /// Install the waiting update and relaunch.
 ///
 /// Only ever called from a button. Nothing in the app installs on its own.
+///
+/// `false` means there was nothing to install after all, which is what a
+/// second press looks like. The page retires the bar rather than reporting
+/// it, because the user asked for a state they are already in.
 #[tauri::command]
-pub async fn install_update(app: tauri::AppHandle) -> Result<(), String> {
+pub async fn install_update(app: tauri::AppHandle) -> Result<bool, String> {
     crate::updater::install(&app).await
 }

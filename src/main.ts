@@ -1589,12 +1589,20 @@ updateInstall.addEventListener("click", () => {
   // the moment it is pressed — the download takes long enough to click twice.
   updateInstall.disabled = true;
   updateText.textContent = "Downloading\u2026";
-  void invoke<void>("install_update").catch((error: unknown) => {
-    // Failing here is worth saying, unlike failing to check: the user asked
-    // for this one and is waiting on it.
-    updateInstall.disabled = false;
-    updateText.textContent = `Update failed: ${String(error)}`;
-  });
+  void invoke<boolean>("install_update")
+    .then((installed) => {
+      // A successful install never returns — the app restarts into the new
+      // version. Reaching here with `false` means the press was redundant:
+      // the version on offer is already the one running. Retire the bar
+      // rather than reporting a state the user asked to be in.
+      if (!installed) updateBar.hidden = true;
+    })
+    .catch((error: unknown) => {
+      // Failing here is worth saying, unlike failing to check: the user
+      // asked for this one and is waiting on it.
+      updateInstall.disabled = false;
+      updateText.textContent = `Update failed: ${String(error)}`;
+    });
 });
 
 void invoke<UpdateInfo | null>("check_update")
