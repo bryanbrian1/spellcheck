@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-07T15:48:40.459Z",
+  "updatedAt": "2026-09-08T14:22:54.997Z",
   "stats": {
-    "games": 40,
-    "winRate": 0.45
+    "games": 47,
+    "winRate": 0.4468
   },
   "items": {
     "starters": [
@@ -20,8 +20,8 @@
         "items": [
           2003
         ],
-        "games": 40,
-        "winRate": 0.45
+        "games": 47,
+        "winRate": 0.4468
       }
     ],
     "boots": [
@@ -29,15 +29,15 @@
         "items": [
           1001
         ],
-        "games": 27,
-        "winRate": 0.4444
+        "games": 32,
+        "winRate": 0.4375
       },
       {
         "items": [
           3158
         ],
-        "games": 12,
-        "winRate": 0.4167
+        "games": 14,
+        "winRate": 0.4286
       },
       {
         "items": [
@@ -76,6 +76,27 @@
   "runes": [
     {
       "primaryStyle": 8200,
+      "secondaryStyle": 8100,
+      "primary": [
+        8229,
+        8226,
+        8210,
+        8237
+      ],
+      "secondary": [
+        8126,
+        8106
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 7,
+      "winRate": 0.7143
+    },
+    {
+      "primaryStyle": 8200,
       "secondaryStyle": 8300,
       "primary": [
         8229,
@@ -94,27 +115,6 @@
       ],
       "games": 7,
       "winRate": 0.2857
-    },
-    {
-      "primaryStyle": 8200,
-      "secondaryStyle": 8100,
-      "primary": [
-        8229,
-        8226,
-        8210,
-        8237
-      ],
-      "secondary": [
-        8126,
-        8106
-      ],
-      "shards": [
-        5008,
-        5008,
-        5001
-      ],
-      "games": 4,
-      "winRate": 0.75
     }
   ],
   "summoners": [
@@ -123,7 +123,7 @@
         4,
         7
       ],
-      "games": 32,
+      "games": 38,
       "winRate": 0.5
     },
     {
@@ -131,7 +131,7 @@
         3,
         4
       ],
-      "games": 3,
+      "games": 4,
       "winRate": 0
     }
   ],

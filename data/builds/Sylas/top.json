@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-07T15:48:40.459Z",
+  "updatedAt": "2026-09-08T14:22:54.997Z",
   "stats": {
-    "games": 21,
-    "winRate": 0.5714
+    "games": 32,
+    "winRate": 0.4688
   },
   "items": {
     "starters": [
@@ -21,8 +21,8 @@
           1056,
           2003
         ],
-        "games": 21,
-        "winRate": 0.5714
+        "games": 32,
+        "winRate": 0.4688
       }
     ],
     "boots": [
@@ -30,14 +30,14 @@
         "items": [
           1001
         ],
-        "games": 20,
-        "winRate": 0.55
+        "games": 30,
+        "winRate": 0.4333
       },
       {
         "items": [
           3158
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       }
     ],
@@ -46,17 +46,8 @@
         "items": [
           3152
         ],
-        "games": 7,
-        "winRate": 0.7143
-      },
-      {
-        "items": [
-          3152,
-          4629,
-          3157
-        ],
-        "games": 2,
-        "winRate": 1
+        "games": 8,
+        "winRate": 0.75
       },
       {
         "items": [
@@ -64,8 +55,16 @@
           4633,
           3157
         ],
-        "games": 2,
+        "games": 4,
         "winRate": 1
+      },
+      {
+        "items": [
+          3152,
+          4633
+        ],
+        "games": 4,
+        "winRate": 0
       }
     ],
     "situational": []
@@ -89,7 +88,7 @@
         5008,
         5011
       ],
-      "games": 4,
+      "games": 6,
       "winRate": 0.5
     },
     {
@@ -110,7 +109,7 @@
         5008,
         5011
       ],
-      "games": 2,
+      "games": 4,
       "winRate": 1
     }
   ],
@@ -120,16 +119,16 @@
         4,
         12
       ],
-      "games": 13,
-      "winRate": 0.8462
+      "games": 18,
+      "winRate": 0.7778
     },
     {
       "spells": [
         4,
         14
       ],
-      "games": 5,
-      "winRate": 0.2
+      "games": 10,
+      "winRate": 0.1
     }
   ],
   "skills": {
@@ -139,9 +138,9 @@
       "Q"
     ],
     "order": [
+      "Q",
       "E",
       "W",
-      "Q",
       "W",
       "W"
     ]

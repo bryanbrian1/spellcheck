@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-07T15:48:40.459Z",
+  "updatedAt": "2026-09-08T14:22:54.997Z",
   "stats": {
-    "games": 14,
-    "winRate": 0.6429
+    "games": 20,
+    "winRate": 0.65
   },
   "items": {
     "starters": [
@@ -21,8 +21,8 @@
           1056,
           2003
         ],
-        "games": 11,
-        "winRate": 0.5455
+        "games": 17,
+        "winRate": 0.5882
       },
       {
         "items": [
@@ -38,18 +38,27 @@
         "items": [
           1001
         ],
-        "games": 13,
-        "winRate": 0.6923
+        "games": 18,
+        "winRate": 0.7222
       },
       {
         "items": [
           3047
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 0
       }
     ],
     "core": [
+      {
+        "items": [
+          3110,
+          3116,
+          3157
+        ],
+        "games": 3,
+        "winRate": 1
+      },
       {
         "items": [
           3116,
@@ -66,15 +75,6 @@
         ],
         "games": 1,
         "winRate": 1
-      },
-      {
-        "items": [
-          3110,
-          3116,
-          3157
-        ],
-        "games": 1,
-        "winRate": 1
       }
     ],
     "situational": [
@@ -82,7 +82,7 @@
         "items": [
           2504
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       },
       {
@@ -158,8 +158,8 @@
         4,
         12
       ],
-      "games": 8,
-      "winRate": 0.75
+      "games": 11,
+      "winRate": 0.6364
     },
     {
       "spells": [

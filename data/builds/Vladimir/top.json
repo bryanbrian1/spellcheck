@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-07T15:48:40.459Z",
+  "updatedAt": "2026-09-08T14:22:54.997Z",
   "stats": {
-    "games": 52,
-    "winRate": 0.5385
+    "games": 68,
+    "winRate": 0.5
   },
   "items": {
     "starters": [
@@ -21,8 +21,8 @@
           1056,
           2003
         ],
-        "games": 52,
-        "winRate": 0.5385
+        "games": 68,
+        "winRate": 0.5
       }
     ],
     "boots": [
@@ -30,8 +30,8 @@
         "items": [
           1001
         ],
-        "games": 43,
-        "winRate": 0.5814
+        "games": 56,
+        "winRate": 0.5536
       },
       {
         "items": [
@@ -44,7 +44,7 @@
         "items": [
           3009
         ],
-        "games": 3,
+        "games": 4,
         "winRate": 0
       }
     ],
@@ -54,8 +54,8 @@
           4629,
           4633
         ],
-        "games": 8,
-        "winRate": 0.25
+        "games": 10,
+        "winRate": 0.2
       },
       {
         "items": [
@@ -70,8 +70,8 @@
           3152,
           3089
         ],
-        "games": 3,
-        "winRate": 0.6667
+        "games": 4,
+        "winRate": 0.75
       }
     ],
     "situational": [
@@ -79,7 +79,14 @@
         "items": [
           3089
         ],
-        "games": 2,
+        "games": 4,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3135
+        ],
+        "games": 3,
         "winRate": 0
       },
       {
@@ -87,13 +94,6 @@
           3157
         ],
         "games": 2,
-        "winRate": 0
-      },
-      {
-        "items": [
-          3135
-        ],
-        "games": 1,
         "winRate": 0
       }
     ]
@@ -148,16 +148,16 @@
         4,
         6
       ],
-      "games": 41,
-      "winRate": 0.4878
+      "games": 55,
+      "winRate": 0.4545
     },
     {
       "spells": [
         4,
         14
       ],
-      "games": 11,
-      "winRate": 0.7273
+      "games": 13,
+      "winRate": 0.6923
     }
   ],
   "skills": {

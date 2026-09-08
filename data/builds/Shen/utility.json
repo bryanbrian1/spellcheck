@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-07T15:48:40.459Z",
+  "updatedAt": "2026-09-08T14:22:54.997Z",
   "stats": {
-    "games": 82,
-    "winRate": 0.4024
+    "games": 100,
+    "winRate": 0.43
   },
   "items": {
     "starters": [
@@ -20,8 +20,8 @@
         "items": [
           2003
         ],
-        "games": 81,
-        "winRate": 0.4074
+        "games": 99,
+        "winRate": 0.4343
       },
       {
         "items": [
@@ -37,8 +37,8 @@
         "items": [
           1001
         ],
-        "games": 48,
-        "winRate": 0.3958
+        "games": 58,
+        "winRate": 0.4655
       },
       {
         "items": [
@@ -51,8 +51,8 @@
         "items": [
           3047
         ],
-        "games": 5,
-        "winRate": 0.6
+        "games": 7,
+        "winRate": 0.5714
       }
     ],
     "core": [
@@ -60,15 +60,15 @@
         "items": [
           3190
         ],
-        "games": 18,
-        "winRate": 0.3889
+        "games": 25,
+        "winRate": 0.44
       },
       {
         "items": [
           2525
         ],
-        "games": 11,
-        "winRate": 0.2727
+        "games": 14,
+        "winRate": 0.2143
       },
       {
         "items": [
@@ -100,8 +100,8 @@
         5010,
         5011
       ],
-      "games": 24,
-      "winRate": 0.5417
+      "games": 29,
+      "winRate": 0.5862
     },
     {
       "primaryStyle": 8400,
@@ -121,8 +121,8 @@
         5010,
         5011
       ],
-      "games": 18,
-      "winRate": 0.5
+      "games": 24,
+      "winRate": 0.4167
     }
   ],
   "summoners": [
@@ -131,22 +131,22 @@
         3,
         4
       ],
-      "games": 42,
-      "winRate": 0.4524
+      "games": 50,
+      "winRate": 0.5
     },
     {
       "spells": [
         4,
         7
       ],
-      "games": 22,
-      "winRate": 0.3182
+      "games": 28,
+      "winRate": 0.3571
     }
   ],
   "skills": {
     "priority": [
-      "E",
       "Q",
+      "E",
       "W"
     ],
     "order": [

@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-07T15:48:40.459Z",
+  "updatedAt": "2026-09-08T14:22:54.997Z",
   "stats": {
-    "games": 137,
-    "winRate": 0.5474
+    "games": 192,
+    "winRate": 0.5313
   },
   "items": {
     "starters": [
@@ -20,8 +20,16 @@
         "items": [
           2003
         ],
-        "games": 136,
-        "winRate": 0.5441
+        "games": 190,
+        "winRate": 0.5316
+      },
+      {
+        "items": [
+          1120,
+          2003
+        ],
+        "games": 1,
+        "winRate": 0
       }
     ],
     "boots": [
@@ -29,19 +37,19 @@
         "items": [
           1001
         ],
-        "games": 134,
-        "winRate": 0.5597
+        "games": 185,
+        "winRate": 0.5514
       },
       {
         "items": [
           3009
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 0
       },
       {
         "items": [
-          3158
+          3020
         ],
         "games": 1,
         "winRate": 0
@@ -50,18 +58,18 @@
     "core": [
       {
         "items": [
-          3190,
-          3109
+          3190
         ],
-        "games": 18,
-        "winRate": 0.6667
+        "games": 28,
+        "winRate": 0.3571
       },
       {
         "items": [
-          3190
+          3190,
+          3109
         ],
-        "games": 17,
-        "winRate": 0.4706
+        "games": 23,
+        "winRate": 0.6522
       },
       {
         "items": [
@@ -108,8 +116,8 @@
         5010,
         5011
       ],
-      "games": 37,
-      "winRate": 0.6216
+      "games": 49,
+      "winRate": 0.5714
     },
     {
       "primaryStyle": 8300,
@@ -139,16 +147,16 @@
         4,
         14
       ],
-      "games": 68,
-      "winRate": 0.5441
+      "games": 95,
+      "winRate": 0.5158
     },
     {
       "spells": [
         4,
         7
       ],
-      "games": 62,
-      "winRate": 0.5484
+      "games": 87,
+      "winRate": 0.5402
     }
   ],
   "skills": {

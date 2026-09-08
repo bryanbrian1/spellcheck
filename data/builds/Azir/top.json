@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-07T15:48:40.459Z",
+  "updatedAt": "2026-09-08T14:22:54.997Z",
   "stats": {
-    "games": 37,
-    "winRate": 0.4324
+    "games": 50,
+    "winRate": 0.46
   },
   "items": {
     "starters": [
@@ -21,8 +21,8 @@
           1056,
           2003
         ],
-        "games": 37,
-        "winRate": 0.4324
+        "games": 50,
+        "winRate": 0.46
       }
     ],
     "boots": [
@@ -30,21 +30,21 @@
         "items": [
           1001
         ],
-        "games": 30,
-        "winRate": 0.4333
+        "games": 41,
+        "winRate": 0.4634
       },
       {
         "items": [
           3158
         ],
-        "games": 3,
+        "games": 4,
         "winRate": 1
       },
       {
         "items": [
           3020
         ],
-        "games": 3,
+        "games": 4,
         "winRate": 0
       }
     ],
@@ -53,15 +53,15 @@
         "items": [
           3115
         ],
-        "games": 9,
-        "winRate": 0
+        "games": 14,
+        "winRate": 0.0714
       },
       {
         "items": [
           3115,
           3157
         ],
-        "games": 2,
+        "games": 4,
         "winRate": 0.5
       },
       {
@@ -78,14 +78,14 @@
         "items": [
           3135
         ],
-        "games": 9,
+        "games": 11,
         "winRate": 1
       },
       {
         "items": [
           3089
         ],
-        "games": 3,
+        "games": 4,
         "winRate": 1
       },
       {
@@ -116,8 +116,8 @@
         5008,
         5011
       ],
-      "games": 6,
-      "winRate": 0.1667
+      "games": 10,
+      "winRate": 0.3
     },
     {
       "primaryStyle": 8000,
@@ -147,8 +147,8 @@
         4,
         12
       ],
-      "games": 36,
-      "winRate": 0.4444
+      "games": 49,
+      "winRate": 0.4694
     },
     {
       "spells": [

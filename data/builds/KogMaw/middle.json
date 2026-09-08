@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-07T15:48:40.459Z",
+  "updatedAt": "2026-09-08T14:22:54.997Z",
   "stats": {
-    "games": 20,
-    "winRate": 0.85
+    "games": 25,
+    "winRate": 0.84
   },
   "items": {
     "starters": [
@@ -21,8 +21,8 @@
           1056,
           2003
         ],
-        "games": 19,
-        "winRate": 0.8421
+        "games": 24,
+        "winRate": 0.8333
       },
       {
         "items": [
@@ -38,18 +38,26 @@
         "items": [
           1001
         ],
-        "games": 16,
-        "winRate": 0.8125
+        "games": 20,
+        "winRate": 0.8
       },
       {
         "items": [
           3020
         ],
-        "games": 4,
+        "games": 5,
         "winRate": 1
       }
     ],
     "core": [
+      {
+        "items": [
+          2510,
+          4645
+        ],
+        "games": 6,
+        "winRate": 0.6667
+      },
       {
         "items": [
           6655,
@@ -61,18 +69,10 @@
       },
       {
         "items": [
-          2510,
-          4645
-        ],
-        "games": 5,
-        "winRate": 0.6
-      },
-      {
-        "items": [
           6655,
           4645
         ],
-        "games": 3,
+        "games": 4,
         "winRate": 1
       }
     ],
@@ -112,8 +112,8 @@
         5008,
         5011
       ],
-      "games": 7,
-      "winRate": 0.8571
+      "games": 8,
+      "winRate": 0.875
     },
     {
       "primaryStyle": 8000,
@@ -133,8 +133,8 @@
         5008,
         5001
       ],
-      "games": 3,
-      "winRate": 1
+      "games": 5,
+      "winRate": 0.8
     }
   ],
   "summoners": [
@@ -143,16 +143,16 @@
         4,
         6
       ],
-      "games": 12,
-      "winRate": 0.9167
+      "games": 14,
+      "winRate": 0.9286
     },
     {
       "spells": [
         3,
         4
       ],
-      "games": 3,
-      "winRate": 1
+      "games": 5,
+      "winRate": 0.8
     }
   ],
   "skills": {
@@ -163,8 +163,8 @@
     ],
     "order": [
       "E",
-      "Q",
       "W",
+      "Q",
       "E",
       "E"
     ]

@@ -9,10 +9,10 @@
   "patch": "16.17",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-07T15:48:40.459Z",
+  "updatedAt": "2026-09-08T14:22:54.997Z",
   "stats": {
-    "games": 56,
-    "winRate": 0.375
+    "games": 77,
+    "winRate": 0.3896
   },
   "items": {
     "starters": [
@@ -21,16 +21,16 @@
           1086,
           2003
         ],
-        "games": 42,
-        "winRate": 0.4524
+        "games": 57,
+        "winRate": 0.4561
       },
       {
         "items": [
           1054,
           2003
         ],
-        "games": 11,
-        "winRate": 0.1818
+        "games": 17,
+        "winRate": 0.2353
       }
     ],
     "boots": [
@@ -38,15 +38,15 @@
         "items": [
           1001
         ],
-        "games": 30,
-        "winRate": 0.3
+        "games": 43,
+        "winRate": 0.3256
       },
       {
         "items": [
           3006
         ],
-        "games": 23,
-        "winRate": 0.3913
+        "games": 31,
+        "winRate": 0.4194
       },
       {
         "items": [
@@ -89,8 +89,15 @@
         "items": [
           3026
         ],
-        "games": 7,
-        "winRate": 0.4286
+        "games": 9,
+        "winRate": 0.4444
+      },
+      {
+        "items": [
+          6333
+        ],
+        "games": 5,
+        "winRate": 0.4
       },
       {
         "items": [
@@ -101,23 +108,16 @@
       },
       {
         "items": [
-          6333
-        ],
-        "games": 3,
-        "winRate": 0.3333
-      },
-      {
-        "items": [
-          3143
+          3031
         ],
         "games": 2,
         "winRate": 1
       },
       {
         "items": [
-          3031
+          3143
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       },
       {
@@ -179,15 +179,15 @@
         3,
         4
       ],
-      "games": 44,
-      "winRate": 0.4545
+      "games": 60,
+      "winRate": 0.4833
     },
     {
       "spells": [
         4,
         12
       ],
-      "games": 6,
+      "games": 10,
       "winRate": 0
     }
   ],
