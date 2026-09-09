@@ -82,9 +82,23 @@ pub async fn check_update(app: tauri::AppHandle) -> Result<Option<UpdateInfo>, S
 
 /// Open the installer for a newer version in the browser.
 ///
-/// Only ever called from a button. The app does not install anything itself
-/// while it is unsigned — see `updater` for what goes wrong when it tries.
+/// Only ever called from a button, and the whole of the story on macOS, where
+/// the app installing itself would destroy itself — see `updater`.
 #[tauri::command]
 pub fn open_download(version: String) -> Result<(), String> {
     crate::updater::open_download(&version)
+}
+
+/// Install the waiting update and restart into it.
+///
+/// Only ever called from a button, and only on Windows — `updater::install`
+/// refuses anywhere else rather than trusting the page to have asked the right
+/// question. On Windows this does not return: the NSIS installer needs the
+/// running copy gone, so the plugin closes it.
+///
+/// `Ok(false)` means the update was already gone by the time the button was
+/// pressed, which is a redundant press rather than a failure.
+#[tauri::command]
+pub async fn install_update(app: tauri::AppHandle) -> Result<bool, String> {
+    crate::updater::install(&app).await
 }

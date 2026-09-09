@@ -1567,9 +1567,11 @@ void invoke<string>("source_label")
 
 /* ---------- update notice ----------
 
-   A notice, not an installer. The app checks whether a newer version exists
-   and opens its download; it does not replace itself, because an unsigned
-   app that tries to do that inside /Applications destroys itself. See
+   A notice on macOS, an installer on Windows, and the app is not the one
+   deciding which: canInstall comes off the check, and install_update refuses
+   on its own if the page asks anyway. macOS is a notice because an unsigned
+   bundle replacing itself inside /Applications destroys itself; Windows has
+   no such rule, so pressing the button there does the whole job. See
    src-tauri/src/updater.rs.
 
    Checked once, at launch. Not on a timer: a new version appearing five
@@ -1583,6 +1585,7 @@ void invoke<string>("source_label")
 interface UpdateInfo {
   version: string;
   notes: string;
+  canInstall: boolean;
 }
 
 const updateBar = el<HTMLDivElement>("update");
@@ -1590,22 +1593,51 @@ const updateText = el<HTMLSpanElement>("update-text");
 const updateInstall = el<HTMLButtonElement>("update-install");
 
 let offered: string | null = null;
+let installable = false;
 
 updateInstall.addEventListener("click", () => {
   if (!offered) return;
-  // Opens the installer in the default browser. The app does not install it
-  // — see updater.rs for what an unsigned app does to itself when it tries.
-  void invoke<void>("open_download", { version: offered }).catch((error: unknown) => {
-    // The user pressed this and is waiting on it, so unlike a failed check it
-    // is worth saying so.
-    updateText.textContent = `Could not open the download: ${String(error)}`;
-  });
+
+  if (!installable) {
+    // Opens the installer in the default browser and leaves the rest to the
+    // user — see updater.rs for what this platform does to itself otherwise.
+    void invoke<void>("open_download", { version: offered }).catch((error: unknown) => {
+      // The user pressed this and is waiting on it, so unlike a failed check
+      // it is worth saying so.
+      updateText.textContent = `Could not open the download: ${String(error)}`;
+    });
+    return;
+  }
+
+  // Downloading a whole installer takes long enough that a button which does
+  // nothing visible reads as broken and gets pressed again. It is disabled
+  // for the duration rather than merely relabelled, because the second press
+  // is the one that would start a second download.
+  updateInstall.disabled = true;
+  updateText.textContent = `Installing ${offered}…`;
+
+  void invoke<boolean>("install_update")
+    .then((installed) => {
+      // Only reachable when there was nothing left to install: a real install
+      // closes the app to let the installer replace it, so success never
+      // returns here. A redundant press is a no-op, not a failure.
+      if (!installed) updateBar.hidden = true;
+    })
+    .catch((error: unknown) => {
+      updateInstall.disabled = false;
+      updateText.textContent = `Update failed: ${String(error)}`;
+    });
 });
 
 void invoke<UpdateInfo | null>("check_update")
   .then((info) => {
     if (!info) return;
     offered = info.version;
+    installable = info.canInstall;
+    // The button has to say which of the two things it does. "Download" that
+    // silently installed, or "Install" that opened a browser, would each be
+    // the wrong promise on one of the platforms.
+    updateInstall.textContent = installable ? "Install" : "Download";
     updateText.textContent = `Version ${info.version} is available.`;
     updateBar.hidden = false;
   })
