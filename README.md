@@ -188,17 +188,41 @@ or registered trademarks of Riot Games, Inc.
 
 ## Installing a beta build
 
-The betas are unsigned, so both systems will try to stop you once. This is
-expected and not a sign of a bad download.
+The betas are unsigned, so both systems try to stop you. macOS does it once
+per install; Windows does it on every update, because the updater runs the
+installer again each time. Neither is a sign of a bad download.
 
-- **macOS** — the app is blocked on first open. System Settings → Privacy &
-  Security → scroll down → **Open Anyway**.
-- **Windows** — SmartScreen shows "Windows protected your PC". **More info**
-  → **Run anyway**.
+**macOS**
+
+1. Open the `.dmg` and drag spellcheck out of it.
+2. Launch it. It gets blocked — do this anyway, because the refused launch is
+   what puts the app in the queue for step 3.
+3. System Settings → Privacy & Security, scroll down to Security. There is a
+   line naming spellcheck and an **Open Anyway** button. Click it and
+   authenticate.
+4. Launch again. It opens, and keeps opening from then on.
+
+Right-clicking the app and choosing **Open** used to be the shortcut for this
+and no longer works on current macOS. System Settings is the only route.
+
+**Keep betas out of `/Applications`.** An unsigned bundle cannot replace
+itself there: the updater leaves the new copy beside the old one under a
+collision name and deletes the original, so the relaunch finds nothing. Use
+`~/Applications` or anywhere else until the app is signed.
+
+**Windows**
+
+1. Run the `-setup.exe`. SmartScreen shows "Windows protected your PC", with
+   only a **Don't run** button.
+2. Click **More info**. That reveals a **Run anyway** button.
+3. Click **Run anyway**.
+
+Expect this on every update, not just the first install.
 
 Signing removes both prompts: an Apple Developer account ($99/yr) for macOS,
 and a certificate for Windows. Adding the `APPLE_*` secrets to the repo is
 enough to turn macOS signing on — the release workflow already reads them.
+Windows has no equivalent step in the workflow yet.
 
 If League is installed somewhere other than the default location — most
 likely on Windows, where the installer lets you pick a drive — point the app
