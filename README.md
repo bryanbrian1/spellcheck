@@ -4,6 +4,33 @@ A macOS and Windows app that detects the champion and role you lock into
 during League champion select, then shows the optimal build path — items,
 runes, summoners, skill order — for that pair.
 
+## Latest release — 0.1.2
+
+Download: **[macOS (universal)](https://pub-7d8d63aa0eec43f5a16598403866eed1.r2.dev/spellcheck_0.1.2_universal.dmg)**
+· **[Windows (x64)](https://pub-7d8d63aa0eec43f5a16598403866eed1.r2.dev/spellcheck_0.1.2_x64-setup.exe)**
+
+The first build that can tell you a newer one exists, and the first that
+anyone outside this repository can actually download.
+
+- An installed copy now checks once at launch whether a newer version is out
+  and shows a bar naming it. It never installs on its own.
+- The in-game standing was wrong roughly a third of the time and biased
+  toward whoever was losing — inventories were priced from a field that
+  reports combine cost rather than total, so a finished Rabadon's counted
+  1100 against a real 3500. Now priced from the item table.
+- Boots and situational items render as a menu you choose between, each
+  option named, with its own win rate and sample, sorted by pick rate.
+- Rune pages draw as three rows with their tree names, and stat shards have
+  their art instead of rendering as three empty boxes.
+- A matchup lookup that fails no longer takes the whole build down with it.
+
+These builds are unsigned, so both systems will warn you once — see
+[Installing a beta build](#installing-a-beta-build).
+
+**[CHANGELOG.md](CHANGELOG.md)** carries every version and the full detail,
+and each [GitHub release](https://github.com/bryanbrian1/spellcheck/releases)
+repeats its own entry.
+
 ## Start here
 
 - **[docs/blueprint.html](docs/blueprint.html)** — the architecture blueprint.
@@ -49,6 +76,12 @@ RIOT_API_KEY=RGAPI-... node scripts/ingest/index.mjs   # a real crawl
 [CHANGELOG.md](CHANGELOG.md) records every released version and what changed
 in it. A tag is the only thing that ships a build, so the changelog entry and
 the version bump belong in the same run-up to a tag as the tag itself.
+
+Two other places repeat that entry and go stale silently if they are not
+moved with it: the **Latest release** section at the top of this file, and
+the GitHub release description, which the workflow fills with install notes
+rather than a changelog. Update the first by hand and the second with
+`gh release edit vX.Y.Z --notes-file <file>`.
 
 Tagging `v*` builds both platforms and publishes them as a GitHub prerelease.
 The tag must match the version in `package.json`, `src-tauri/tauri.conf.json`
