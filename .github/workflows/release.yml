@@ -255,6 +255,7 @@ jobs:
           path: |
             src-tauri/target/**/release/bundle/macos/*.app.tar.gz
             src-tauri/target/**/release/bundle/macos/*.app.tar.gz.sig
+            src-tauri/target/**/release/bundle/dmg/*.dmg
             src-tauri/target/release/bundle/nsis/*-setup.exe
             src-tauri/target/release/bundle/nsis/*-setup.exe.sig
 
@@ -294,6 +295,14 @@ jobs:
             fi
             cp "$f" "$f.sig" upload/
           done
+
+          # The .dmg is what a person downloads and installs; the .app.tar.gz
+          # above is only what the updater reads. The bar's Download button
+          # builds this filename from the version, so a rename here silently
+          # breaks it.
+          dmg=$(find artifacts -name '*.dmg' | head -1)
+          [ -n "$dmg" ] || { echo "no .dmg among the artifacts" >&2; exit 1; }
+          cp "$dmg" upload/
 
           jq -n \
             --arg version "$version" \

@@ -415,9 +415,10 @@ impl BuildClaim {
 pub fn run() {
     tauri::Builder::default()
         // The only plugin in the app. It is never reached from the page —
-        // `commands::check_update` and `commands::install_update` are the
-        // whole of its exposure — so the window's capability file still
-        // grants the webview nothing but `core:default`.
+        // `commands::check_update` is the whole of its exposure — so the
+        // window's capability file still grants the webview nothing but
+        // `core:default`. The install half is deliberately not exposed at
+        // all while the app is unsigned; see `updater`.
         .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
             let config = resolve_config(app.handle());
@@ -435,7 +436,7 @@ pub fn run() {
             commands::fetch_build,
             commands::data_dragon,
             commands::check_update,
-            commands::install_update,
+            commands::open_download,
         ])
         .run(tauri::generate_context!())
         .expect("spellcheck failed to start");

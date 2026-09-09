@@ -1565,7 +1565,12 @@ void invoke<string>("source_label")
     /* the footer simply carries no attribution if the bridge is unavailable */
   });
 
-/* ---------- self-update ----------
+/* ---------- update notice ----------
+
+   A notice, not an installer. The app checks whether a newer version exists
+   and opens its download; it does not replace itself, because an unsigned
+   app that tries to do that inside /Applications destroys itself. See
+   src-tauri/src/updater.rs.
 
    Checked once, at launch. Not on a timer: a new version appearing five
    minutes into a game is not something to interrupt anybody about, and the
@@ -1584,30 +1589,23 @@ const updateBar = el<HTMLDivElement>("update");
 const updateText = el<HTMLSpanElement>("update-text");
 const updateInstall = el<HTMLButtonElement>("update-install");
 
+let offered: string | null = null;
+
 updateInstall.addEventListener("click", () => {
-  // The button is the only route to an install, so it has to stop being one
-  // the moment it is pressed — the download takes long enough to click twice.
-  updateInstall.disabled = true;
-  updateText.textContent = "Downloading\u2026";
-  void invoke<boolean>("install_update")
-    .then((installed) => {
-      // A successful install never returns — the app restarts into the new
-      // version. Reaching here with `false` means the press was redundant:
-      // the version on offer is already the one running. Retire the bar
-      // rather than reporting a state the user asked to be in.
-      if (!installed) updateBar.hidden = true;
-    })
-    .catch((error: unknown) => {
-      // Failing here is worth saying, unlike failing to check: the user
-      // asked for this one and is waiting on it.
-      updateInstall.disabled = false;
-      updateText.textContent = `Update failed: ${String(error)}`;
-    });
+  if (!offered) return;
+  // Opens the installer in the default browser. The app does not install it
+  // — see updater.rs for what an unsigned app does to itself when it tries.
+  void invoke<void>("open_download", { version: offered }).catch((error: unknown) => {
+    // The user pressed this and is waiting on it, so unlike a failed check it
+    // is worth saying so.
+    updateText.textContent = `Could not open the download: ${String(error)}`;
+  });
 });
 
 void invoke<UpdateInfo | null>("check_update")
   .then((info) => {
     if (!info) return;
+    offered = info.version;
     updateText.textContent = `Version ${info.version} is available.`;
     updateBar.hidden = false;
   })
