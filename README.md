@@ -145,12 +145,12 @@ address.
 
 ## About
 
-I'm a hardstuck gold mid player, which is exactly the right amount of
-qualification to want this and none of the right amount to hand out advice.
-That shaped the whole thing. spellcheck doesn't tell you what I think you
-should build — it shows you what the data actually says, and on the occasions
-it reasons rather than measures, it says so plainly instead of dressing an
-opinion up as a number.
+I'm a hardstuck gold mid. I built this for myself, and I'm not qualified to
+tell anyone what to build — so the app doesn't. It shows you what the data
+says, and when it's reasoning rather than measuring, it tells you that too.
+
+It's a side project and it's early. If it gets something wrong in your game,
+that's the thing I want to hear about.
 
 Whatever else changes, a few decisions are not up for negotiation, because
 they are the reasons this exists rather than preferences about how to build it:
