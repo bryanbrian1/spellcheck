@@ -6,6 +6,58 @@ anything not listed here was never downloadable.
 
 Dates are the day the tag was pushed. Numbers in brackets are pull requests.
 
+## 0.1.3 — 2026-09-09
+
+Windows installs its own updates now. macOS still does not, and will not
+until the app is code signed — that is a certificate problem rather than a
+code one, and the code for it is already written and waiting.
+
+**You will not see this working until the release after this one.** The
+button in an installed copy is whatever that copy was built with, so a
+tester on 0.1.2 still gets "Download" when this appears. Install 0.1.3 the
+manual way once more, and 0.1.4 is the one that arrives on a single press.
+
+### Changed
+
+- **The update button installs on Windows** instead of opening a browser
+  and leaving the rest to you. It downloads, installs and restarts into the
+  new version. The in-place installer had been switched off for both
+  platforms in 0.1.2 for a reason that only ever applied to macOS, so
+  Windows testers were doing manual reinstalls to work around a restriction
+  their OS does not have. SmartScreen still fires during the install,
+  because the build is unsigned. (#35)
+- The button says which of the two things it does — "Install" on Windows,
+  "Download" on macOS — and disables itself while an install is running, so
+  a long download behind an unchanged button cannot be pressed twice into
+  two downloads. (#35)
+
+### Repository
+
+Nothing here changes the app, but both were wrong in a way that was costing
+somebody the answer to "what is in this version".
+
+- Every GitHub release description is its own changelog entry now, rather
+  than the same eleven lines of install warnings on all of them, and the
+  workflow assembles it from `CHANGELOG.md` at build time instead of a
+  literal that had to be kept in sync by hand. (#37)
+- The README opens with the current release, what changed in it, and the
+  download links. (#36)
+
+### Known
+
+- macOS remains notify-only. An unsigned bundle cannot replace itself inside
+  `/Applications` — App Management has no code signature to check, so the
+  new copy lands beside the old one under a collision name and the original
+  is deleted. Code signing is the only thing that changes this.
+- Builds are unsigned on both platforms, so macOS blocks the first open and
+  Windows shows SmartScreen. On Windows that now happens on every update
+  rather than only on first install.
+- The download address is an `r2.dev` bucket, which Cloudflare documents as
+  development-only and rate limits. Moving off it later costs every
+  installed copy one manual reinstall.
+- Item set and rune page imports are still disabled everywhere: nothing in
+  the LCU layer can write a rune page yet.
+
 ## 0.1.2 — 2026-09-09
 
 The first build that can tell you a newer one exists, and the first that

@@ -4,25 +4,25 @@ A macOS and Windows app that detects the champion and role you lock into
 during League champion select, then shows the optimal build path — items,
 runes, summoners, skill order — for that pair.
 
-## Latest release — 0.1.2
+## Latest release — 0.1.3
 
-Download: **[macOS (universal)](https://pub-7d8d63aa0eec43f5a16598403866eed1.r2.dev/spellcheck_0.1.2_universal.dmg)**
-· **[Windows (x64)](https://pub-7d8d63aa0eec43f5a16598403866eed1.r2.dev/spellcheck_0.1.2_x64-setup.exe)**
+Download: **[macOS (universal)](https://pub-7d8d63aa0eec43f5a16598403866eed1.r2.dev/spellcheck_0.1.3_universal.dmg)**
+· **[Windows (x64)](https://pub-7d8d63aa0eec43f5a16598403866eed1.r2.dev/spellcheck_0.1.3_x64-setup.exe)**
 
-The first build that can tell you a newer one exists, and the first that
-anyone outside this repository can actually download.
+Windows installs its own updates now. macOS still does not, and will not
+until the app is code signed.
 
-- An installed copy now checks once at launch whether a newer version is out
-  and shows a bar naming it. It never installs on its own.
-- The in-game standing was wrong roughly a third of the time and biased
-  toward whoever was losing — inventories were priced from a field that
-  reports combine cost rather than total, so a finished Rabadon's counted
-  1100 against a real 3500. Now priced from the item table.
-- Boots and situational items render as a menu you choose between, each
-  option named, with its own win rate and sample, sorted by pick rate.
-- Rune pages draw as three rows with their tree names, and stat shards have
-  their art instead of rendering as three empty boxes.
-- A matchup lookup that fails no longer takes the whole build down with it.
+- The update button downloads, installs and restarts into the new version on
+  Windows, instead of opening a browser and leaving the rest to you. It says
+  which of the two things it does, and disables itself while installing.
+- On macOS it stays a notice: an unsigned bundle cannot replace itself inside
+  `/Applications` without destroying itself.
+- Every GitHub release now carries its own changelog entry rather than the
+  same install warnings, generated from `CHANGELOG.md` at build time.
+
+You will not see the Windows install button working until 0.1.4 — an
+installed copy uses whatever updater it was built with, so 0.1.3 has to be
+installed by hand once more.
 
 These builds are unsigned, so both systems will warn you once — see
 [Installing a beta build](#installing-a-beta-build).
