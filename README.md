@@ -143,6 +143,34 @@ changed for copies already installed**: a shipped binary only ever looks where
 it was built to look. Changing it strands every existing install on the old
 address.
 
+## About
+
+I'm a hardstuck gold mid player, which is exactly the right amount of
+qualification to want this and none of the right amount to hand out advice.
+That shaped the whole thing. spellcheck doesn't tell you what I think you
+should build — it shows you what the data actually says, and on the occasions
+it reasons rather than measures, it says so plainly instead of dressing an
+opinion up as a number.
+
+Whatever else changes, a few decisions are not up for negotiation, because
+they are the reasons this exists rather than preferences about how to build it:
+
+- **It stays small.** Rust and Tauri, a hard budget of under 120MB resident,
+  a frontend of vanilla TypeScript and plain CSS. Nothing that runs beside a
+  game should cost more than the game does.
+- **It never scrapes.** Documented APIs only — Riot's own, Data Dragon, and
+  OP.GG's published endpoint.
+- **It never acts on its own.** Item set and rune page imports happen on a
+  button press or not at all. An app that rewrites your runes mid-champ-select
+  has taken the decision away from you.
+- **A statistic and a rule never look alike.** A win rate is a measurement; a
+  reason to build antiheal is an argument. The interface will not let the
+  second borrow the authority of the first.
+
+Bug reports and feedback are welcome in
+[issues](https://github.com/bryanbrian1/spellcheck/issues) — what broke is more
+useful than what worked.
+
 ## Licence
 
 MIT. See [LICENSE](LICENSE).
