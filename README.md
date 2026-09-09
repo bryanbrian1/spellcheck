@@ -143,6 +143,21 @@ changed for copies already installed**: a shipped binary only ever looks where
 it was built to look. Changing it strands every existing install on the old
 address.
 
+## Licence
+
+MIT. See [LICENSE](LICENSE).
+
+The build data is not ours to relicense and is not covered by it. Riot-sourced
+data — Data Dragon and our own crawl under `data/` — is redistributable and
+ships with the app. OP.GG data is fetched per request, never cached into this
+repository and never redistributed, which is why `OpggProvider` holds nothing
+between calls.
+
+spellcheck isn't endorsed by Riot Games and doesn't reflect the views or
+opinions of Riot Games or anyone officially involved in producing or managing
+Riot Games properties. Riot Games and all associated properties are trademarks
+or registered trademarks of Riot Games, Inc.
+
 ## Installing a beta build
 
 The betas are unsigned, so both systems will try to stop you once. This is
