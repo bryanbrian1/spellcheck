@@ -6,6 +6,89 @@ anything not listed here was never downloadable.
 
 Dates are the day the tag was pushed. Numbers in brackets are pull requests.
 
+## 0.1.2 — 2026-09-09
+
+The first build that can tell you a newer one exists, and the first that
+anyone outside the repository can actually download. Both of those are new,
+and the second is a correction: the source repository is private, GitHub
+does not serve a private repo's release assets to anonymous clients, and an
+installed app is an anonymous client — so the 0.1.1 installers were never
+downloadable by anybody who was not signed in with access to this repo.
+
+**This one is still a manual install for everybody.** 0.1.1 has no update
+check in it, so nothing already on a tester's machine can be told about
+0.1.2. The bar starts working for the release after this one.
+
+### Added
+
+- An installed copy checks once at launch whether a newer version exists,
+  and shows a bar naming it. It never installs on its own — the button
+  opens that version's installer and you install it the ordinary way, which
+  is the same rule the item set and rune imports follow. (#32, #33)
+- Installers and the update manifest are published to a Cloudflare R2
+  bucket that answers anonymously, and the GitHub prerelease stays as our
+  own record of what was built. Shipping the app a token that reads a
+  private repository was the alternative, and it would have put that
+  credential inside a binary anybody can run `strings` on. (#32)
+
+### Fixed
+
+- **The in-game standing was wrong roughly a third of the time, and biased
+  toward whoever was losing.** Inventories were priced from the live API's
+  `price` field, which is the combine cost rather than the total, so every
+  component already consumed into a finished item went uncounted — a
+  finished Rabadon's counted 1100 against a real 3500, and finished boots
+  counted zero. Measured over 81 samples from one real match: spend counted
+  at 46% of its true value, the standing wrong in 30 of them, and the app
+  silent while genuinely behind in 15. Behind is the only footing that
+  produces advice, so the check went quiet in precisely the window it
+  exists to serve. Pricing now comes from the item table, which carries
+  `gold.total` for all 868 items. (#26)
+- Boots and situational items are a menu you choose between, and now render
+  as one: each option named at a readable size, with its own win rate and
+  its own sample, sorted by how often it is actually built. They were six
+  anonymous 32px squares under a header reading "6 options", with the win
+  rate in a tooltip nobody hovers mid-game. (#26)
+- A matchup lookup that failed or had too few games took the entire build
+  down with it, including the general build the app would otherwise have
+  shown. It falls back now. This only ever hit the in-game route, because
+  champ select cannot name an opponent in any queue that hides the
+  draft. (#26)
+- The header says "Game over" when a game has ended, instead of falling
+  back to describing the client and leaving a finished game looking
+  live. (#26)
+- Stat shards draw their art and their names instead of rendering as
+  "#5005", "#5008" and "#5001" in three empty-looking boxes. Data Dragon
+  does serve the art; the file that indexes runes just omits it. (#26)
+- Rune labels no longer print through the art that replaced them. Item art
+  is an opaque square and rune art is a transparent symbol, so the label
+  underneath showed through the gaps in the glyph. It stands down once art
+  has actually loaded, and still stays put when art fails. (#28)
+- A rune page renders as the three things it is — primary, secondary,
+  shards — each row led by its tree name. Which tree to open for your
+  second pair was previously stated nowhere on the screen. (#29)
+- The crawler's key check tells a fresh 401 to wait before it tells you to
+  re-paste the key. A brand-new Riot key can be rejected until it reaches
+  their edge, which is exactly when a 401 is most likely and exactly when
+  the old advice was wrong. (#31)
+
+### Known
+
+- Builds are still unsigned, so macOS blocks the first open and Windows
+  shows SmartScreen. On Windows this now fires on every update rather than
+  only on first install.
+- The update bar reports and does not install. An unsigned app cannot
+  replace its own bundle inside `/Applications` — it lands beside the old
+  one under a collision name and the original is deleted — so the in-place
+  install is written, tested and deliberately not wired to anything until
+  the app is code signed.
+- The download address is an `r2.dev` bucket, which Cloudflare documents as
+  development-only and rate limits. Moving off it later costs every
+  installed copy one manual reinstall, which is a fair price for a beta and
+  would not be for a release.
+- Item set and rune page imports are still disabled everywhere: nothing in
+  the LCU layer can write a rune page yet.
+
 ## 0.1.1 — 2026-09-06
 
 The app is called spellcheck now, and the companion window was redesigned.
