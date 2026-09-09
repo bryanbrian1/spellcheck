@@ -92,8 +92,18 @@ without publishing anything.
 ## Updates
 
 An installed copy checks for a new version once at launch and, if there is
-one, offers a bar with a button. It never installs on its own — the same rule
-`CLAUDE.md` sets for item set and rune imports, for the same reason.
+one, offers a bar with a button. Nothing is ever installed without that press
+— the same rule `CLAUDE.md` sets for item set and rune imports, for the same
+reason.
+
+What the press does depends on the platform, and the app decides rather than
+the page. **On Windows** it downloads the update, installs it and restarts
+into it; SmartScreen fires each time, because the build is unsigned. **On
+macOS** it opens the installer in a browser and you install it by hand: an
+unsigned bundle cannot replace itself inside `/Applications` — App Management
+has no code signature to check, so the new copy lands beside the old one under
+a collision name and the original is deleted. Code signing is the only thing
+that changes this.
 
 The source repository is private, and GitHub does not serve a private repo's
 release assets to anonymous clients. An installed app is an anonymous client,

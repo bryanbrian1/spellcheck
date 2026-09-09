@@ -1,17 +1,30 @@
-//! Noticing that a new version exists, and pointing at it.
+//! Noticing that a new version exists, and — on Windows — installing it.
 //!
-//! This is deliberately *not* a self-installing updater, even though the
-//! machinery for one is present and tested. On macOS an unsigned app cannot
-//! replace its own bundle inside `/Applications`: App Management protection
-//! decides whether an app may modify an app there by looking at code
-//! signatures, an unsigned bundle has no identity to check, and what actually
-//! happens is that the new version lands beside the old one under a Finder
-//! collision name and the original is deleted. The user is left with no app.
+//! Whether the app may replace itself is a per-platform answer, and for a
+//! while it was answered globally with "no". That was right for the platform
+//! it was reasoned about and wrong for the other one.
 //!
-//! So until the app is signed, the check runs and the install does not. The
-//! bar reports the new version and opens the download; the user installs it
-//! the ordinary way. Re-enabling the in-place install is a matter of wiring
-//! [`install`] back to a command — see the note on that function.
+//! On macOS an unsigned app cannot replace its own bundle inside
+//! `/Applications`: App Management protection decides whether an app may
+//! modify an app there by looking at code signatures, an unsigned bundle has
+//! no identity to check, and what actually happens is that the new version
+//! lands beside the old one under a Finder collision name and the original is
+//! deleted. The user is left with no app. So macOS stays a notice: the bar
+//! reports the new version and [`open_download`] opens its installer, and the
+//! user installs it the ordinary way. Code signing is what changes this, and
+//! nothing else will.
+//!
+//! Windows has none of that. The NSIS installer replaces the app the way any
+//! installer replaces any program, and the plugin closes the running copy
+//! first because the installer requires it. SmartScreen still fires — the
+//! build is unsigned, and on Windows that means it fires on every update
+//! rather than only on first install — but one "Run anyway" is a great deal
+//! less than a manual download and reinstall, and Windows is where most of
+//! this app's users are. So [`install`] is reachable there.
+//!
+//! The split is enforced here rather than in the page. A webview that decides
+//! which platform it is running on is a webview that can be talked into
+//! deciding wrong.
 //!
 //! The whole of this lives in Rust rather than in the page. The frontend
 //! calls our own commands, the same way it calls everything else, and never
@@ -40,6 +53,20 @@ pub struct UpdateInfo {
     pub version: String,
     /// Release notes, as written into the manifest. May be empty.
     pub notes: String,
+    /// Whether this platform can install the update in place. False on macOS
+    /// while the app is unsigned, and the page uses it to decide what its
+    /// button says — not whether it is allowed to install, which [`install`]
+    /// decides for itself.
+    pub can_install: bool,
+}
+
+/// Can this platform replace the app in place?
+///
+/// Windows only, and not because of anything about the update — because of
+/// what macOS does to an unsigned bundle inside `/Applications`. See the
+/// module documentation.
+pub const fn can_install() -> bool {
+    cfg!(target_os = "windows")
 }
 
 /// Is there a newer version?
@@ -59,6 +86,7 @@ pub async fn check(app: &AppHandle) -> Result<Option<UpdateInfo>, String> {
     Ok(update.map(|update| UpdateInfo {
         version: update.version.clone(),
         notes: update.body.clone().unwrap_or_default(),
+        can_install: can_install(),
     }))
 }
 
@@ -106,17 +134,20 @@ pub fn open_download(version: &str) -> Result<(), String> {
 
 /// Download the waiting update, install it, and relaunch into it.
 ///
-/// **Parked, and not reachable from the page.** This works — it was run end
-/// to end against a real bucket — but only where the app is not inside
-/// `/Applications`, which is where users put it. It is kept rather than
-/// deleted because the day the app is code signed this becomes correct again,
-/// and the way back is to expose it as a command and point the bar's button
-/// at it instead of [`open_download`].
+/// Windows only. The guard is here rather than in the command or the page
+/// because this is the function that would do the damage, and a check that
+/// lives anywhere else is a check that a future caller can forget. On macOS
+/// this is not a thing that fails cleanly — an unsigned bundle replacing
+/// itself inside `/Applications` leaves the user with no app at all — so it
+/// refuses before it reaches the plugin.
 ///
 /// `Ok(false)` means there was nothing left to install by the time the button
 /// was pressed, which is a no-op rather than a failure.
-#[allow(dead_code)]
 pub async fn install(app: &AppHandle) -> Result<bool, String> {
+    if !can_install() {
+        return Err("this platform installs updates by hand".into());
+    }
+
     let Some(update) = app
         .updater()
         .map_err(|error| error.to_string())?
@@ -139,7 +170,23 @@ pub async fn install(app: &AppHandle) -> Result<bool, String> {
 
 #[cfg(test)]
 mod tests {
-    use super::open_download;
+    use super::{can_install, open_download, UpdateInfo};
+
+    #[test]
+    fn the_page_is_told_whether_this_platform_can_install() {
+        let info = UpdateInfo {
+            version: "0.1.3".into(),
+            notes: String::new(),
+            can_install: can_install(),
+        };
+        let json = serde_json::to_value(&info).expect("UpdateInfo should serialize");
+
+        // The page reads this key to decide whether its button installs or
+        // downloads. Renaming the field without the rename_all attribute would
+        // leave the button silently reading undefined and always downloading,
+        // which is a worse bug than a broken build.
+        assert_eq!(json["canInstall"], serde_json::json!(cfg!(target_os = "windows")));
+    }
 
     #[test]
     fn a_version_that_is_not_digits_and_dots_is_refused() {

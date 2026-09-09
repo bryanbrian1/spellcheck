@@ -415,10 +415,11 @@ impl BuildClaim {
 pub fn run() {
     tauri::Builder::default()
         // The only plugin in the app. It is never reached from the page —
-        // `commands::check_update` is the whole of its exposure — so the
-        // window's capability file still grants the webview nothing but
-        // `core:default`. The install half is deliberately not exposed at
-        // all while the app is unsigned; see `updater`.
+        // `commands::check_update` and `commands::install_update` are the
+        // whole of its exposure — so the window's capability file still grants
+        // the webview nothing but `core:default`. Installing is Windows-only
+        // and the platform check lives in `updater`, not in either of those
+        // commands and certainly not in the page.
         .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
             let config = resolve_config(app.handle());
@@ -437,6 +438,7 @@ pub fn run() {
             commands::data_dragon,
             commands::check_update,
             commands::open_download,
+            commands::install_update,
         ])
         .run(tauri::generate_context!())
         .expect("spellcheck failed to start");
