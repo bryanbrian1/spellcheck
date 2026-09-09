@@ -207,6 +207,71 @@ jobs:
           } >> "$GITHUB_ENV"
           echo "Apple signing configured; this build will be signed and notarised."
 
+      # The release description used to be a literal in this file, which meant
+      # every version shipped the same eleven lines of install warnings and
+      # said nothing about what changed. CHANGELOG.md already holds that, so
+      # it is read from there rather than written twice and kept in sync by
+      # hand — which it was not.
+      #
+      # A missing entry warns rather than fails. The tag is already pushed by
+      # the time this runs and the build behind it takes twenty minutes; a
+      # release with thin notes is recoverable with `gh release edit`, and a
+      # release that never happened because of a documentation slip is a worse
+      # trade. The annotation is visible on the run summary.
+      - name: Assemble the release description
+        id: notes
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+
+          # Literal prefix match including the trailing space, so 0.1.2 does
+          # not also match 0.1.20, and so the em dash in the heading never has
+          # to survive a locale round trip.
+          entry=$(awk -v v="$version" '
+            index($0, "## " v " ") == 1 { grab = 1; next }
+            grab && /^## / { exit }
+            grab { print }
+          ' CHANGELOG.md)
+
+          if [ -z "$(printf '%s' "$entry" | tr -d '[:space:]')" ]; then
+            echo "::warning::CHANGELOG.md has no entry for $version; publishing install notes only"
+            entry="Beta build."
+          fi
+
+          base="https://pub-7d8d63aa0eec43f5a16598403866eed1.r2.dev"
+          {
+            echo "body<<__SPELLCHECK_NOTES__"
+            printf '%s\n' "$entry"
+            cat <<NOTES
+
+          ### Downloads
+
+          - [macOS (universal)]($base/spellcheck_${version}_universal.dmg)
+          - [Windows (x64)]($base/spellcheck_${version}_x64-setup.exe)
+
+          The GitHub assets below are not downloadable without repository
+          access — the links above are the ones that work.
+
+          ---
+
+          ### Installing
+
+          These builds are unsigned, so both systems will try to stop you once.
+          That is expected and not a sign of a bad download.
+
+          - **macOS** — blocked on first open. System Settings → Privacy &
+            Security → scroll down → **Open Anyway**.
+          - **Windows** — SmartScreen shows "Windows protected your PC".
+            **More info** → **Run anyway**.
+
+          League does not need to be running to install or open the app. It
+          waits for the client and says so when there isn't one.
+          NOTES
+            echo "__SPELLCHECK_NOTES__"
+          } >> "$GITHUB_OUTPUT"
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -222,18 +287,9 @@ jobs:
           # and uploads nothing.
           tagName: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
           releaseName: spellcheck ${{ github.ref_name }}
-          releaseBody: |
-            Beta build. These installers are unsigned, so both systems will
-            try to stop you the first time.
-
-            **macOS** — the app is blocked on first open. System Settings →
-            Privacy & Security → scroll down → Open Anyway.
-
-            **Windows** — SmartScreen shows "Windows protected your PC".
-            More info → Run anyway.
-
-            League does not need to be running to install or open the app; it
-            waits for the client and reports when none is there.
+          # Assembled above from CHANGELOG.md. Empty on a non-tag run, which
+          # is harmless: tagName is empty there too, so nothing publishes.
+          releaseBody: ${{ steps.notes.outputs.body }}
           # A beta is not a release. This also keeps the repo's "latest
           # release" pointing at nothing until there is something to stand
           # behind.
