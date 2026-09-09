@@ -219,10 +219,21 @@ collision name and deletes the original, so the relaunch finds nothing. Use
 
 Expect this on every update, not just the first install.
 
-Signing removes both prompts: an Apple Developer account ($99/yr) for macOS,
-and a certificate for Windows. Adding the `APPLE_*` secrets to the repo is
-enough to turn macOS signing on — the release workflow already reads them.
-Windows has no equivalent step in the workflow yet.
+**Why none of this is signed: I'm broke.** That is the whole answer. Neither
+warning means the download was tampered with or that something is wrong with
+the build — they mean nobody has paid to vouch for who made it, and the thing
+being bought is identity verification, not safety. Apple wants $99 a year for
+the Developer ID certificate. A Windows certificate authority wants somewhere
+around $200–600 a year, or roughly $10 a month through Azure Trusted Signing
+if you qualify for it. That is a real bill for a beta with a handful of
+testers, so it is not one I am paying yet. The unsigned installer and the
+unsigned updater both come from the same missing line item.
+
+It is not permanent, and nothing needs rewriting when it changes. The release
+workflow already reads the `APPLE_*` secrets, so macOS signing switches on the
+day there is a certificate to hand it; Windows has no equivalent step written
+yet. Apple is the one worth doing first — signing there is also what makes the
+macOS updater safe, which is a working feature rather than a quieter dialog.
 
 If League is installed somewhere other than the default location — most
 likely on Windows, where the installer lets you pick a drive — point the app
