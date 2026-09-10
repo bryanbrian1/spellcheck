@@ -127,11 +127,13 @@ same rule `CLAUDE.md` sets for item set and rune imports, for the same reason.
 because an unsigned bundle cannot replace itself inside `/Applications` — see
 [Installing a beta build](#installing-a-beta-build).
 
-The source repository is private, and GitHub does not serve a private repo's
-release assets to anonymous clients — which an installed app is. Shipping it a
-token would put a credential that reads this repository inside a binary anyone
-can run `strings` on, so the installers and the update manifest live in a
-Cloudflare R2 bucket instead.
+The installers and the update manifest live in a Cloudflare R2 bucket rather
+than on the GitHub release. The bucket dates from when this repository was
+private — GitHub does not serve a private repo's release assets to anonymous
+clients, which an installed app is — and it stays now that the repository is
+public because every installed copy is compiled to look there and nowhere
+else (see `R2_PUBLIC_URL` below). Anyone can download from it, no GitHub
+account needed; the GitHub release is only the record of what was built.
 
 Two signatures are involved and they are not substitutes for each other:
 

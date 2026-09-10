@@ -27,11 +27,11 @@
 # signing on without editing this file — but see the signing step for why
 # they cannot simply be listed as build env.
 #
-# Third, the source repository is private, which is why the publish job
-# exists at all: GitHub will not serve a private repo's release assets to an
-# anonymous client, and an installed app is an anonymous client. Handing it a
-# token instead would ship a credential that reads this repository inside a
-# binary anybody can run `strings` on.
+# Third, the publish job exists because the repository used to be private:
+# GitHub will not serve a private repo's release assets to an anonymous
+# client, and an installed app is an anonymous client. The repository is
+# public now, but the job stays — every installed copy is compiled to fetch
+# from the R2 URL and cannot be re-pointed, so that URL must keep answering.
 name: release
 
 on:
@@ -315,11 +315,13 @@ jobs:
             src-tauri/target/release/bundle/nsis/*-setup.exe
             src-tauri/target/release/bundle/nsis/*-setup.exe.sig
 
-  # Distribution. The source repository is private, so its release assets are
-  # not downloadable without a GitHub account that can see them — which an
-  # installed copy of the app does not have and must never be given. The
-  # binaries therefore live in an R2 bucket that answers anonymously, and the
-  # GitHub prerelease above stays as our own record of what was built.
+  # Distribution. The binaries live in an R2 bucket that answers anonymously,
+  # a choice made while the repository was private (a private repo's release
+  # assets need a GitHub account to download, which an installed copy does
+  # not have and must never be given). The repository is public now, but the
+  # bucket URL is baked into every installed copy, so it is the one place the
+  # binaries must always be. The GitHub prerelease above is our own record of
+  # what was built.
   publish:
     needs: build
     if: startsWith(github.ref, 'refs/tags/')
