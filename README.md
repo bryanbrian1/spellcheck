@@ -17,9 +17,53 @@ The Windows install button will not work until 0.1.4 — an installed copy uses
 whatever updater it was built with, so 0.1.3 has to be installed by hand once
 more.
 
-These builds are unsigned, so both systems warn you: see
-[Installing a beta build](#installing-a-beta-build).
 Full history in **[CHANGELOG.md](CHANGELOG.md)**.
+
+## Installing a beta build
+
+The betas are unsigned, so both systems try to stop you. macOS does it once per
+install; Windows does it on every update, because the updater re-runs the
+installer. Neither is a sign of a bad download.
+
+**macOS**
+
+1. Open the `.dmg` and drag spellcheck out of it.
+2. Launch it and let it get blocked — that refused launch is what puts the app
+   in the queue for step 3.
+3. System Settings → Privacy & Security, scroll down to Security, then
+   **Open Anyway**. Authenticate.
+4. Launch again. It opens, and keeps opening from then on.
+
+Right-clicking and choosing **Open** was the old shortcut for this and no
+longer works on current macOS. **Keep betas out of `/Applications`** — an
+unsigned bundle cannot replace itself there, so the updater leaves the new copy
+beside the old one under a collision name and deletes the original. Use
+`~/Applications` until the app is signed.
+
+**Windows**
+
+1. Run the `-setup.exe`. SmartScreen shows "Windows protected your PC" with
+   only a **Don't run** button.
+2. Click **More info**, then **Run anyway**.
+
+**Why none of it is signed: I'm broke.** Neither warning means the download was
+tampered with — what is missing is a paid attestation of who built the binary.
+Apple charges $99/yr for that, a Windows certificate authority $200–600/yr (or
+about $10/month through Azure Trusted Signing, if you qualify). That is not a
+bill worth paying for a beta with a handful of testers.
+
+It is not permanent. The release workflow already reads the `APPLE_*` secrets,
+so macOS signing turns on the day there is a certificate to hand it; Windows
+needs a step written first. Apple is worth doing first, because signing there
+is also what makes the macOS updater safe.
+
+If League is installed somewhere other than the default location — most likely
+on Windows, where the installer lets you pick a drive — point the app at the
+lockfile yourself:
+
+```sh
+SPELLCHECK_LOCKFILE='D:\Games\League of Legends\lockfile'
+```
 
 ## Start here
 
@@ -161,49 +205,3 @@ spellcheck isn't endorsed by Riot Games and doesn't reflect the views or
 opinions of Riot Games or anyone officially involved in producing or managing
 Riot Games properties. Riot Games and all associated properties are trademarks
 or registered trademarks of Riot Games, Inc.
-
-## Installing a beta build
-
-The betas are unsigned, so both systems try to stop you. macOS does it once per
-install; Windows does it on every update, because the updater re-runs the
-installer. Neither is a sign of a bad download.
-
-**macOS**
-
-1. Open the `.dmg` and drag spellcheck out of it.
-2. Launch it and let it get blocked — that refused launch is what puts the app
-   in the queue for step 3.
-3. System Settings → Privacy & Security, scroll down to Security, then
-   **Open Anyway**. Authenticate.
-4. Launch again. It opens, and keeps opening from then on.
-
-Right-clicking and choosing **Open** was the old shortcut for this and no
-longer works on current macOS. **Keep betas out of `/Applications`** — an
-unsigned bundle cannot replace itself there, so the updater leaves the new copy
-beside the old one under a collision name and deletes the original. Use
-`~/Applications` until the app is signed.
-
-**Windows**
-
-1. Run the `-setup.exe`. SmartScreen shows "Windows protected your PC" with
-   only a **Don't run** button.
-2. Click **More info**, then **Run anyway**.
-
-**Why none of it is signed: I'm broke.** Neither warning means the download was
-tampered with — what is missing is a paid attestation of who built the binary.
-Apple charges $99/yr for that, a Windows certificate authority $200–600/yr (or
-about $10/month through Azure Trusted Signing, if you qualify). That is not a
-bill worth paying for a beta with a handful of testers.
-
-It is not permanent. The release workflow already reads the `APPLE_*` secrets,
-so macOS signing turns on the day there is a certificate to hand it; Windows
-needs a step written first. Apple is worth doing first, because signing there
-is also what makes the macOS updater safe.
-
-If League is installed somewhere other than the default location — most likely
-on Windows, where the installer lets you pick a drive — point the app at the
-lockfile yourself:
-
-```sh
-SPELLCHECK_LOCKFILE='D:\Games\League of Legends\lockfile'
-```
