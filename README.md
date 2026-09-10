@@ -169,6 +169,18 @@ I'm a hardstuck gold mid. I built this for myself, and I'm not qualified to
 tell anyone what to build — so the app doesn't. It shows you what the data
 says, and when it's reasoning rather than measuring, it tells you that too.
 
+![spellcheck running beside the League client, with the build filled in for a locked champion](docs/screenshots/in-use.png)
+
+The client on the left, spellcheck on the right. Lock a champion and the build
+fills in on its own — runes, summoners, starting items, core build.
+
+<img src="docs/screenshots/build.png" width="380"
+     alt="The live screen showing Jayce mid: runes, summoners and starting items, each with a win rate and the number of games behind it">
+
+Champion **and** role come from champ select; this one read Jayce mid. Every
+percentage carries the sample it was measured over, because a win rate over
+1,893 games and one over 12 are not the same claim.
+
 It's a side project and it's early. If it gets something wrong in your game,
 that's the thing I want to hear about.
 
