@@ -7,3 +7,5 @@ src-tauri/gen/schemas/
 .env
 .env.local
 .claude/launch.json
+# Working files from the Impeccable design plugin; per-machine, never source.
+.impeccable/
