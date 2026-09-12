@@ -1,6 +1,6 @@
 //! The frontend's entire surface area.
 //!
-//! Five commands, all thin. None of them names a provider: the UI asks for a
+//! Seven commands, all thin. None of them names a provider: the UI asks for a
 //! build and gets [`BuildLookup`] back, whether that came from OP.GG or from
 //! our own crawl. Swapping sources is a config change, invisible from here.
 
@@ -10,13 +10,23 @@ use tauri::State;
 
 use crate::ddragon::{DataDragon, DataDragonState};
 use crate::updater::UpdateInfo;
-use crate::{BuildLookup, BuildService};
+use crate::{BuildLookup, BuildService, ClientSettings};
 
 /// Attribution string for whichever source is live. The UI renders it
 /// verbatim in the footer and must not branch on the value.
 #[tauri::command]
 pub fn source_label(service: State<'_, Arc<BuildService>>) -> String {
     service.source_label().to_string()
+}
+
+/// Where the config file is and what it says about the League client.
+///
+/// The page asks for this when it cannot find the client, and only then: on
+/// a machine with League in the default place it is never called. The path
+/// is shown, not opened — nothing in the page writes the file.
+#[tauri::command]
+pub fn client_settings(settings: State<'_, ClientSettings>) -> ClientSettings {
+    settings.inner().clone()
 }
 
 /// Look up one champion-role pair.

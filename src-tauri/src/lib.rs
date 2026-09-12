@@ -18,7 +18,7 @@ pub mod recommend;
 pub mod updater;
 
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use serde::Serialize;
@@ -28,7 +28,7 @@ use tokio::sync::mpsc;
 use build_data::config::CONFIG_FILE_NAME;
 use ddragon::DataDragonState;
 use lcu::session::Comp;
-use lcu::{ChampSelectEvent, WatcherConfig};
+use lcu::{ChampSelectEvent, LockfileSearch, WatcherConfig};
 use live::{GameEvent, GameSnapshot, LiveWatcherConfig};
 use recommend::{
     enemy_threat, game_state, standing, team_gaps, Standing, Suggestion, Tags, TeamView,
@@ -422,18 +422,26 @@ pub fn run() {
         // commands and certainly not in the page.
         .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
-            let config = resolve_config(app.handle());
+            let config_file = config_path(app.handle());
+            let config = resolve_config(&config_file, app.handle());
             let service = Arc::new(build_service(&config));
             app.manage(Arc::clone(&service));
             // Fetched lazily on the first render that wants an icon, then
             // kept. Nothing is requested if the window is never opened on a
             // build.
             app.manage(Arc::new(DataDragonState::new()));
-            spawn_champ_select(app.handle(), service);
+            // The page shows this when it cannot find the client, so a
+            // player with League on another drive is told where to say so.
+            app.manage(ClientSettings {
+                config_file: config_file.display().to_string(),
+                lockfile: config.lockfile.as_ref().map(|p| p.display().to_string()),
+            });
+            spawn_champ_select(app.handle(), service, config.lockfile.clone());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             commands::source_label,
+            commands::client_settings,
             commands::fetch_build,
             commands::data_dragon,
             commands::check_update,
@@ -464,13 +472,23 @@ fn build_service(config: &ProviderConfig) -> BuildService {
 /// they meet here, in one call. Both tasks run for the life of the app, and
 /// both are cheap while nothing is happening — the watcher is asleep on a
 /// socket and this one is asleep on a channel.
-fn spawn_champ_select(handle: &AppHandle, service: Arc<BuildService>) {
+fn spawn_champ_select(
+    handle: &AppHandle,
+    service: Arc<BuildService>,
+    configured_lockfile: Option<PathBuf>,
+) {
     // Champ select produces a handful of events per game. A small buffer is
     // plenty, and a full one would mean something is very wrong.
     let (sender, mut receiver) = mpsc::channel(16);
     let handle = handle.clone();
 
-    tauri::async_runtime::spawn(lcu::watch(WatcherConfig::default(), sender));
+    let watcher = WatcherConfig {
+        lockfile: LockfileSearch::Discover {
+            configured: configured_lockfile,
+        },
+        ..WatcherConfig::default()
+    };
+    tauri::async_runtime::spawn(lcu::watch(watcher, sender));
 
     // The live watcher is gated on this. While it holds false that task does
     // no work whatsoever — it is asleep on the channel, not polling slowly —
@@ -701,23 +719,39 @@ async fn build_for(
     }
 }
 
+/// What the page needs to point a player at the config file. Read once at
+/// startup and never again: the file is not watched, and a change to it
+/// takes a relaunch, which is what the page says.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ClientSettings {
+    /// Where `providers.json` is, or would be. Shown so the player knows
+    /// which file to make.
+    pub config_file: String,
+    /// The `lockfile` setting as loaded, if there is one.
+    pub lockfile: Option<String>,
+}
+
 /// `providers.json` in the OS app-config directory, falling back to the
-/// working directory when the platform will not name one. A missing file is
-/// the normal first-run case and yields defaults.
+/// working directory when the platform will not name one.
+fn config_path(handle: &tauri::AppHandle) -> PathBuf {
+    handle
+        .path()
+        .app_config_dir()
+        .map(|dir| dir.join(CONFIG_FILE_NAME))
+        .unwrap_or_else(|_| PathBuf::from(CONFIG_FILE_NAME))
+}
+
+/// Load `path`. A missing file is the normal first-run case and yields
+/// defaults.
 ///
 /// The loaded config is then anchored to the bundle's resource directory,
 /// which is the only place the app can be sure `data/builds` exists. Without
 /// that step a bundled app resolves the shipped default against its working
 /// directory — `/` when macOS launches it from Finder — and RiotProvider
 /// finds nothing at all.
-fn resolve_config(handle: &tauri::AppHandle) -> ProviderConfig {
-    let path = handle
-        .path()
-        .app_config_dir()
-        .map(|dir| dir.join(CONFIG_FILE_NAME))
-        .unwrap_or_else(|_| PathBuf::from(CONFIG_FILE_NAME));
-
-    let mut config = ProviderConfig::load(&path).unwrap_or_else(|error| {
+fn resolve_config(path: &Path, handle: &tauri::AppHandle) -> ProviderConfig {
+    let mut config = ProviderConfig::load(path).unwrap_or_else(|error| {
         eprintln!("spellcheck: {}: {error}; using defaults", path.display());
         ProviderConfig::default()
     });
