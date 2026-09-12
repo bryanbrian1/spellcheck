@@ -6,6 +6,58 @@ anything not listed here was never downloadable.
 
 Dates are the day the tag was pushed. Numbers in brackets are pull requests.
 
+## 0.1.4 — 2026-09-12
+
+The first fix to come from a real Windows machine, and the first release a
+Windows copy can install for itself: press the button in 0.1.3 and this one
+arrives. macOS still downloads by hand.
+
+The Windows build had been checking exactly one path for the League client,
+`C:\Riot Games\League of Legends\lockfile`, which is only the installer's
+default. The first tester's League was somewhere else, so the app reported
+"Offline" through the lobby, champ select and the whole game — and gave no
+way to tell that state apart from the client simply being closed. (#50)
+
+### Fixed
+
+- **The Windows build finds League wherever the installer put it.** It reads
+  the Riot installer's own records under `%ProgramData%\Riot Games` — the
+  same files the installer maintains for itself — then tries the default
+  path and the same path on D:, E: and F:. The search is repeated on every
+  check, so installing League while the app is open is noticed without a
+  relaunch. (#51)
+- **The offline notice says where it looked.** A fold under "League isn't
+  running" lists every path tried and names the config file to edit if none
+  of them is right. Closed by default; nobody with League in the usual place
+  needs to open it. (#51)
+- A lockfile that exists but cannot be read is its own state — "Can't read",
+  with the path and the error — instead of the same "Offline" as a closed
+  client. It is the one failure here a person can fix. (#51)
+- The watcher's first status was always lost: it spoke before the page had
+  anyone listening, and the page's built-in default happened to say the same
+  words, which is why nobody noticed. The page now asks for the current
+  status on load. (#51)
+
+### Added
+
+- `lockfile` in `providers.json` points the app at a client it cannot find on
+  its own. Tried before the installer's records, so a wrong value cannot hide
+  a client the search would have found. `SPELLCHECK_LOCKFILE` in the
+  environment still wins over it, and is for development — a Start Menu
+  launch never sees a shell export. (#51)
+
+### Known
+
+- macOS remains notify-only until the app is code signed.
+- Builds are unsigned on both platforms: macOS blocks the first open, and
+  Windows shows SmartScreen on every update because the updater re-runs the
+  installer.
+- The download address is an `r2.dev` bucket, which Cloudflare documents as
+  development-only. Moving off it later costs every installed copy one
+  manual reinstall.
+- Item set and rune page imports are still disabled everywhere.
+- The under-120 MB memory target has still not been measured on Windows.
+
 ## 0.1.3 — 2026-09-09
 
 Windows installs its own updates now. macOS still does not, and will not

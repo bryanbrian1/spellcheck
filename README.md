@@ -4,18 +4,18 @@ A macOS and Windows app that detects the champion and role you lock into
 during League champion select, then shows the optimal build path — items,
 runes, summoners, skill order — for that pair.
 
-## Latest release — 0.1.3
+## Latest release — 0.1.4
 
-Download: **[macOS (universal)](https://pub-7d8d63aa0eec43f5a16598403866eed1.r2.dev/spellcheck_0.1.3_universal.dmg)**
-· **[Windows (x64)](https://pub-7d8d63aa0eec43f5a16598403866eed1.r2.dev/spellcheck_0.1.3_x64-setup.exe)**
+Download: **[macOS (universal)](https://pub-7d8d63aa0eec43f5a16598403866eed1.r2.dev/spellcheck_0.1.4_universal.dmg)**
+· **[Windows (x64)](https://pub-7d8d63aa0eec43f5a16598403866eed1.r2.dev/spellcheck_0.1.4_x64-setup.exe)**
 
-Windows installs its own updates now; macOS will not until the app is code
-signed. Every GitHub release also carries its own changelog entry, generated
-from `CHANGELOG.md` at build time.
+The Windows build now finds League wherever the installer put it, instead of
+only at the default path — the first fix to come from a real Windows machine.
+When it still cannot find the client, the offline notice says where it looked.
 
-The Windows install button will not work until 0.1.4 — an installed copy uses
-whatever updater it was built with, so 0.1.3 has to be installed by hand once
-more.
+A Windows copy of 0.1.3 installs this one itself: press the button. macOS
+will not until the app is code signed. Every GitHub release carries its own
+changelog entry, generated from `CHANGELOG.md` at build time.
 
 Full history in **[CHANGELOG.md](CHANGELOG.md)**.
 
