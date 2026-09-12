@@ -3,6 +3,10 @@
 //! The active provider is data, not a compile-time choice: flip
 //! `provider` in the config file (or set `SPELLCHECK_PROVIDER`) to move the
 //! whole app from OP.GG to our own crawl without touching the UI.
+//!
+//! `providers.json` is also the app's only config file, so the one setting
+//! that is not about a provider — where the League client is — lives in it
+//! too rather than in a second file the player would have to find.
 
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -75,6 +79,14 @@ pub struct ProviderConfig {
     pub provider: ProviderKind,
     pub opgg: OpggConfig,
     pub riot: RiotConfig,
+    /// Where the League client's lockfile is, for an install the app cannot
+    /// find on its own. Absent on almost every machine: the watcher looks in
+    /// the installer's own records and the platform default first, and this
+    /// is for the install those miss. Tried before them when set, after the
+    /// `SPELLCHECK_LOCKFILE` environment override. Written by hand today; a
+    /// settings screen would write the same field.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lockfile: Option<PathBuf>,
 }
 
 impl ProviderConfig {
@@ -175,6 +187,30 @@ mod tests {
     fn missing_config_file_is_not_an_error() {
         let config = ProviderConfig::load(Path::new("/nonexistent/providers.json")).unwrap();
         assert_eq!(config.provider, ProviderKind::Opgg);
+        assert_eq!(config.lockfile, None);
+    }
+
+    #[test]
+    fn the_lockfile_setting_is_read_as_written() {
+        // What a Windows tester with League on D: types into providers.json.
+        // Backslashes are doubled because it is JSON, and nothing here should
+        // try to be clever about that.
+        let config: ProviderConfig =
+            serde_json::from_str(r#"{ "lockfile": "D:\\Games\\League of Legends\\lockfile" }"#)
+                .unwrap();
+        assert_eq!(
+            config.lockfile.as_deref(),
+            Some(Path::new(r"D:\Games\League of Legends\lockfile"))
+        );
+        assert_eq!(config.provider, ProviderKind::Opgg, "the rest still defaults");
+    }
+
+    #[test]
+    fn an_absent_lockfile_setting_is_not_written_out() {
+        // A settings screen that saves the file must not leave `"lockfile":
+        // null` behind for the player to wonder about.
+        let text = serde_json::to_string(&ProviderConfig::default()).unwrap();
+        assert!(!text.contains("lockfile"), "{text}");
     }
 
     #[test]

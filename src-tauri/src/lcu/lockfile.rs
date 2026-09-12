@@ -13,6 +13,7 @@ use base64::engine::general_purpose::STANDARD as BASE64;
 use base64::Engine as _;
 
 use super::error::LcuError;
+use super::install;
 
 /// Where the macOS client keeps it. The path is inside the installed app
 /// bundle, so it is the same on every Mac with a default install.
@@ -23,10 +24,23 @@ pub const DEFAULT_LOCKFILE_PATH: &str =
 /// Where the Windows client keeps it, with a weaker guarantee than the macOS
 /// path above. The Windows installer lets you choose a drive, and regional
 /// builds land somewhere else again, so this is the common default rather
-/// than the only answer. That difference is why [`LOCKFILE_ENV_VAR`] is a
-/// user-facing setting here and only a development convenience on macOS.
+/// than the only answer. [`LockfileSearch`] exists because of that
+/// difference: on Windows it asks the installer's own records first and
+/// treats this constant as one guess among several.
 #[cfg(target_os = "windows")]
 pub const DEFAULT_LOCKFILE_PATH: &str = r"C:\Riot Games\League of Legends\lockfile";
+
+/// The default install directory on the drives people most often pick when
+/// they do not take `C:`. Checked after the installer's records, which is
+/// where a non-default install is normally found; these are for a machine
+/// whose records are missing or unreadable. A stat of a path that does not
+/// exist is what each one costs.
+#[cfg(target_os = "windows")]
+const OTHER_DRIVE_LOCKFILE_PATHS: [&str; 3] = [
+    r"D:\Riot Games\League of Legends\lockfile",
+    r"E:\Riot Games\League of Legends\lockfile",
+    r"F:\Riot Games\League of Legends\lockfile",
+];
 
 /// Anywhere else there is no client to find. A path that cannot exist is the
 /// honest default: every lookup reports the state the app is designed to
@@ -37,7 +51,9 @@ pub const DEFAULT_LOCKFILE_PATH: &str = r"C:\Riot Games\League of Legends\lockfi
 pub const DEFAULT_LOCKFILE_PATH: &str = "/nonexistent/league-client/lockfile";
 
 /// Points the app at a lockfile somewhere else — a non-default install, or a
-/// captured file for development on a machine with no client.
+/// captured file for development on a machine with no client. Wins over the
+/// config file's `lockfile` setting, which is the user-facing way to say the
+/// same thing.
 pub const LOCKFILE_ENV_VAR: &str = "SPELLCHECK_LOCKFILE";
 
 /// The LCU authenticates every caller as this user; the password is the
@@ -112,9 +128,28 @@ impl Lockfile {
         }
     }
 
-    /// The lockfile this machine should be watching.
-    pub fn discover() -> Result<Option<Lockfile>, LcuError> {
-        Lockfile::read(&default_lockfile_path())
+    /// The first lockfile found at any of `paths`, in order.
+    ///
+    /// `Ok(None)` means none of them exists, which is the client being
+    /// closed. A path that exists but cannot be read is remembered and
+    /// reported only if nothing later in the list succeeds: the client can
+    /// be found through one candidate while another is stale, and finding
+    /// it is the point.
+    pub fn read_first(paths: &[PathBuf]) -> Result<Option<Lockfile>, LcuError> {
+        let mut first_error = None;
+        for path in paths {
+            match Lockfile::read(path) {
+                Ok(Some(lockfile)) => return Ok(Some(lockfile)),
+                Ok(None) => {}
+                Err(error) => {
+                    first_error.get_or_insert(error);
+                }
+            }
+        }
+        match first_error {
+            Some(error) => Err(error),
+            None => Ok(None),
+        }
     }
 
     /// Base URL for the REST API. Always loopback: the port in the lockfile
@@ -166,11 +201,70 @@ impl fmt::Debug for Lockfile {
     }
 }
 
-pub fn default_lockfile_path() -> PathBuf {
-    match std::env::var(LOCKFILE_ENV_VAR) {
-        Ok(raw) if !raw.trim().is_empty() => PathBuf::from(raw.trim()),
-        _ => PathBuf::from(DEFAULT_LOCKFILE_PATH),
+/// Where to look for the lockfile.
+///
+/// The watcher asks this every time it checks whether the client is running,
+/// so a League installed after the app was opened is found on the next
+/// check rather than the next launch.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LockfileSearch {
+    /// Exactly these paths and nothing else. For tests, which must not find
+    /// a real client running on the developer's machine.
+    Only(Vec<PathBuf>),
+    /// Everywhere the client could be, most deliberate first: the
+    /// environment override, then the config file's `lockfile` setting, then
+    /// wherever this platform's installer says it put the client, then the
+    /// platform's default path.
+    Discover {
+        /// The config file's `lockfile` setting, if there is one.
+        configured: Option<PathBuf>,
+    },
+}
+
+impl Default for LockfileSearch {
+    fn default() -> Self {
+        LockfileSearch::Discover { configured: None }
     }
+}
+
+impl LockfileSearch {
+    /// The paths to try, in order, with repeats removed.
+    pub fn candidates(&self) -> Vec<PathBuf> {
+        match self {
+            LockfileSearch::Only(paths) => paths.clone(),
+            LockfileSearch::Discover { configured } => {
+                let mut paths = Vec::new();
+                paths.extend(env_override());
+                paths.extend(configured.clone());
+                paths.extend(platform_paths());
+                install::dedup(paths)
+            }
+        }
+    }
+}
+
+/// `SPELLCHECK_LOCKFILE`, if set to something. Blank is not a choice: it
+/// falls through rather than pointing the watcher at the current directory.
+fn env_override() -> Option<PathBuf> {
+    match std::env::var(LOCKFILE_ENV_VAR) {
+        Ok(raw) if !raw.trim().is_empty() => Some(PathBuf::from(raw.trim())),
+        _ => None,
+    }
+}
+
+/// Every place this platform's client is known to live, best-informed first.
+#[cfg(target_os = "windows")]
+fn platform_paths() -> Vec<PathBuf> {
+    let mut paths = install::lockfiles_in(&install::recorded_install_dirs());
+    paths.push(PathBuf::from(DEFAULT_LOCKFILE_PATH));
+    paths.extend(OTHER_DRIVE_LOCKFILE_PATHS.iter().map(PathBuf::from));
+    paths
+}
+
+/// The macOS client lives inside its app bundle, so there is one place.
+#[cfg(not(target_os = "windows"))]
+fn platform_paths() -> Vec<PathBuf> {
+    vec![PathBuf::from(DEFAULT_LOCKFILE_PATH)]
 }
 
 #[cfg(test)]
@@ -248,28 +342,105 @@ mod tests {
     }
 
     #[test]
-    fn the_override_beats_the_platform_default() {
+    fn the_override_is_searched_before_everything_else() {
         // Windows installs land wherever the installer was pointed, so this
         // override is the supported way out and not only a test seam.
         std::env::set_var(LOCKFILE_ENV_VAR, "/tmp/somewhere-else/lockfile");
-        assert_eq!(
-            default_lockfile_path(),
-            PathBuf::from("/tmp/somewhere-else/lockfile")
-        );
+        let candidates = LockfileSearch::default().candidates();
+        assert_eq!(candidates[0], PathBuf::from("/tmp/somewhere-else/lockfile"));
+        assert!(candidates.contains(&PathBuf::from(DEFAULT_LOCKFILE_PATH)));
 
         // Blank is not a choice — it falls back rather than pointing the
         // watcher at the current directory.
         std::env::set_var(LOCKFILE_ENV_VAR, "   ");
         assert_eq!(
-            default_lockfile_path(),
+            LockfileSearch::default().candidates()[0],
             PathBuf::from(DEFAULT_LOCKFILE_PATH)
         );
 
         std::env::remove_var(LOCKFILE_ENV_VAR);
         assert_eq!(
-            default_lockfile_path(),
+            LockfileSearch::default().candidates()[0],
             PathBuf::from(DEFAULT_LOCKFILE_PATH)
         );
+    }
+
+    #[test]
+    fn the_configured_path_comes_before_the_platform_s_guesses() {
+        std::env::remove_var(LOCKFILE_ENV_VAR);
+        let search = LockfileSearch::Discover {
+            configured: Some(PathBuf::from("/tmp/configured/lockfile")),
+        };
+        let candidates = search.candidates();
+        assert_eq!(candidates[0], PathBuf::from("/tmp/configured/lockfile"));
+        assert!(candidates.contains(&PathBuf::from(DEFAULT_LOCKFILE_PATH)));
+    }
+
+    #[test]
+    fn a_configured_path_that_is_also_the_default_is_listed_once() {
+        std::env::remove_var(LOCKFILE_ENV_VAR);
+        let search = LockfileSearch::Discover {
+            configured: Some(PathBuf::from(DEFAULT_LOCKFILE_PATH)),
+        };
+        let candidates = search.candidates();
+        assert_eq!(
+            candidates.iter().filter(|p| p.as_path() == Path::new(DEFAULT_LOCKFILE_PATH)).count(),
+            1,
+            "{candidates:?}"
+        );
+    }
+
+    #[test]
+    fn only_means_only() {
+        let search = LockfileSearch::Only(vec![PathBuf::from("/tmp/a"), PathBuf::from("/tmp/b")]);
+        assert_eq!(search.candidates(), vec![PathBuf::from("/tmp/a"), PathBuf::from("/tmp/b")]);
+    }
+
+    #[test]
+    fn the_first_readable_candidate_wins() {
+        let dir = std::env::temp_dir().join("spellcheck-read-first-test");
+        std::fs::create_dir_all(&dir).unwrap();
+        let real = dir.join("lockfile");
+        std::fs::write(&real, "LeagueClient:1:2:pw:https").unwrap();
+
+        let found = Lockfile::read_first(&[
+            PathBuf::from("/nonexistent/first/lockfile"),
+            real.clone(),
+            PathBuf::from("/nonexistent/third/lockfile"),
+        ])
+        .unwrap()
+        .expect("the middle candidate exists");
+        assert_eq!(found.port, 2);
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn no_candidate_existing_is_the_client_being_closed() {
+        let found = Lockfile::read_first(&[
+            PathBuf::from("/nonexistent/first/lockfile"),
+            PathBuf::from("/nonexistent/second/lockfile"),
+        ])
+        .unwrap();
+        assert!(found.is_none());
+        assert!(Lockfile::read_first(&[]).unwrap().is_none());
+    }
+
+    #[test]
+    fn a_bad_candidate_is_reported_only_when_no_good_one_follows() {
+        let dir = std::env::temp_dir().join("spellcheck-read-first-bad-test");
+        std::fs::create_dir_all(&dir).unwrap();
+        let bad = dir.join("bad-lockfile");
+        std::fs::write(&bad, "this is not a lockfile").unwrap();
+        let good = dir.join("lockfile");
+        std::fs::write(&good, "LeagueClient:1:2:pw:https").unwrap();
+
+        // Bad then good: found.
+        assert!(Lockfile::read_first(&[bad.clone(), good.clone()]).unwrap().is_some());
+        // Bad then nothing: the error surfaces, so it can be shown.
+        assert!(Lockfile::read_first(&[bad.clone(), PathBuf::from("/nonexistent/lockfile")]).is_err());
+
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     #[test]
