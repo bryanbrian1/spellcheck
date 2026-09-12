@@ -12,7 +12,6 @@
 //! Everything the watcher reports is a state, including the one it reports
 //! most: the client is closed.
 
-use std::path::PathBuf;
 use std::time::Duration;
 
 use serde::Serialize;
@@ -20,7 +19,7 @@ use tokio::sync::mpsc;
 
 use super::client::LcuClient;
 use super::error::LcuError;
-use super::lockfile::{default_lockfile_path, Lockfile};
+use super::lockfile::{Lockfile, LockfileSearch};
 use super::session::{ChampSelectSession, Comp, Selection, CHAMP_SELECT_SESSION_URI};
 use super::ws::LcuEventStream;
 
@@ -37,7 +36,9 @@ const DEFAULT_RECONNECT_SECS: u64 = 2;
 
 #[derive(Debug, Clone)]
 pub struct WatcherConfig {
-    pub lockfile_path: PathBuf,
+    /// Where to look for the client. Re-asked on every check, so a client
+    /// installed while the app is open is found without a relaunch.
+    pub lockfile: LockfileSearch,
     pub client_check_interval: Duration,
     pub reconnect_delay: Duration,
 }
@@ -45,7 +46,7 @@ pub struct WatcherConfig {
 impl Default for WatcherConfig {
     fn default() -> Self {
         WatcherConfig {
-            lockfile_path: default_lockfile_path(),
+            lockfile: LockfileSearch::default(),
             client_check_interval: Duration::from_secs(DEFAULT_CLIENT_CHECK_SECS),
             reconnect_delay: Duration::from_secs(DEFAULT_RECONNECT_SECS),
         }
@@ -69,7 +70,16 @@ pub struct LockedChampion {
 pub enum ChampSelectEvent {
     /// No client. The default state of the machine, and the first thing the
     /// app hears on almost every launch.
-    ClientOffline,
+    ///
+    /// Carries where the app looked, because "offline" is also what a client
+    /// installed somewhere this app does not know about looks like, and the
+    /// only way the player can tell the two apart is to be shown the paths.
+    ClientOffline { searched: Vec<String> },
+    /// A lockfile exists but cannot be read — a permissions problem, most
+    /// likely. The client is running; this app cannot reach it. Its own
+    /// state because on screen it would otherwise be identical to offline,
+    /// and unlike offline it is something the player can fix.
+    LockfileUnreadable { path: String, detail: String },
     /// Connected and listening, but not in champ select.
     ClientConnected,
     /// Champ select opened. Nothing is locked yet.
@@ -104,12 +114,15 @@ pub enum ChampSelectEvent {
 /// the failures available here — client quit, socket dropped, lockfile caught
 /// mid-write — are all cured by waiting.
 pub async fn watch(config: WatcherConfig, events: mpsc::Sender<ChampSelectEvent>) {
-    let mut reported_offline = false;
+    // What was last said while no client was found, so it is said once. The
+    // paths are part of it: a config change that adds one is worth repeating.
+    let mut reported: Option<ChampSelectEvent> = None;
 
     loop {
-        match Lockfile::read(&config.lockfile_path) {
+        let candidates = config.lockfile.candidates();
+        match Lockfile::read_first(&candidates) {
             Ok(Some(lockfile)) => {
-                reported_offline = false;
+                reported = None;
                 if let Err(error) = follow_client(&lockfile, &events).await {
                     if !events.is_closed() {
                         eprintln!("spellcheck: {error}");
@@ -122,17 +135,30 @@ pub async fn watch(config: WatcherConfig, events: mpsc::Sender<ChampSelectEvent>
             }
             Ok(None) => {
                 // The ordinary case. Say so once, then stay quiet.
-                if !reported_offline {
-                    reported_offline = true;
-                    if events.send(ChampSelectEvent::ClientOffline).await.is_err() {
-                        return;
-                    }
+                let event = ChampSelectEvent::ClientOffline {
+                    searched: candidates.iter().map(|p| p.display().to_string()).collect(),
+                };
+                if !say_once(&mut reported, event, &events).await {
+                    return;
                 }
                 tokio::time::sleep(config.client_check_interval).await;
             }
             Err(error) => {
-                if !error.is_retryable() {
-                    eprintln!("spellcheck: {error}");
+                // A half-written lockfile is retryable and the next check
+                // reads it whole. Anything else is a file that exists and
+                // cannot be used, which the player needs to be told about.
+                match &error {
+                    LcuError::LockfileUnreadable { path, detail } if !error.is_retryable() => {
+                        let event = ChampSelectEvent::LockfileUnreadable {
+                            path: path.clone(),
+                            detail: detail.clone(),
+                        };
+                        if !say_once(&mut reported, event, &events).await {
+                            return;
+                        }
+                    }
+                    _ if !error.is_retryable() => eprintln!("spellcheck: {error}"),
+                    _ => {}
                 }
                 tokio::time::sleep(config.client_check_interval).await;
             }
@@ -142,6 +168,21 @@ pub async fn watch(config: WatcherConfig, events: mpsc::Sender<ChampSelectEvent>
             return;
         }
     }
+}
+
+/// Send `event` unless it is what was last sent. Returns false when the
+/// receiver is gone, which is the watcher's signal to stop.
+async fn say_once(
+    last: &mut Option<ChampSelectEvent>,
+    event: ChampSelectEvent,
+    events: &mpsc::Sender<ChampSelectEvent>,
+) -> bool {
+    if last.as_ref() == Some(&event) {
+        return true;
+    }
+    let sent = events.send(event.clone()).await.is_ok();
+    *last = Some(event);
+    sent
 }
 
 /// One connection's lifetime: connect, catch up, then listen until the client
@@ -339,6 +380,7 @@ impl ChampSelectState {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::PathBuf;
     use serde_json::json;
 
     fn session(champion_id: u32, position: &str) -> ChampSelectSession {
@@ -480,8 +522,23 @@ mod tests {
     #[test]
     fn the_wire_shape_the_ui_reads_is_fixed() {
         assert_eq!(
-            serde_json::to_value(ChampSelectEvent::ClientOffline).unwrap(),
-            json!({ "event": "clientOffline" })
+            serde_json::to_value(ChampSelectEvent::ClientOffline {
+                searched: vec!["/x/lockfile".to_string()]
+            })
+            .unwrap(),
+            json!({ "event": "clientOffline", "searched": ["/x/lockfile"] })
+        );
+        assert_eq!(
+            serde_json::to_value(ChampSelectEvent::LockfileUnreadable {
+                path: "/x/lockfile".to_string(),
+                detail: "permission denied".to_string(),
+            })
+            .unwrap(),
+            json!({
+                "event": "lockfileUnreadable",
+                "path": "/x/lockfile",
+                "detail": "permission denied",
+            })
         );
         assert_eq!(
             serde_json::to_value(ChampSelectEvent::Entered).unwrap(),
@@ -514,15 +571,23 @@ mod tests {
     #[tokio::test]
     async fn a_closed_client_is_reported_once_and_is_not_an_error() {
         let (sender, mut receiver) = mpsc::channel(4);
+        let missing = "/nonexistent/League of Legends.app/lockfile";
         let config = WatcherConfig {
-            lockfile_path: PathBuf::from("/nonexistent/League of Legends.app/lockfile"),
+            lockfile: LockfileSearch::Only(vec![PathBuf::from(missing)]),
             client_check_interval: Duration::from_millis(5),
             reconnect_delay: Duration::from_millis(5),
         };
 
         let watcher = tokio::spawn(watch(config, sender));
 
-        assert_eq!(receiver.recv().await, Some(ChampSelectEvent::ClientOffline));
+        // The report names where it looked, so an install this app does not
+        // know about can be told apart from a closed client.
+        assert_eq!(
+            receiver.recv().await,
+            Some(ChampSelectEvent::ClientOffline {
+                searched: vec![missing.to_string()]
+            })
+        );
 
         // Several check intervals later, still nothing further to say.
         tokio::time::sleep(Duration::from_millis(40)).await;

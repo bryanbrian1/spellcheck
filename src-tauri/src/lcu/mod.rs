@@ -6,7 +6,9 @@
 //!
 //! The layer is built bottom-up:
 //!
-//! 1. [`lockfile`] — the port and password, rewritten every launch.
+//! 1. [`lockfile`] — the port and password, rewritten every launch, and
+//!    where to look for them; [`install`] is where the Windows installer
+//!    says it put the client.
 //! 2. [`client`] — the REST API, for the champion-id-to-key mapping and for
 //!    the one read that catches us up if we connect mid-champ-select.
 //! 3. [`session`] — the champ select payload, reduced to champion and role.
@@ -22,6 +24,7 @@
 
 pub mod client;
 pub mod error;
+pub mod install;
 pub mod lockfile;
 pub mod session;
 pub mod watcher;
@@ -29,7 +32,7 @@ pub mod ws;
 
 pub use client::LcuClient;
 pub use error::LcuError;
-pub use lockfile::{Lockfile, DEFAULT_LOCKFILE_PATH, LCU_USERNAME};
+pub use lockfile::{Lockfile, LockfileSearch, DEFAULT_LOCKFILE_PATH, LCU_USERNAME};
 pub use session::{ChampSelectSession, Selection, CHAMP_SELECT_SESSION_URI};
 pub use watcher::{watch, ChampSelectEvent, LockedChampion, WatcherConfig};
 pub use ws::{LcuEventStream, LcuJsonEvent, CHAMP_SELECT_EVENT};

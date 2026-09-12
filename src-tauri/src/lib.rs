@@ -497,7 +497,7 @@ fn spawn_champ_select(handle: &AppHandle, service: Arc<BuildService>) {
             // which is the gate the live task waits on. Read before the match
             // below consumes the event. A send failure means that task is
             // gone, which is not fatal to this one.
-            let _ = launcher_running.send(!matches!(&event, ChampSelectEvent::ClientOffline));
+            let _ = launcher_running.send(!matches!(&event, ChampSelectEvent::ClientOffline { .. }));
 
             let recheck = match event {
                 ChampSelectEvent::Locked(champion) => {
@@ -550,7 +550,14 @@ fn spawn_champ_select(handle: &AppHandle, service: Arc<BuildService>) {
                 // nothing we can still see. `Left` deliberately does not do
                 // this: champ select ending is how a game *starts*, and the
                 // pair we just looked up is the pair about to be played.
-                ChampSelectEvent::ClientOffline => {
+                //
+                // An unreadable lockfile is the same from here: whatever
+                // champ select we last saw belongs to a client we can no
+                // longer follow. The launcher gate above stays open for it,
+                // because the client *is* running and the game's own API
+                // needs no lockfile.
+                ChampSelectEvent::ClientOffline { .. }
+                | ChampSelectEvent::LockfileUnreadable { .. } => {
                     locked = None;
                     comp = None;
                     claim.release().await;
