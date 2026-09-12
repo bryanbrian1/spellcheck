@@ -436,12 +436,19 @@ pub fn run() {
                 config_file: config_file.display().to_string(),
                 lockfile: config.lockfile.as_ref().map(|p| p.display().to_string()),
             });
-            spawn_champ_select(app.handle(), service, config.lockfile.clone());
+            // The watcher's first word — almost always "offline" — is out
+            // before the page has anyone listening. Kept here so the page
+            // can ask for it when it is ready, rather than showing a
+            // built-in guess until the client changes state.
+            let latest = LatestStatus::default();
+            app.manage(latest.clone());
+            spawn_champ_select(app.handle(), service, config.lockfile.clone(), latest);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             commands::source_label,
             commands::client_settings,
+            commands::client_status,
             commands::fetch_build,
             commands::data_dragon,
             commands::check_update,
@@ -476,6 +483,7 @@ fn spawn_champ_select(
     handle: &AppHandle,
     service: Arc<BuildService>,
     configured_lockfile: Option<PathBuf>,
+    latest: LatestStatus,
 ) {
     // Champ select produces a handful of events per game. A small buffer is
     // plenty, and a full one would mean something is very wrong.
@@ -509,6 +517,7 @@ fn spawn_champ_select(
         while let Some(event) = receiver.recv().await {
             // The UI shows "League isn't running" from this, so every state
             // goes out, not just the interesting one.
+            latest.set(&event);
             let _ = handle.emit(CHAMP_SELECT_STATUS_EVENT, &event);
 
             // Every state the watcher reports also answers "is League open?",
@@ -716,6 +725,26 @@ async fn build_for(
         inferred_role,
         lookup,
         error,
+    }
+}
+
+/// The last thing the watcher said, for a page that was not yet listening.
+///
+/// The watcher starts with the app and speaks at once; the page loads a
+/// moment later and would otherwise sit on its built-in "offline" until
+/// the client next changed state — which, with League closed, is never.
+#[derive(Debug, Clone, Default)]
+pub struct LatestStatus(Arc<std::sync::Mutex<Option<ChampSelectEvent>>>);
+
+impl LatestStatus {
+    fn set(&self, event: &ChampSelectEvent) {
+        if let Ok(mut slot) = self.0.lock() {
+            *slot = Some(event.clone());
+        }
+    }
+
+    pub fn get(&self) -> Option<ChampSelectEvent> {
+        self.0.lock().ok().and_then(|slot| slot.clone())
     }
 }
 

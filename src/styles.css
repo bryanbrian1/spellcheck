@@ -266,7 +266,19 @@ body{
 
 /* Client-not-running is a first-class screen, never an error. */
 .empty{flex:1;display:grid;place-items:center;padding:32px 24px;text-align:center}
-.empty p{color:var(--text-faint);font-size:13px;max-width:34ch;line-height:1.55}
+.empty p{color:var(--text-faint);font-size:13px;max-width:34ch;line-height:1.55;margin:0 auto}
+
+/* Where the app looked for the client. Folded under the offline notice:
+   nobody with League in the usual place should ever need to open it. */
+.where{margin-top:14px;max-width:100%;text-align:left;font-size:11px;color:var(--text-faint)}
+.where summary{cursor:default;color:var(--text-muted);text-align:center;list-style:none}
+.where summary::-webkit-details-marker{display:none}
+.where summary::before{content:"\203A\00a0";display:inline-block;transition:transform var(--dur-fast) var(--ease-out)}
+.where[open] summary::before{transform:rotate(90deg)}
+.where ul{margin:8px 0 0;padding:0;list-style:none}
+.where li{margin:2px 0;overflow-wrap:anywhere}
+.where p{margin:8px 0 0;max-width:none;font-size:11px;text-align:left;overflow-wrap:anywhere}
+.where code{font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted)}
 
 /* Lane state. The gold delta was the largest type on screen at 17px — the
    loudest thing in the window was bad news. It is context now, not a headline. */

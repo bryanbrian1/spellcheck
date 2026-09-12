@@ -92,7 +92,8 @@ interface LockedChampion {
  * it is a state to render, not an error to report.
  */
 type LcuStatus =
-  | { event: "clientOffline" }
+  | { event: "clientOffline"; searched: string[] }
+  | { event: "lockfileUnreadable"; path: string; detail: string }
   | { event: "clientConnected" }
   | { event: "entered" }
   | ({ event: "locked" } & LockedChampion)
@@ -1225,6 +1226,74 @@ let gapsSlot = "";
  *  screen, which once a game is running there always is. */
 let noticeSlot = "";
 
+/**
+ * `client_settings` — where the config file is, for the one notice that
+ * needs it. Asked for the first time the client cannot be found and kept;
+ * the file is read once at startup on the other side, so the answer does
+ * not change while the app is open.
+ */
+interface ClientSettings {
+  configFile: string;
+  lockfile: string | null;
+}
+let clientSettings: ClientSettings | null | undefined;
+
+/** The paths the last offline report said it looked at. Kept so the notice
+ *  can be redrawn when the settings arrive a moment after it. */
+let searchedPaths: string[] = [];
+
+/**
+ * "League isn't running", with where this app looked tucked underneath.
+ *
+ * Offline is the ordinary state and the plain line is all it should say.
+ * But a League installed somewhere this app does not know about is
+ * *also* offline as far as the screen can tell, and the only way for a
+ * person to tell the two apart is to be shown the paths — so they are
+ * there, folded, for whoever needs them.
+ */
+const offlineHtml = (): string => {
+  const paths = searchedPaths.map((p) => `<li><code>${escape(p)}</code></li>`).join("");
+  const settings = clientSettings;
+  // Forward slashes in the example: Windows accepts them in a path and JSON
+  // needs nothing escaped, where a backslash typed once is a parse error and
+  // the file is silently ignored.
+  const fix = settings
+    ? `<p>League installed somewhere else? Add its lockfile to</p>` +
+      `<p><code>${escape(settings.configFile)}</code></p>` +
+      `<p>as <code>{ "lockfile": "D:/Games/League of Legends/lockfile" }</code> and relaunch.` +
+      (settings.lockfile
+        ? ` It currently says <code>${escape(settings.lockfile)}</code>.`
+        : "") +
+      `</p>`
+    : "";
+  // One child of the grid, not two: `.empty` centres each child in its own
+  // row, and the fold belongs directly under the sentence.
+  return (
+    `<div class="empty"><div><p>League isn't running. This screen fills itself when you lock a champion.</p>` +
+    (paths
+      ? `<details class="where"><summary>Where this app looked</summary><ul>${paths}</ul>${fix}</details>`
+      : "") +
+    `</div></div>`
+  );
+};
+
+/** Fetch the settings once, and redraw the offline notice when they land. */
+const wantClientSettings = (): void => {
+  if (clientSettings !== undefined) return;
+  clientSettings = null;
+  void invoke<ClientSettings>("client_settings")
+    .then((settings) => {
+      clientSettings = settings;
+      if (selectPill[0] === "Offline") {
+        noticeSlot = offlineHtml();
+        paintLive();
+      }
+    })
+    .catch(() => {
+      /* outside the app window there is nothing to point at */
+    });
+};
+
 /** The header, while no game is running. A game overrides all of it. */
 let selectSub = "Waiting for the League client";
 let selectPill: [text: string, connected: boolean] = ["Offline", false];
@@ -1375,9 +1444,25 @@ const onStatus = (status: LcuStatus): void => {
       clearLive();
       selectSub = "Waiting for the League client";
       selectPill = ["Offline", false];
-      noticeSlot = emptyHtml(
-        "League isn't running. This screen fills itself when you lock a champion.",
-      );
+      searchedPaths = status.searched;
+      noticeSlot = offlineHtml();
+      wantClientSettings();
+      break;
+
+    // A lockfile is there and this app cannot read it. Unlike offline, the
+    // client is running and this is something the person can fix, so it is
+    // its own state with the file named.
+    case "lockfileUnreadable":
+      locked = null;
+      clearLive();
+      selectSub = "Found League, can't read it";
+      selectPill = ["Can't read", false];
+      noticeSlot =
+        `<div class="empty"><div><p>League is running, but this app can't read its lockfile.</p>` +
+        `<details class="where" open><summary>What went wrong</summary>` +
+        `<ul><li><code>${escape(status.path)}</code></li></ul>` +
+        `<p>${escape(status.detail)}</p></details></div></div>`;
+      showScreen("live");
       break;
 
     case "clientConnected":
@@ -1537,6 +1622,15 @@ const onGameState = (update: InGameUpdate): void => {
 };
 
 listen<LcuStatus>("lcu:status", onStatus);
+// The watcher speaks before this page exists, and its first word — offline,
+// nearly always — is the one that says where it looked. Ask for it.
+void invoke<LcuStatus | null>("client_status")
+  .then((status) => {
+    if (status) onStatus(status);
+  })
+  .catch(() => {
+    /* outside the app window there is no watcher to ask */
+  });
 listen<LiveBuild>("live:build", onBuild);
 listen<ChampSelectSuggestions>("lcu:suggestions", onSuggestions);
 listen<InGameUpdate>("game:state", onGameState);
