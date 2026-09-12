@@ -57,13 +57,20 @@ so macOS signing turns on the day there is a certificate to hand it; Windows
 needs a step written first. Apple is worth doing first, because signing there
 is also what makes the macOS updater safe.
 
-If League is installed somewhere other than the default location — most likely
-on Windows, where the installer lets you pick a drive — point the app at the
-lockfile yourself:
+On Windows the app finds League wherever the Riot installer put it, by reading
+the installer's own records under `%ProgramData%\Riot Games`. If it still
+says "Offline" with the client open, open the fold under that notice — it lists
+every path it tried and names the config file. Add one line to that file and
+relaunch:
 
-```sh
-SPELLCHECK_LOCKFILE='D:\Games\League of Legends\lockfile'
+```json
+{ "lockfile": "D:/Games/League of Legends/lockfile" }
 ```
+
+Forward slashes are fine on Windows and save you doubling every backslash for
+JSON. `SPELLCHECK_LOCKFILE` in the environment does the same thing and wins
+over the file, but a Start Menu launch never sees a shell export, so the file is
+the one to use for an installed copy.
 
 ## Start here
 

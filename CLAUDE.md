@@ -71,10 +71,17 @@ Never present a rule-based suggestion as a statistic.
 ## LCU integration notes
 
 - Lockfile, macOS: `/Applications/League of Legends.app/Contents/LoL/lockfile`
-- Lockfile, Windows: `C:\Riot Games\League of Legends\lockfile`. Unlike the
-  macOS path this is only the common default — the installer takes a drive and
-  regional builds differ — so `SPELLCHECK_LOCKFILE` is a user-facing
-  setting on Windows, not just a development one
+- Lockfile, Windows: `C:\Riot Games\League of Legends\lockfile` is only the
+  installer's default — it takes a drive, and regional builds differ. The
+  watcher reads the installer's own records first
+  (`%ProgramData%\Riot Games\RiotClientInstalls.json` and
+  `Metadata\league_of_legends.*\*.product_settings.yaml`), then the default,
+  then the same path on D:–F:. `lockfile` in `providers.json` is the
+  user-facing override; `SPELLCHECK_LOCKFILE` wins over it and is for
+  development
+- When the client cannot be found, the offline event carries every path
+  searched and the page shows them. Keep it that way: an unknown install and
+  a closed client are otherwise indistinguishable on screen
 - Format: `ProcessName:PID:Port:Password:Protocol`
 - Auth: HTTP Basic, username `riot`, password from lockfile
 - Base URL: `https://127.0.0.1:{port}` — self-signed cert, verification must
