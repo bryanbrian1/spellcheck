@@ -17,7 +17,9 @@ interface BuildStats {
   pickRate?: number;
   banRate?: number;
 }
-interface ItemRef { id: number; name?: string }
+/** `tags` are what the item is for — "Antiheal", "Armor pen" — stamped on by
+ *  the backend from our own item file, whichever source answered. */
+interface ItemRef { id: number; name?: string; tags?: string[] }
 interface ItemGroup { items: ItemRef[]; stats?: BuildStats; label?: string }
 interface ItemPlan {
   starters?: ItemGroup[];
@@ -674,9 +676,14 @@ const itemRowBlock = (title: string, groups: ItemGroup[]): string => {
  * useful as one recommendation; they are about as useful as none, because the
  * one question a player has here — which of these, and when — went unanswered.
  *
- * So each option gets its own column: what it is, and how it actually
- * performs. Two separate things are being said at once, and the colour law
- * governs how they may sit together.
+ * So each option is a row that reads left to right the way the question is
+ * asked: the item, what it is for, how it performs. Three separate things are
+ * being said, and the colour law governs how they may sit together.
+ *
+ * The **tags** are what the item is — "Antiheal", "Armor pen", "Active" — so
+ * a player scanning for the one that answers a Mundo does not have to know
+ * every icon by sight. They come from our own item file, by way of the
+ * backend, and say nothing about this game.
  *
  * The numbers are **statistics** and carry themselves. Each option shows its
  * own win rate and its own sample, because the header cannot speak for a menu
@@ -685,12 +692,14 @@ const itemRowBlock = (title: string, groups: ItemGroup[]): string => {
  * app were neutral between them.
  *
  * The flag is a **rule**. When the recommendation engine has independently
- * argued for one of these items in this game, that option is marked amber and
- * captioned with the engine's own priority wording, with its reasoning in the
- * tooltip. It never becomes a number and never edits the statistics beside
- * it: a win rate says how the item performs across thousands of games, the
- * amber says this particular enemy team is why you would reach for it, and
- * conflating those two is the exact failure the colour law exists to prevent.
+ * argued for one of these items in this game, that row is marked amber and
+ * captioned with the engine's own priority wording, with its reasoning in
+ * place of the tags — the reason it wants the item *now* outranks what the
+ * item is in general. It never becomes a number and never edits the
+ * statistics beside it: a win rate says how the item performs across
+ * thousands of games, the amber says this particular enemy team is why you
+ * would reach for it, and conflating those two is the exact failure the
+ * colour law exists to prevent.
  */
 const alternativesBlock = (title: string, groups: ItemGroup[], advice: Advice): string => {
   if (!groups.length) return "";
@@ -704,31 +713,40 @@ const alternativesBlock = (title: string, groups: ItemGroup[], advice: Advice): 
 
   if (!options.length) return "";
 
-  const columns = options
+  const rows = options
     .map(({ item, stats }) => {
       const flagged = advice.reasons.get(item.id);
       const label = escape(item.name ?? `#${item.id}`);
-      const stat = statLine(stats);
-      // The engine's own words for when it wants the item, never new ones.
-      const why = flagged
-        ? `<span class="seq-why">${escape(priorityLabels[flagged.priority])}</span>`
-        : "";
-      return `<div class="seq-i">
+      const wr = percent(stats?.winRate);
+      const games = count(stats?.games);
+      const tags = (item.tags ?? []).map((t) => `<span class="tag">${escape(t)}</span>`).join("");
+      // The engine's own words for when it wants the item, and why, never
+      // new ones. When it has spoken the tags step aside: "next back ·
+      // they all deal physical damage" is the whole of what a player needs
+      // to read, and "Armor · Health" underneath it would be noise.
+      const sub = flagged
+        ? `<span class="alt-why"><b>${escape(priorityLabels[flagged.priority])}</b> · ${escape(flagged.reason)}</span>`
+        : tags
+          ? `<span class="alt-tags">${tags}</span>`
+          : "";
+      return `<div class="alt${flagged ? " rule" : ""}">
         ${tile(item.id, item.name, flagged ? "tile rule" : "tile", "item", flagged ? flagged.reason : itemTitle(item, stats))}
-        <span class="seq-lbl">${label}</span>
-        ${stat ? `<span class="seq-stat">${stat}</span>` : ""}
-        ${why}
+        <div class="alt-txt">
+          <span class="alt-name">${label}</span>
+          ${sub}
+        </div>
+        ${wr || games ? `<span class="alt-stat">${wr ? `<b>${wr}</b>` : ""}${games ? `<span>${games} games</span>` : ""}</span>` : ""}
       </div>`;
     })
     .join("");
 
   // With a menu, the header counts it rather than borrowing one option's win
   // rate to stand for all of them — that borrowed authority is the whole
-  // reason each column carries its own numbers. With exactly one option there
+  // reason each row carries its own numbers. With exactly one option there
   // is nothing to be ambiguous about, so the header speaks for it as it
   // always did.
   const meta = options.length === 1 ? statLine(options[0]?.stats) : `${options.length} options`;
-  return block(title, meta, `<div class="seq">${columns}</div>`, railFor(options[0]?.stats));
+  return block(title, meta, `<div class="alts">${rows}</div>`, railFor(options[0]?.stats));
 };
 
 const skillBlock = (skills: SkillPlan): string => {
