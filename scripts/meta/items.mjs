@@ -9,8 +9,8 @@
 // reason the file exists, and this script NEVER invents them. It reads the
 // committed file and carries every existing entry across untouched.
 //
-// Everything else — name, cost, buildsInto, isComponent — is mechanical, comes
-// from Data Dragon, and is regenerated wholesale.
+// Everything else — name, cost, tags, buildsInto, isComponent — is mechanical,
+// comes from Data Dragon, and is regenerated wholesale.
 //
 // The file used to hold only the 75 items that answer something. It now holds
 // the whole catalogue, because the in-game gold comparison needs a cost for
@@ -31,9 +31,11 @@ const NOTE =
   "Every item Data Dragon knows, with the cost the app compares spend against. " +
   "`cost` is Data Dragon's gold.total — the whole build path — because the " +
   "live game API reports only gold.base and summing that undercounts a " +
-  "finished item by roughly three quarters. `answers` and `damage` are " +
-  "curated judgement and are never generated; every other field is derived " +
-  "from Data Dragon and rewritten by scripts/meta/items.mjs.";
+  "finished item by roughly three quarters. `tags` is Data Dragon's own stat " +
+  "vocabulary, verbatim, and is what the situational list labels an item " +
+  "with once the curated answers have had their say. `answers` and `damage` " +
+  "are curated judgement and are never generated; every other field is " +
+  "derived from Data Dragon and rewritten by scripts/meta/items.mjs.";
 
 const get = async (url) => {
   const response = await fetch(url);
@@ -81,6 +83,10 @@ const main = async () => {
       cost: item.gold?.total ?? 0,
       answers: carried?.answers ?? [],
       damage: carried?.damage ?? null,
+      // Riot's stat vocabulary — "ArmorPenetration", "LifeSteal", "Active".
+      // Kept verbatim so the app owns the wording it shows; this is the one
+      // field here that exists for the screen rather than for a check.
+      tags: item.tags ?? [],
       buildsInto: into,
       isComponent: into.length > 0,
     };
