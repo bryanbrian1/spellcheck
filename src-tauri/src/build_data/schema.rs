@@ -147,6 +147,30 @@ pub struct ChampionBuild {
     pub skills: SkillPlan,
 }
 
+impl ChampionBuild {
+    /// Fill in what our own item tags know about every item here: the label
+    /// chips, and a display name when the source left one out.
+    ///
+    /// `describe` answers for one item id, or `None` for one the tag file
+    /// has never heard of — in which case the item is left exactly as the
+    /// source gave it. A name the source *did* give is never overwritten;
+    /// the source's wording is its own, and the tag file's is a fallback for
+    /// providers that speak only in ids.
+    pub fn annotate_items<F>(&mut self, mut describe: F)
+    where
+        F: FnMut(u32) -> Option<(String, Vec<String>)>,
+    {
+        for item in self.items.items_mut() {
+            if let Some((name, tags)) = describe(item.id) {
+                if item.name.as_deref().map_or(true, str::is_empty) {
+                    item.name = Some(name);
+                }
+                item.tags = tags;
+            }
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionRef {
@@ -279,6 +303,20 @@ impl ItemPlan {
             && self.core.is_empty()
             && self.situational.is_empty()
     }
+
+    /// Every item the plan names, in every section, for a pass that wants to
+    /// touch each one — see [`ChampionBuild::annotate_items`].
+    pub fn items_mut(&mut self) -> impl Iterator<Item = &mut ItemRef> {
+        [
+            &mut self.starters,
+            &mut self.boots,
+            &mut self.core,
+            &mut self.situational,
+        ]
+        .into_iter()
+        .flat_map(|groups| groups.iter_mut())
+        .flat_map(|group| group.items.iter_mut())
+    }
 }
 
 /// One buildable option: a single item, or an ordered path like
@@ -309,11 +347,24 @@ pub struct ItemRef {
     pub id: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    /// What the item is for, in a few words — "Antiheal", "Armor pen",
+    /// "Active". Never set by a provider: [`BuildService`] stamps these on
+    /// from our own item tags after any source has answered, so every build
+    /// reads the same way whoever it came from, and the UI need not carry an
+    /// item catalogue to explain a situational list.
+    ///
+    /// [`BuildService`]: crate::BuildService
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub tags: Vec<String>,
 }
 
 impl ItemRef {
     pub fn new(id: u32) -> Self {
-        ItemRef { id, name: None }
+        ItemRef {
+            id,
+            name: None,
+            tags: Vec::new(),
+        }
     }
 }
 
@@ -516,5 +567,38 @@ mod tests {
         }
         .non_empty()
         .is_some());
+    }
+
+    /// The tag pass fills in what the source left out and leaves alone what
+    /// it said. A name a provider chose is its own; an id it never named
+    /// gets ours; an id nobody knows stays a bare id.
+    #[test]
+    fn annotating_items_names_the_unnamed_and_keeps_the_named() {
+        let mut build = sample_build();
+        build.items.situational = vec![
+            ItemGroup::new(vec![ItemRef {
+                id: 3075,
+                name: Some("Thornmail (source)".into()),
+                tags: vec![],
+            }]),
+            ItemGroup::new(vec![ItemRef::new(1)]),
+        ];
+
+        build.annotate_items(|id| match id {
+            6655 => Some(("Luden's".into(), vec!["AP".into()])),
+            3075 => Some(("Thornmail".into(), vec!["Antiheal".into(), "Armor".into()])),
+            _ => None,
+        });
+
+        let core = &build.items.core[0].items[0];
+        assert_eq!(core.name.as_deref(), Some("Luden's"), "an unnamed id is named");
+        assert_eq!(core.tags, ["AP"]);
+
+        let thornmail = &build.items.situational[0].items[0];
+        assert_eq!(thornmail.name.as_deref(), Some("Thornmail (source)"));
+        assert_eq!(thornmail.tags, ["Antiheal", "Armor"]);
+
+        let unknown = &build.items.situational[1].items[0];
+        assert_eq!(unknown, &ItemRef::new(1), "an unknown id is left exactly as it came");
     }
 }

@@ -51,6 +51,19 @@ pub enum Answer {
 }
 
 impl Answer {
+    /// The chip under an item's name. Title-cased and short, because it sits
+    /// in a row with two others and is read at a glance mid-game.
+    pub fn label(self) -> &'static str {
+        match self {
+            Answer::Armor => "Armor",
+            Answer::Mr => "Magic resist",
+            Answer::Antiheal => "Antiheal",
+            Answer::Tenacity => "Tenacity",
+            Answer::AntiShield => "Anti-shield",
+            Answer::AntiCrit => "Anti-crit",
+        }
+    }
+
     /// For rendering inside a reason sentence.
     pub fn describe(self) -> &'static str {
         match self {
@@ -102,6 +115,76 @@ pub struct ItemTags {
     /// on the back that answers a threat *now*, at the cost of a slot later.
     #[serde(default)]
     pub is_component: bool,
+    /// Riot's own stat vocabulary for the item — `ArmorPenetration`,
+    /// `LifeSteal`, `Active` — copied verbatim from Data Dragon. No check
+    /// reads it; it exists so the screen can say what an item *is* without
+    /// a second catalogue. See [`ItemTags::labels`].
+    #[serde(default)]
+    pub tags: Vec<String>,
+}
+
+/// The most labels an item wears on screen.
+///
+/// A situational row has one line under the name, and three short words fill
+/// it. Past three the chips stop distinguishing the item and start describing
+/// its whole stat line, which the tooltip already does.
+pub const MAX_LABELS: usize = 3;
+
+impl ItemTags {
+    /// What to print under the item's name: why a player reaches for it.
+    ///
+    /// The curated answers lead, because they are the reason the item is on
+    /// a situational list at all — Thornmail is bought as antiheal, not as
+    /// "armour, health". Riot's own tags follow in a fixed order of how much
+    /// each one decides a purchase: penetration and sustain before a resist,
+    /// a resist before a raw stat, and the stats nearly every item carries —
+    /// haste, health — last, so they only show when nothing more telling is
+    /// there to say. Capped at [`MAX_LABELS`], deduplicated, and never a
+    /// number: these are words about what the item does, not how it performs.
+    pub fn labels(&self) -> Vec<&'static str> {
+        let mut out: Vec<&'static str> = Vec::with_capacity(MAX_LABELS);
+        let mut push = |label: &'static str| {
+            if out.len() < MAX_LABELS && !out.contains(&label) {
+                out.push(label);
+            }
+        };
+
+        for answer in &self.answers {
+            push(answer.label());
+        }
+
+        let has = |tag: &str| self.tags.iter().any(|t| t == tag);
+        // Riot's vocabulary, in the order it decides a purchase.
+        const RIOT: [(&str, &str); 16] = [
+            ("ArmorPenetration", "Armor pen"),
+            ("MagicPenetration", "Magic pen"),
+            ("LifeSteal", "Lifesteal"),
+            ("SpellVamp", "Omnivamp"),
+            ("Armor", "Armor"),
+            ("SpellBlock", "Magic resist"),
+            ("MagicResist", "Magic resist"),
+            ("Tenacity", "Tenacity"),
+            ("Active", "Active"),
+            ("Slow", "Slow"),
+            ("CriticalStrike", "Crit"),
+            ("AttackSpeed", "Attack speed"),
+            ("Health", "Health"),
+            ("Damage", "AD"),
+            ("SpellDamage", "AP"),
+            ("AbilityHaste", "Haste"),
+        ];
+        for (riot, label) in RIOT {
+            // Lifesteal and omnivamp are one idea to a buyer; an item tagged
+            // with both is a lifesteal item, and saying it twice wastes a slot.
+            if riot == "SpellVamp" && has("LifeSteal") {
+                continue;
+            }
+            if has(riot) {
+                push(label);
+            }
+        }
+        out
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -329,6 +412,49 @@ mod tests {
                 "nothing answers {answer:?}, so a check asking for it can only stay silent"
             );
         }
+    }
+
+    /// The curated reason leads, Riot's stat line follows, and three is the
+    /// most a row may say.
+    #[test]
+    fn labels_lead_with_the_curated_answer_and_stop_at_three() {
+        let tags = Tags::get();
+
+        // Thornmail's curated answers lead; the health Riot tags it with is
+        // the least telling thing about it and comes last.
+        let thornmail = tags.item(3075).unwrap();
+        assert_eq!(thornmail.labels(), ["Armor", "Antiheal", "Health"]);
+
+        // Maw: the curated resist, then the sustain, then the raw stat — and
+        // "Magic resist" once, though it is both an answer and a Riot tag.
+        let maw = tags.item(3156).unwrap();
+        assert_eq!(maw.labels(), ["Magic resist", "Lifesteal", "AD"]);
+
+        // Lord Dominik's has no curated answer at all and still says
+        // something a buyer can act on.
+        let ldr = tags.item(3036).unwrap();
+        assert_eq!(ldr.labels(), ["Armor pen", "Crit", "AD"]);
+    }
+
+    /// An item tagged with both sustain kinds says one thing about it.
+    #[test]
+    fn lifesteal_and_omnivamp_do_not_both_print() {
+        let item = ItemTags {
+            name: "Test".into(),
+            cost: 0,
+            answers: vec![],
+            damage: None,
+            builds_into: vec![],
+            is_component: false,
+            tags: vec!["SpellVamp".into(), "LifeSteal".into()],
+        };
+        assert_eq!(item.labels(), ["Lifesteal"]);
+
+        let vamp_only = ItemTags {
+            tags: vec!["SpellVamp".into()],
+            ..item
+        };
+        assert_eq!(vamp_only.labels(), ["Omnivamp"]);
     }
 
     #[test]

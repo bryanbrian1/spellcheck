@@ -65,8 +65,24 @@ impl BuildService {
         self.provider.label()
     }
 
+    /// Ask the provider, then say what each item is for.
+    ///
+    /// The tag chips under a situational item come from our own
+    /// `data/meta/items.json`, not from the source, and are put on here so
+    /// that every provider's answer reads the same way and none of them has
+    /// to know the vocabulary. The same pass names an item the source left
+    /// as a bare id, which the crawled files always do.
     pub async fn build(&self, request: &BuildRequest) -> Result<BuildLookup, ProviderError> {
-        self.provider.fetch_build(request).await
+        let mut lookup = self.provider.fetch_build(request).await?;
+        if let BuildLookup::Found(build) = &mut lookup {
+            let tags = Tags::get();
+            build.annotate_items(|id| {
+                let item = tags.item(id)?;
+                let labels = item.labels().into_iter().map(str::to_string).collect();
+                Some((item.name.clone(), labels))
+            });
+        }
+        Ok(lookup)
     }
 
     /// League-shaped entry point: champ select hands us a champion key and an
@@ -833,6 +849,57 @@ mod tests {
         async fn primary_role(&self, _champion_key: &str) -> Result<Option<Role>, ProviderError> {
             Ok(Some(self.0))
         }
+    }
+
+    /// A source that speaks only in ids, the way the crawled files do.
+    struct BareIds;
+
+    #[async_trait]
+    impl BuildDataProvider for BareIds {
+        fn label(&self) -> &str {
+            "bare"
+        }
+
+        async fn fetch_build(&self, request: &BuildRequest) -> Result<BuildLookup, ProviderError> {
+            use build_data::schema::{ChampionRef, ItemGroup, ItemPlan, ItemRef, SourceInfo};
+            Ok(BuildLookup::found(ChampionBuild {
+                champion: ChampionRef {
+                    key: request.champion_key.clone(),
+                    name: request.champion_key.clone(),
+                    id: None,
+                },
+                role: request.role,
+                source: SourceInfo {
+                    provider_label: "bare".into(),
+                    ..SourceInfo::default()
+                },
+                stats: None,
+                matchup: None,
+                items: ItemPlan {
+                    situational: vec![ItemGroup::new(vec![ItemRef::new(3075)])],
+                    ..ItemPlan::default()
+                },
+                runes: vec![],
+                summoners: vec![],
+                skills: Default::default(),
+            }))
+        }
+    }
+
+    /// The chips under a situational item are ours, whoever answered: the
+    /// service puts them on after the provider, so the UI never needs an
+    /// item catalogue and a source that only knows ids still names its items.
+    #[tokio::test]
+    async fn every_build_leaves_the_service_with_item_tags_on() {
+        let service = BuildService::new(Arc::new(BareIds));
+        let resolved = service.build_for("Malphite", "top", None, None).await.unwrap();
+        let BuildLookup::Found(build) = resolved.lookup else {
+            panic!("the stub answers with a build");
+        };
+        let thornmail = &build.items.situational[0].items[0];
+        assert_eq!(thornmail.name.as_deref(), Some("Thornmail"));
+        assert!(thornmail.tags.iter().any(|t| t == "Antiheal"), "{:?}", thornmail.tags);
+        assert!(thornmail.tags.iter().any(|t| t == "Armor"), "{:?}", thornmail.tags);
     }
 
     /// Practice Tool, customs and ARAM report no lane at all. Showing nothing
