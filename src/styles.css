@@ -181,10 +181,11 @@ body{
    captions broke mid-word and whose numbers fell wherever the names let
    them. Names and tags left, numbers right, always in the same place. */
 .alts{display:flex;flex-direction:column}
-.alt{display:flex;align-items:center;gap:10px;padding:6px 0;min-width:0}
+.alt{display:flex;align-items:center;gap:12px;padding:10px 0;min-width:0}
+.alt:first-child{padding-top:2px}
 .alt + .alt{border-top:1px solid var(--line-hair)}
-.alt .tile{width:36px;height:36px}
-.alt-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.alt .tile{width:40px;height:40px}
+.alt-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
 .alt-name{font-size:13px;font-weight:600;color:var(--text-title);line-height:1.2;letter-spacing:-.005em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* What the item is for. Chips, so three short words scan as three facts
    rather than one run-on line, and quiet: they describe the item in general

@@ -749,15 +749,6 @@ const alternativesBlock = (title: string, groups: ItemGroup[], advice: Advice): 
   return block(title, meta, `<div class="alts">${rows}</div>`, railFor(options[0]?.stats));
 };
 
-const skillBlock = (skills: SkillPlan): string => {
-  const priority = skills.priority ?? [];
-  const order = skills.order ?? [];
-  if (!priority.length && !order.length) return "";
-  const meta = priority.length ? priority.join(" → ") : "";
-  const row = order.map((s) => `<div class="tile sm">${s}</div>`).join("");
-  return block("Skill order", meta, `<div class="row">${row}</div>`, "rail lo");
-};
-
 /**
  * The matchup banner.
  *
@@ -825,7 +816,10 @@ const buildHtml = (lookup: FoundBuild, advice: Advice = NO_ADVICE): string | nul
     ...(lookup.items.core ?? []).slice(0, 1).map(coreBlock),
     alternativesBlock("Boots", lookup.items.boots ?? [], mine),
     alternativesBlock("Situational", lookup.items.situational ?? [], mine),
-    lookup.skills ? skillBlock(lookup.skills) : "",
+    // No skill order. It arrives on the build and stays on the type, but
+    // was dropped from the screen: fifteen 24px letters under the items
+    // answered nothing a player asks mid-game and pushed the situational
+    // menu — the part that does — further down.
   ].filter(Boolean);
 
   if (!blocks.length) return null;
