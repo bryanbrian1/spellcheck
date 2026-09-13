@@ -30,8 +30,13 @@ const STARTER_WINDOW_MS = 60_000;
 const SKILL_ORDER_LENGTH = 5;
 
 /** How many of each kind survive into the file. The rest are a long tail of
- *  one-off games that would bloat every file for no reader. */
-const KEEP = { starters: 2, boots: 3, core: 3, situational: 6, runes: 2, summoners: 2 };
+ *  one-off games that would bloat every file for no reader.
+ *
+ *  Situational keeps more than the others because it is the one list a
+ *  player picks *between*: the screen shows every entry as its own tagged
+ *  row, and the seventh-most-built defensive item is exactly what someone
+ *  facing an unusual comp is scrolling for. Ten rows is still one screen. */
+const KEEP = { starters: 2, boots: 3, core: 3, situational: 10, runes: 2, summoners: 2 };
 
 export function roleOf(participant) {
   const raw = String(participant?.teamPosition ?? "").toLowerCase();
