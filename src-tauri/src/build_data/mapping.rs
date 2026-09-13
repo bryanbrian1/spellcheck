@@ -145,6 +145,7 @@ pub fn item_ref(value: &Value) -> Option<ItemRef> {
     Some(ItemRef {
         id: id_of(value)?,
         name: value.as_object().and_then(|_| str_field(value, NAME_KEYS)),
+        tags: Vec::new(),
     })
 }
 

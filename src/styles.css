@@ -12,7 +12,8 @@
      Statistical rails are silent — a win rate in .meta already says
      "measured". Amber is still never used for a statistic.
    - Item names are readable. The 9px truncated captions were the original
-     complaint: they are 11px --text-muted now.
+     complaint: they are 12px body text now, and a menu of alternatives is a
+     list of rows with the item's tags beside its name.
    - Every number is monospace so columns align.
    - Values come from the spellcheck design system tokens rather than
      being invented here. Kept inline (not @import) because the product
@@ -169,21 +170,45 @@ body{
 .seq{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
 .seq-i{display:flex;flex-direction:column;align-items:center;gap:5px;width:70px}
 .seq-n{font-family:var(--font-mono);font-size:10px;color:var(--text-faint);font-weight:600}
-/* The original complaint: 9px grey captions were unreadable mid-game. */
-.seq-lbl{font-size:11px;font-weight:500;color:var(--text-muted);text-align:center;line-height:1.2;overflow-wrap:break-word}
-/* One option's own numbers. Monospace like every other number in the app, so
-   a column of win rates lines up and can be read down rather than across. */
-.seq-stat{
+/* An item's name is the thing a player reads, so it is set like one: body
+   size, medium weight, title colour. The 11px grey it replaced was a caption
+   for the art; this is the label the art decorates. */
+.seq-lbl{font-size:12px;font-weight:500;color:var(--text-body);text-align:center;line-height:1.25;overflow-wrap:break-word;letter-spacing:-.005em}
+
+/* A menu of alternatives is a list, not a grid. Each option is one row —
+   art, then what it is, then how it performs — so six situational items read
+   down like a table instead of wrapping into a 70px-column mosaic whose
+   captions broke mid-word and whose numbers fell wherever the names let
+   them. Names and tags left, numbers right, always in the same place. */
+.alts{display:flex;flex-direction:column}
+.alt{display:flex;align-items:center;gap:12px;padding:10px 0;min-width:0}
+.alt:first-child{padding-top:2px}
+.alt + .alt{border-top:1px solid var(--line-hair)}
+.alt .tile{width:40px;height:40px}
+.alt-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.alt-name{font-size:13px;font-weight:600;color:var(--text-title);line-height:1.2;letter-spacing:-.005em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* What the item is for. Chips, so three short words scan as three facts
+   rather than one run-on line, and quiet: they describe the item in general
+   and must not compete with amber, which is about this game. */
+.alt-tags{display:flex;gap:4px;flex-wrap:wrap}
+.tag{
+  font-size:10px;font-weight:500;line-height:1;letter-spacing:.02em;
+  color:var(--text-muted);background:var(--surface-raised);
+  border:1px solid var(--line-hair);border-radius:3px;padding:3px 5px;white-space:nowrap;
+}
+/* The engine's argument for this item, in place of the tags. Amber on the
+   priority word only — the reason is prose and reads as such. */
+.alt-why{font-size:11px;color:var(--text-muted);line-height:1.3}
+.alt-why b{color:var(--amber);font-weight:600}
+.alt.rule .alt-name{color:var(--amber)}
+/* One option's own numbers, right-aligned so a column of win rates can be
+   read down. Monospace like every other number in the app. */
+.alt-stat{
+  flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;
   font-family:var(--font-mono);font-size:10px;color:var(--text-faint);
-  text-align:center;line-height:1.3;font-variant-numeric:tabular-nums;
+  line-height:1.2;font-variant-numeric:tabular-nums;text-align:right;
 }
-.seq-stat b{color:var(--text-muted);font-weight:600}
-/* Amber, and never on a number: this says the engine argued for the item, and
-   the statistic above it is a separate claim that stands on its own. */
-.seq-why{
-  font-size:10px;font-weight:600;color:var(--amber);text-align:center;
-  line-height:1.2;overflow-wrap:break-word;
-}
+.alt-stat b{color:var(--text-body);font-weight:600;font-size:12px}
 
 /* A suggestion is a row, not a card. Amber survives in the name only. */
 .sug{background:none;border:0;border-radius:0;padding:0;display:flex;gap:11px;align-items:flex-start}

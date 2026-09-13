@@ -319,6 +319,7 @@ fn group(section: Option<&Value>) -> Option<ItemGroup> {
                 .and_then(Value::as_str)
                 .map(|name| name.trim().to_string())
                 .filter(|name| !name.is_empty()),
+            tags: Vec::new(),
         })
         .collect();
 
