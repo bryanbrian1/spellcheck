@@ -6,7 +6,7 @@
   "description": "Champion select build lookup for League of Legends",
   "license": "MIT",
   "scripts": {
-    "build": "tsc && cp index.html dist/ && cp src/styles.css dist/",
+    "build": "tsc && cp index.html dist/ && cp src/styles.css dist/ && mkdir -p dist/fonts && cp src/fonts/*.woff2 dist/fonts/",
     "dev": "npm run build && tauri dev",
     "app": "npm run build && tauri build",
     "tauri": "tauri",
