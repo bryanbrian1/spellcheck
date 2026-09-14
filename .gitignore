@@ -9,3 +9,6 @@ src-tauri/gen/schemas/
 .claude/launch.json
 # Working files from the Impeccable design plugin; per-machine, never source.
 .impeccable/
+# Wrangler's local-secrets file. Would hold a Cloudflare token if one ever
+# existed; must never reach the public repo.
+.dev.vars
