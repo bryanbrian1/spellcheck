@@ -1,0 +1,10 @@
+// Cloudflare Workers config for the website. The Worker has no script; it
+// serves site/ as static assets, so this is the whole thing. The name must
+// match the Workers project in the Cloudflare dashboard, which is bound to
+// spellcheck.pro. The app's updater endpoint is R2, not this Worker — see
+// src-tauri/tauri.conf.json.
+{
+  "name": "spellcheck",
+  "compatibility_date": "2026-09-11",
+  "assets": { "directory": "./site" }
+}
