@@ -1,28 +1,27 @@
 {
   "schemaVersion": 1,
   "champion": {
-    "key": "Mel",
-    "name": "Mel",
-    "id": 800
+    "key": "TwistedFate",
+    "name": "Twisted Fate",
+    "id": 4
   },
-  "role": "middle",
+  "role": "utility",
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
   "updatedAt": "2026-09-14T23:10:14.532Z",
   "stats": {
     "games": 5,
-    "winRate": 0.6
+    "winRate": 0.4
   },
   "items": {
     "starters": [
       {
         "items": [
-          1056,
           2003
         ],
         "games": 5,
-        "winRate": 0.6
+        "winRate": 0.4
       }
     ],
     "boots": [
@@ -35,86 +34,77 @@
       },
       {
         "items": [
-          3020
+          3158
         ],
         "games": 2,
-        "winRate": 1
+        "winRate": 0.5
       }
     ],
     "core": [
       {
         "items": [
-          6655,
-          4645
+          3094
         ],
-        "games": 4,
-        "winRate": 0.5
+        "games": 2,
+        "winRate": 0
       },
       {
         "items": [
-          2503,
-          4645,
-          3157
+          3094,
+          2065
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3094,
+          3152
         ],
         "games": 1,
         "winRate": 1
       }
     ],
-    "situational": [
-      {
-        "items": [
-          3089
-        ],
-        "games": 1,
-        "winRate": 1
-      },
-      {
-        "items": [
-          3135
-        ],
-        "games": 1,
-        "winRate": 1
-      }
-    ]
+    "situational": []
   },
   "runes": [
     {
-      "primaryStyle": 8200,
-      "secondaryStyle": 8000,
-      "primary": [
-        8229,
-        8226,
-        8210,
-        8237
-      ],
-      "secondary": [
-        9105,
-        8017
-      ],
-      "shards": [
-        5005,
-        5008,
-        5001
-      ],
-      "games": 2,
-      "winRate": 1
-    },
-    {
       "primaryStyle": 8300,
-      "secondaryStyle": 8000,
+      "secondaryStyle": 8100,
       "primary": [
-        8369,
+        8351,
         8321,
-        8313,
+        8345,
         8347
       ],
       "secondary": [
-        9105,
-        8017
+        8141,
+        8106
+      ],
+      "shards": [
+        5007,
+        5010,
+        5011
+      ],
+      "games": 2,
+      "winRate": 0.5
+    },
+    {
+      "primaryStyle": 8400,
+      "secondaryStyle": 8300,
+      "primary": [
+        8437,
+        8446,
+        8473,
+        8451
+      ],
+      "secondary": [
+        8345,
+        8304
       ],
       "shards": [
         5005,
-        5008,
+        5001,
         5001
       ],
       "games": 1,
@@ -125,7 +115,7 @@
     {
       "spells": [
         4,
-        6
+        7
       ],
       "games": 4,
       "winRate": 0.5
@@ -133,24 +123,24 @@
     {
       "spells": [
         4,
-        12
+        6
       ],
       "games": 1,
-      "winRate": 1
+      "winRate": 0
     }
   ],
   "skills": {
     "priority": [
-      "Q",
-      "E",
-      "W"
-    ],
-    "order": [
-      "Q",
-      "E",
       "W",
       "Q",
-      "Q"
+      "E"
+    ],
+    "order": [
+      "W",
+      "E",
+      "W",
+      "E",
+      "W"
     ]
   }
 }

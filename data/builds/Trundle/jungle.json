@@ -9,26 +9,26 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T16:38:06.646Z",
+  "updatedAt": "2026-09-14T23:10:14.532Z",
   "stats": {
-    "games": 5,
-    "winRate": 0.2
+    "games": 13,
+    "winRate": 0.3846
   },
   "items": {
     "starters": [
       {
         "items": [
-          1103
+          1102
         ],
-        "games": 3,
-        "winRate": 0.3333
+        "games": 8,
+        "winRate": 0.375
       },
       {
         "items": [
-          1102
+          1103
         ],
-        "games": 2,
-        "winRate": 0
+        "games": 5,
+        "winRate": 0.4
       }
     ],
     "boots": [
@@ -36,19 +36,19 @@
         "items": [
           3047
         ],
-        "games": 2,
-        "winRate": 0.5
-      },
-      {
-        "items": [
-          1001
-        ],
-        "games": 1,
-        "winRate": 0
+        "games": 5,
+        "winRate": 0.4
       },
       {
         "items": [
           3111
+        ],
+        "games": 4,
+        "winRate": 0.75
+      },
+      {
+        "items": [
+          1001
         ],
         "games": 1,
         "winRate": 0
@@ -59,7 +59,7 @@
         "items": [
           3078
         ],
-        "games": 2,
+        "games": 5,
         "winRate": 0
       },
       {
@@ -67,17 +67,17 @@
           3078,
           3742
         ],
-        "games": 1,
+        "games": 3,
         "winRate": 1
       },
       {
         "items": [
-          3078,
-          3153,
-          3742
+          3073,
+          3742,
+          6333
         ],
         "games": 1,
-        "winRate": 0
+        "winRate": 1
       }
     ],
     "situational": []
@@ -101,8 +101,8 @@
         5008,
         5001
       ],
-      "games": 3,
-      "winRate": 0.3333
+      "games": 5,
+      "winRate": 0.4
     },
     {
       "primaryStyle": 8000,
@@ -122,8 +122,8 @@
         5008,
         5001
       ],
-      "games": 1,
-      "winRate": 0
+      "games": 5,
+      "winRate": 0.4
     }
   ],
   "summoners": [
@@ -132,21 +132,21 @@
         4,
         11
       ],
-      "games": 5,
-      "winRate": 0.2
+      "games": 13,
+      "winRate": 0.3846
     }
   ],
   "skills": {
     "priority": [
-      "W",
       "Q",
+      "W",
       "E"
     ],
     "order": [
       "Q",
       "W",
-      "Q",
       "E",
+      "Q",
       "Q"
     ]
   }

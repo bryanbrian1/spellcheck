@@ -9,10 +9,10 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T16:38:06.646Z",
+  "updatedAt": "2026-09-14T23:10:14.532Z",
   "stats": {
-    "games": 13,
-    "winRate": 0.2308
+    "games": 23,
+    "winRate": 0.3043
   },
   "items": {
     "starters": [
@@ -21,15 +21,15 @@
           1056,
           2003
         ],
-        "games": 11,
-        "winRate": 0.1818
+        "games": 19,
+        "winRate": 0.2632
       },
       {
         "items": [
           2003,
           3070
         ],
-        "games": 2,
+        "games": 4,
         "winRate": 0.5
       }
     ],
@@ -38,8 +38,8 @@
         "items": [
           1001
         ],
-        "games": 13,
-        "winRate": 0.2308
+        "games": 23,
+        "winRate": 0.3043
       }
     ],
     "core": [
@@ -49,23 +49,23 @@
           3003,
           2522
         ],
-        "games": 5,
-        "winRate": 0.2
+        "games": 9,
+        "winRate": 0.2222
       },
       {
         "items": [
           6657,
           3003
         ],
-        "games": 5,
+        "games": 7,
         "winRate": 0
       },
       {
         "items": [
           6657
         ],
-        "games": 2,
-        "winRate": 0.5
+        "games": 5,
+        "winRate": 0.6
       }
     ],
     "situational": [
@@ -73,14 +73,14 @@
         "items": [
           3135
         ],
-        "games": 2,
+        "games": 4,
         "winRate": 0
       },
       {
         "items": [
           3157
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 0
       }
     ]
@@ -104,7 +104,7 @@
         5008,
         5011
       ],
-      "games": 2,
+      "games": 4,
       "winRate": 0.5
     },
     {
@@ -135,16 +135,16 @@
         4,
         6
       ],
-      "games": 9,
-      "winRate": 0.1111
+      "games": 15,
+      "winRate": 0.1333
     },
     {
       "spells": [
         4,
         12
       ],
-      "games": 3,
-      "winRate": 0.3333
+      "games": 6,
+      "winRate": 0.5
     }
   ],
   "skills": {

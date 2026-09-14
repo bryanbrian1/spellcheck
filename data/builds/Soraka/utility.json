@@ -9,10 +9,10 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T16:38:06.646Z",
+  "updatedAt": "2026-09-14T23:10:14.532Z",
   "stats": {
-    "games": 17,
-    "winRate": 0.5294
+    "games": 34,
+    "winRate": 0.5
   },
   "items": {
     "starters": [
@@ -20,8 +20,15 @@
         "items": [
           2003
         ],
-        "games": 17,
-        "winRate": 0.5294
+        "games": 33,
+        "winRate": 0.4848
+      },
+      {
+        "items": [
+          2055
+        ],
+        "games": 1,
+        "winRate": 1
       }
     ],
     "boots": [
@@ -29,14 +36,14 @@
         "items": [
           1001
         ],
-        "games": 16,
-        "winRate": 0.5
+        "games": 32,
+        "winRate": 0.4688
       },
       {
         "items": [
           3158
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       }
     ],
@@ -46,23 +53,23 @@
           6617,
           3107
         ],
-        "games": 3,
-        "winRate": 0.3333
+        "games": 7,
+        "winRate": 0.4286
       },
       {
         "items": [
           6617,
           3222
         ],
-        "games": 3,
+        "games": 7,
         "winRate": 0
       },
       {
         "items": [
           6617
         ],
-        "games": 2,
-        "winRate": 0.5
+        "games": 5,
+        "winRate": 0.6
       }
     ],
     "situational": []
@@ -94,21 +101,21 @@
       "secondaryStyle": 8400,
       "primary": [
         8214,
-        8224,
-        8210,
-        8237
+        8226,
+        8234,
+        8236
       ],
       "secondary": [
-        8473,
+        8463,
         8453
       ],
       "shards": [
-        5005,
-        5001,
+        5007,
+        5010,
         5011
       ],
-      "games": 1,
-      "winRate": 1
+      "games": 2,
+      "winRate": 0
     }
   ],
   "summoners": [
@@ -117,8 +124,8 @@
         4,
         7
       ],
-      "games": 17,
-      "winRate": 0.5294
+      "games": 34,
+      "winRate": 0.5
     }
   ],
   "skills": {

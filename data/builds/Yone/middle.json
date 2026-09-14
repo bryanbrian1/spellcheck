@@ -9,10 +9,10 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T16:38:06.646Z",
+  "updatedAt": "2026-09-14T23:10:14.532Z",
   "stats": {
-    "games": 85,
-    "winRate": 0.4706
+    "games": 157,
+    "winRate": 0.4713
   },
   "items": {
     "starters": [
@@ -21,38 +21,38 @@
           1086,
           2003
         ],
-        "games": 56,
-        "winRate": 0.5357
+        "games": 101,
+        "winRate": 0.5347
       },
       {
         "items": [
           1054,
           2003
         ],
-        "games": 19,
-        "winRate": 0.3158
+        "games": 37,
+        "winRate": 0.2973
       }
     ],
     "boots": [
       {
         "items": [
-          1001
+          3006
         ],
-        "games": 43,
-        "winRate": 0.4651
+        "games": 78,
+        "winRate": 0.4615
       },
       {
         "items": [
-          3006
+          1001
         ],
-        "games": 41,
-        "winRate": 0.4634
+        "games": 77,
+        "winRate": 0.4675
       },
       {
         "items": [
           3047
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       }
     ],
@@ -63,24 +63,24 @@
           3031,
           6333
         ],
-        "games": 11,
-        "winRate": 0.6364
+        "games": 24,
+        "winRate": 0.625
       },
       {
         "items": [
           6673,
           3031
         ],
-        "games": 11,
-        "winRate": 0.3636
+        "games": 18,
+        "winRate": 0.4444
       },
       {
         "items": [
           3153,
           6673
         ],
-        "games": 8,
-        "winRate": 0.25
+        "games": 15,
+        "winRate": 0.3333
       }
     ],
     "situational": [
@@ -88,29 +88,43 @@
         "items": [
           3026
         ],
-        "games": 5,
-        "winRate": 0.6
+        "games": 11,
+        "winRate": 0.4545
       },
       {
         "items": [
           6333
         ],
-        "games": 3,
-        "winRate": 0.3333
+        "games": 5,
+        "winRate": 0.2
       },
       {
         "items": [
           3036
         ],
-        "games": 2,
+        "games": 4,
         "winRate": 1
       },
       {
         "items": [
           3031
         ],
-        "games": 2,
+        "games": 4,
         "winRate": 0.5
+      },
+      {
+        "items": [
+          6665
+        ],
+        "games": 2,
+        "winRate": 1
+      },
+      {
+        "items": [
+          2504
+        ],
+        "games": 2,
+        "winRate": 0
       },
       {
         "items": [
@@ -128,17 +142,10 @@
       },
       {
         "items": [
-          6665
+          6673
         ],
         "games": 1,
         "winRate": 1
-      },
-      {
-        "items": [
-          2504
-        ],
-        "games": 1,
-        "winRate": 0
       },
       {
         "items": [
@@ -146,17 +153,31 @@
         ],
         "games": 1,
         "winRate": 0
-      },
-      {
-        "items": [
-          3139
-        ],
-        "games": 1,
-        "winRate": 0
       }
     ]
   },
   "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8400,
+      "primary": [
+        8021,
+        9101,
+        9104,
+        8017
+      ],
+      "secondary": [
+        8444,
+        8451
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 10,
+      "winRate": 0.3
+    },
     {
       "primaryStyle": 8000,
       "secondaryStyle": 8400,
@@ -177,27 +198,6 @@
       ],
       "games": 6,
       "winRate": 0.3333
-    },
-    {
-      "primaryStyle": 8000,
-      "secondaryStyle": 8400,
-      "primary": [
-        8021,
-        9101,
-        9104,
-        8017
-      ],
-      "secondary": [
-        8444,
-        8451
-      ],
-      "shards": [
-        5005,
-        5008,
-        5011
-      ],
-      "games": 5,
-      "winRate": 0.2
     }
   ],
   "summoners": [
@@ -206,16 +206,16 @@
         3,
         4
       ],
-      "games": 42,
-      "winRate": 0.4762
+      "games": 81,
+      "winRate": 0.4568
     },
     {
       "spells": [
         4,
         12
       ],
-      "games": 35,
-      "winRate": 0.4
+      "games": 62,
+      "winRate": 0.4355
     }
   ],
   "skills": {
