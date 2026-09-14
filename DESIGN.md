@@ -257,7 +257,7 @@ Flat by default, with tonal layering: ground, panel, raised are three consecutiv
 - **Button lift** (`box-shadow: 0 1px 0 rgba(0,0,0,.25), 0 6px 14px -8px rgba(0,0,0,.6)`): the teal install button only; removed on the secondary variant.
 - **Floating panel** (`box-shadow: 0 6px 12px -6px rgba(0,0,0,.7), 0 1px 3px rgba(0,0,0,.5)`): the provenance tooltip.
 - **Dropdown** (`box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 6px 18px rgba(0,0,0,.5)`): the app's champion search list.
-- **Focus ring** (`0 0 0 2px ground, 0 0 0 4px teal-ring` on the site; `0 0 0 2px teal-deep` in the app): focus-visible only, never on hover.
+- **Focus ring** (site: `outline: 2px solid teal-ring` with a 2px offset, so a component's own shadow can never hide it; app: `0 0 0 2px teal-deep` box-shadow): focus-visible only, never on hover.
 
 ### Named Rules
 **The Three-Steps Rule.** Depth is ground, panel, raised and nothing beyond; a fourth surface tone is a mistake. Anything that must float uses one of the three listed shadows.
@@ -275,12 +275,12 @@ Quiet and rectangular; the fill announces the one action, everything else is an 
 - **Shape:** control radius (5px), 1px border matching the fill.
 - **Primary (site install):** teal fill, teal-on ink, 600 at 15px, three-column grid (icon, label stack, size) with `11px 14px 11px 12px` padding; file name and size in mono under and beside the label at 11–12px, 78–85% opacity. Carries the button-lift shadow.
 - **Hover / Focus:** fill goes to teal-hi at 110ms; active nudges 1px down; focus draws the ring.
-- **Secondary (`.install.other`):** the visitor's other platform. Raised fill, title ink, line border, no shadow; hover steps to edge-soft with an edge-strong border. Assigned by script from the user agent, so both buttons share one markup.
+- **Secondary (`.install.other`, and the second `.install` in a group by default):** the visitor's other platform. Raised fill, title ink, line border, no shadow; hover steps to edge-soft with an edge-strong border. The stylesheet demotes the second button on its own; the script promotes the visitor's platform to the front, so with no script or an unknown platform the pair still reads "mac, then Windows" with one teal. Phones get no promotion and a copy-link line instead.
 - **Ghost (app `.btn`):** transparent, 1px line border, 28px tall, 12px/500; hover fills raised. Disabled is raised with a hairline border and slate-dot text, including when the button is primary.
 
 ### Tags (provenance)
 - **Style:** 11px/600, 0.03em, raised fill, hairline border, 3px radius, `3px 6px` padding; `cursor: help`. Measured tint is blue text on blue-dim; argued tint is amber text on amber-dim.
-- **State:** the tag is a button. Hover, focus-visible or `aria-expanded="true"` reveals a tooltip sibling above it; an expanded tag wears the focus ring. In the app the same class is a neutral 10px/500 descriptive chip beside an item name, with no coloured variants.
+- **State:** the tag is a button. Hover, focus-visible or `aria-expanded="true"` reveals a tooltip sibling above it; an expanded tag wears the focus ring. Once the page is one column (≤860px) the definition opens inline under the sentence instead of floating. In the app the same class is a neutral 10px/500 descriptive chip beside an item name, with no coloured variants.
 
 ### Tooltip (`.def`)
 Anchored bottom-left above its tag, 8px clear, raised fill, line border, control radius, 13px/1.4 body ink, floating-panel shadow, max 320px or the viewport minus the gutter. Uses `display`, not `visibility`, so a hidden definition cannot widen the page. The bold lead word takes the tag's colour.

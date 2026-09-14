@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>spellcheck 0.1.4 — the build for the champion you just locked</title>
-<meta name="description" content="A small macOS and Windows app that reads the champion and role you lock in champ select and shows the build: runes, summoners, items, with the win rate and the number of games behind each.">
+<meta name="description" content="A lightweight League of Legends build tool made for low-end PCs. Shows runes, summoners and items for the champion you lock, in a 3 MB app with no Electron.">
 <link rel="canonical" href="https://spellcheck.pro/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="spellcheck">
-<meta property="og:title" content="spellcheck 0.1.4">
-<meta property="og:description" content="Lock a champion. The build fills in beside the client — runes, summoners, items, each with the games it was measured over.">
+<meta property="og:title" content="spellcheck — the build for the champion you just locked">
+<meta property="og:description" content="Build tool for League that runs fine on a low-end PC. Lock a champion, get runes, summoners and items beside the client — 3 MB, no Electron, no alt-tab.">
 <meta property="og:url" content="https://spellcheck.pro/">
 <meta property="og:image" content="https://spellcheck.pro/img/in-use.jpg">
 <meta property="og:image:width" content="1600">
@@ -38,7 +38,7 @@
       <small>for League of Legends</small>
     </div>
     <div class="ver">
-      <h1>0.1.4</h1>
+      <h1><span class="sr">spellcheck </span>0.1.4</h1>
       <div class="ver-meta">
         <span class="stage">beta</span>
         <time datetime="2026-09-12">12 September 2026</time>
@@ -57,7 +57,9 @@
       <span><span class="os">Download for Windows</span><span class="file">spellcheck_0.1.4_x64-setup.exe</span></span>
       <span class="size">3.1 MB</span>
     </a>
-    <p class="fine">Unsigned beta. Both systems will try to stop you once — <a href="#install">here is what to click</a>. Apple Silicon and Intel in one file; Windows is 64-bit only.</p>
+    <p class="fine later" hidden>spellcheck is a desktop app for macOS and Windows. <button type="button" class="copy" data-copy="https://spellcheck.pro/">Copy the link</button> for when you're at your computer.</p>
+    <p class="fine">Free and open source, MIT. It isn't code-signed, so macOS blocks the first open and Windows warns on every install — two clicks each, <a href="#install">here is what to press</a>. Nothing has been tampered with; I haven't bought a certificate.</p>
+    <p class="fine">Built in public by <a href="https://github.com/bryanbrian1/spellcheck/blob/main/.github/workflows/release.yml">GitHub Actions</a> from tag <span class="mono">v0.1.4</span>; the same files are on <a href="https://github.com/bryanbrian1/spellcheck/releases/tag/v0.1.4">GitHub Releases</a>. Apple Silicon and Intel in one file; Windows is 64-bit only.</p>
   </div>
 </header>
 
@@ -90,8 +92,8 @@
 
     <section id="what">
       <figure class="highlight">
-        <img src="img/in-use.jpg" width="1600" height="1008" alt="The League client in champ select on the left with Fizz locked; spellcheck on the right showing Fizz's runes, summoners, starting items and core build, each row with a win rate and the number of games behind it." fetchpriority="high">
-        <figcaption>The client on the left, spellcheck on the right. Fizz was locked a second ago and the build is already in: Domination at 50.6% over 47,978 games, summoners over 130,787, starting items over 126,116.</figcaption>
+        <img src="img/in-use.jpg" srcset="img/in-use-800.jpg 800w, img/in-use.jpg 1600w" sizes="(max-width: 860px) calc(100vw - 32px), 680px" width="1600" height="1008" alt="The League client in champ select on the left with Fizz locked; spellcheck on the right showing Fizz's runes, summoners, starting items and core build, each row with a win rate and the number of games behind it." fetchpriority="high">
+        <figcaption>The client on the left, spellcheck on the right. Fizz was locked a second ago and the build is already in: the rune page at 50.6% over 47,978 games, summoners over 130,787, starting items over 126,116.</figcaption>
       </figure>
       <h2>What it is</h2>
       <p>I'm a hardstuck gold mid. I built this because I was tired of alt-tabbing to a build site during the ninety seconds of champ select and reading a page that never quite matched the role I'd been given. spellcheck sits beside the client, reads the champion <em>and</em> role you lock, and shows the build for that pair. That's it.</p>
@@ -113,11 +115,15 @@
         <div class="rail"></div>
         <div class="change-in"><p><b>It never acts on its own.</b><span class="why">Rune and item imports are a button press or nothing. The buttons are there, and disabled, because the client can't be written to yet — see <a href="#known">known issues</a>.</span></p></div>
       </div>
+      <div class="change">
+        <div class="rail"></div>
+        <div class="change-in"><p><b>It never touches the game.</b><span class="why">It reads the client's own local API during champ select and Riot's Live Client Data API once the game starts, both on your machine. No game memory, no injection, no input, and it never writes to the client. Whether Riot is fine with that is Riot's call, not mine; what I can tell you is that this is all it does, and the code is there to check.</span></p></div>
+      </div>
     </section>
 
     <section id="champ-select">
       <h2>How it reads champ select</h2>
-      <p>The League client runs a small web server on your machine for its own interface. spellcheck reads the file the client writes on launch to find that server's port and password, connects to it, and subscribes to champ-select events over a WebSocket — so it hears the lock the moment it happens, without polling anything.</p>
+      <p>No Riot account credentials are involved at any point. The League client runs a small web server on your machine for its own interface, and writes its port and a throwaway password to a file when it starts — that password is the client's own, for its own local server, and it changes every launch. spellcheck reads that file, connects, and subscribes to champ-select events over a WebSocket, so it hears the lock the moment it happens without polling anything.</p>
       <div class="pipe" aria-label="How spellcheck connects to the client">
         <div><div class="st">League client</div><div class="d">Writes a <code>lockfile</code> with its port and password when it starts.</div></div>
         <div><div class="st">Lockfile</div><div class="d">spellcheck reads it. Windows installs get searched for wherever Riot's installer put them.</div></div>
@@ -125,16 +131,15 @@
         <div><div class="st">The build</div><div class="d"><code>championId</code> and <code>assignedPosition</code> arrive; the build for that pair is fetched and drawn.</div></div>
       </div>
       <p>"League isn't running" is the app's default state, not an error. When it can't find the client, the window says so and lists every path it looked in. When the client is open and it still says offline, that list is what you need to fix it.</p>
-      <p>No Riot account credentials are involved at any point. The lockfile password is the client's own, for its own local server, and it changes every time the client starts.</p>
     </section>
 
     <section id="data">
       <h2>Where the data comes from</h2>
       <p>Builds come from documented APIs only. Nothing is scraped, from anyone, ever.</p>
       <table class="facts">
-        <tr><th>Win rates and samples</th><td>Riot's API, crawled daily in CI into per-champion JSON; and OP.GG's published endpoint, queried per request and never stored.<small>The crawled data ships with the app. OP.GG data doesn't — it's theirs, and it's fetched when you need it.</small></td></tr>
-        <tr><th>Names, icons, item stats</th><td>Data Dragon, Riot's own static data.</td></tr>
-        <tr><th>What happens in the app</th><td>Nothing leaves your machine except those requests. No analytics, no account, no telemetry.</td></tr>
+        <tr><th scope="row">Win rates and samples</th><td>Riot's API, crawled daily in CI into per-champion JSON; and OP.GG's published endpoint, queried per request and never stored.<small>The crawled data ships with the app. OP.GG data doesn't — it's theirs, and it's fetched when you need it.</small></td></tr>
+        <tr><th scope="row">Names, icons, item stats</th><td>Data Dragon, Riot's own static data.</td></tr>
+        <tr><th scope="row">What happens in the app</th><td>Nothing leaves your machine except those requests. No analytics, no account, no telemetry.</td></tr>
       </table>
       <p>One row, as the app draws it. The percentage is the win rate of that rune page for that champion in that role; the number after it is how many games that percentage was measured over.</p>
       <div class="row-sample">
@@ -163,10 +168,10 @@
       <h2>Small on purpose</h2>
       <p>Nothing that runs beside a game should cost more than the game does. That's not a preference about how to build it; it's the reason it exists at all, so it's written down as a constraint and every change is held to it.</p>
       <table class="facts">
-        <tr><th>Download</th><td><span class="mono">7.4 MB</span> macOS · <span class="mono">3.1 MB</span> Windows<small>The sizes of the files above, as served.</small></td></tr>
-        <tr><th>Memory budget</th><td>Under <span class="mono">120 MB</span> resident<span class="tagwrap"><button type="button" class="tag a" aria-describedby="def-a-2">argued</button><span class="def" id="def-a-2" role="tooltip"><b>Argued:</b> this is the budget the app is held to, not a measurement I'm publishing. Windows in particular has not been measured yet.</span></span><small>Set against macOS's WebKit. Windows renders in WebView2, which runs more processes, and I haven't measured it there yet — so I'm not claiming it there yet.</small></td></tr>
-        <tr><th>Made of</th><td>Rust, a system WebView, and plain TypeScript and CSS<small>No Electron, no bundled browser, no UI framework. If a dependency isn't strictly necessary it isn't in there.</small></td></tr>
-        <tr><th>Talks to</th><td>The client on <span class="mono">127.0.0.1</span>, Riot's data, OP.GG's endpoint, and the update check<small>Once at launch, for the update. Nothing installs without a press.</small></td></tr>
+        <tr><th scope="row">Download</th><td><span class="mono">7.4 MB</span> macOS · <span class="mono">3.1 MB</span> Windows<small>The sizes of the files above, as served.</small></td></tr>
+        <tr><th scope="row">Memory budget</th><td>Under <span class="mono">120 MB</span> resident<span class="tagwrap"><button type="button" class="tag a" aria-describedby="def-a-2">argued</button><span class="def" id="def-a-2" role="tooltip"><b>Argued:</b> this is the budget the app is held to, not a measurement I'm publishing. Windows in particular has not been measured yet.</span></span><small>Set against macOS's WebKit. Windows renders in WebView2, which runs more processes, and I haven't measured it there yet — so I'm not claiming it there yet.</small></td></tr>
+        <tr><th scope="row">Made of</th><td>Rust, a system WebView, and plain TypeScript and CSS<small>No Electron, no bundled browser, no UI framework. If a dependency isn't strictly necessary it isn't in there.</small></td></tr>
+        <tr><th scope="row">Talks to</th><td>The client on <span class="mono">127.0.0.1</span>, Riot's data, OP.GG's endpoint, and the update check<small>Once at launch, for the update. Nothing installs without a press.</small></td></tr>
       </table>
     </section>
 
@@ -175,7 +180,7 @@
       <p>The honest list. Every one of these is in the changelog too.</p>
       <div class="change">
         <div class="rail"></div>
-        <div class="change-in"><p><b>Builds are unsigned on both platforms.</b><span class="why">macOS blocks the first open and Windows shows SmartScreen — on every update, because the updater re-runs the installer. Neither means the download was tampered with. Why none of it is signed: I'm broke. Apple wants $99 a year and a Windows certificate several hundred, and that isn't a bill worth paying for a beta yet; the release workflow is ready for the certificate the day there is one.</span></p></div>
+        <div class="change-in"><p><b>The builds aren't code-signed, so both systems warn you.</b><span class="why">macOS blocks the first open and Windows shows SmartScreen — on every update, because the updater re-runs the installer. Neither means the download was tampered with. Why none of it is signed: I'm broke. Apple wants $99 a year and a Windows certificate several hundred, and that isn't a bill worth paying for a beta yet; the release workflow is ready for the certificate the day there is one.</span></p></div>
       </div>
       <div class="change">
         <div class="rail"></div>
@@ -197,14 +202,14 @@
 
     <section id="install">
       <h2>Install</h2>
-      <p>Both systems will try to stop you, because the build isn't signed. macOS does it once per install; Windows does it on every update. It's the same two clicks each time.</p>
+      <p>Both systems will try to stop you, because the build isn't code-signed. macOS does it once per install; Windows does it on every install and every update. It's the same two clicks each time.</p>
       <div class="platforms">
         <div>
           <h3>macOS</h3>
           <ol>
-            <li>Open the <code>.dmg</code> and drag spellcheck out of it — into <code>~/Applications</code>, not <code>/Applications</code>, while it's unsigned.</li>
+            <li>Open the <code>.dmg</code> and drag spellcheck out of it — into the Applications folder inside your home folder (<code>~/Applications</code>), not the system one, while it's unsigned. If there isn't one, make it.</li>
             <li>Launch it and let it get blocked. That refused launch is what puts it in the queue for the next step.</li>
-            <li>System Settings → Privacy &amp; Security. Scroll down to Security and press <b>Open Anyway</b>. Authenticate.</li>
+            <li>System Settings → Privacy &amp; Security. Scroll down to Security and press <b>Open Anyway</b>, then enter your Mac password.</li>
             <li>Launch again. It opens, and keeps opening from then on.</li>
           </ol>
         </div>
