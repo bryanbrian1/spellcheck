@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Maokai",
+    "name": "Maokai",
+    "id": 57
+  },
+  "role": "jungle",
+  "patch": "16.18",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-14T16:38:06.646Z",
+  "stats": {
+    "games": 5,
+    "winRate": 0.4
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1101,
+          2003
+        ],
+        "games": 4,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          1101
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          3158
+        ],
+        "games": 4,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6653
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          6653,
+          4005,
+          3165
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6653,
+          4005
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          8010
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8300,
+      "secondaryStyle": 8100,
+      "primary": [
+        8369,
+        8304,
+        8313,
+        8410
+      ],
+      "secondary": [
+        8126,
+        8106
+      ],
+      "shards": [
+        5007,
+        5008,
+        5001
+      ],
+      "games": 3,
+      "winRate": 0.3333
+    },
+    {
+      "primaryStyle": 8300,
+      "secondaryStyle": 8100,
+      "primary": [
+        8369,
+        8304,
+        8313,
+        8347
+      ],
+      "secondary": [
+        8126,
+        8106
+      ],
+      "shards": [
+        5007,
+        5008,
+        5001
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 5,
+      "winRate": 0.4
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

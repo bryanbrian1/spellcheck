@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Darius",
+    "name": "Darius",
+    "id": 122
+  },
+  "role": "jungle",
+  "patch": "16.18",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-14T16:38:06.646Z",
+  "stats": {
+    "games": 5,
+    "winRate": 0.2
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1102
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          1102,
+          2003
+        ],
+        "games": 2,
+        "winRate": 0
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 5,
+        "winRate": 0.2
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3142,
+          3742,
+          3053
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3078,
+          3161,
+          3053
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3142,
+          3742
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3143
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3036
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          4401
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8230,
+        8275,
+        8234,
+        8236
+      ],
+      "secondary": [
+        9104,
+        9111
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 2,
+      "winRate": 0
+    },
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8230,
+        8275,
+        8234,
+        8236
+      ],
+      "secondary": [
+        9111,
+        9104
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 5,
+      "winRate": 0.2
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "W",
+      "Q",
+      "E",
+      "Q",
+      "Q"
+    ]
+  }
+}

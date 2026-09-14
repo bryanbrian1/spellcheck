@@ -6,13 +6,13 @@
     "id": 517
   },
   "role": "middle",
-  "patch": "16.17",
+  "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-08T14:22:54.997Z",
+  "updatedAt": "2026-09-14T16:38:06.646Z",
   "stats": {
-    "games": 293,
-    "winRate": 0.5051
+    "games": 50,
+    "winRate": 0.54
   },
   "items": {
     "starters": [
@@ -21,16 +21,16 @@
           1056,
           2003
         ],
-        "games": 285,
-        "winRate": 0.5018
+        "games": 48,
+        "winRate": 0.5625
       },
       {
         "items": [
-          1054,
-          2003
+          1082,
+          2031
         ],
-        "games": 5,
-        "winRate": 0.8
+        "games": 1,
+        "winRate": 0
       }
     ],
     "boots": [
@@ -38,39 +38,39 @@
         "items": [
           1001
         ],
-        "games": 268,
-        "winRate": 0.5187
-      },
-      {
-        "items": [
-          3020
-        ],
-        "games": 8,
-        "winRate": 0.375
+        "games": 45,
+        "winRate": 0.5333
       },
       {
         "items": [
           3111
         ],
-        "games": 6,
+        "games": 3,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3020
+        ],
+        "games": 1,
         "winRate": 0
       }
     ],
     "core": [
       {
         "items": [
-          3152,
-          4633
+          3152
         ],
-        "games": 54,
-        "winRate": 0.5556
+        "games": 13,
+        "winRate": 0.3846
       },
       {
         "items": [
-          3152
+          3152,
+          4633
         ],
-        "games": 49,
-        "winRate": 0.6122
+        "games": 8,
+        "winRate": 0.625
       },
       {
         "items": [
@@ -78,8 +78,8 @@
           4633,
           3157
         ],
-        "games": 35,
-        "winRate": 0.5429
+        "games": 5,
+        "winRate": 0.8
       }
     ],
     "situational": [
@@ -87,47 +87,54 @@
         "items": [
           3089
         ],
-        "games": 14,
-        "winRate": 0.7857
-      },
-      {
-        "items": [
-          8010
-        ],
-        "games": 7,
-        "winRate": 0
+        "games": 4,
+        "winRate": 0.75
       },
       {
         "items": [
           3157
         ],
-        "games": 5,
-        "winRate": 0.2
-      },
-      {
-        "items": [
-          3135
-        ],
         "games": 3,
-        "winRate": 0
+        "winRate": 1
       },
       {
         "items": [
           8020
         ],
-        "games": 2,
-        "winRate": 0.5
+        "games": 1,
+        "winRate": 1
       },
       {
         "items": [
-          3742
+          4645
         ],
-        "games": 2,
+        "games": 1,
         "winRate": 0
       }
     ]
   },
   "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8000,
+      "primary": [
+        8112,
+        8143,
+        8137,
+        8105
+      ],
+      "secondary": [
+        9111,
+        8017
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 7,
+      "winRate": 0.7143
+    },
     {
       "primaryStyle": 8000,
       "secondaryStyle": 8400,
@@ -146,29 +153,8 @@
         5008,
         5011
       ],
-      "games": 42,
-      "winRate": 0.5714
-    },
-    {
-      "primaryStyle": 8200,
-      "secondaryStyle": 8000,
-      "primary": [
-        8230,
-        8226,
-        8233,
-        8237
-      ],
-      "secondary": [
-        9111,
-        8017
-      ],
-      "shards": [
-        5008,
-        5008,
-        5011
-      ],
-      "games": 8,
-      "winRate": 0.75
+      "games": 3,
+      "winRate": 1
     }
   ],
   "summoners": [
@@ -177,16 +163,16 @@
         4,
         14
       ],
-      "games": 150,
-      "winRate": 0.5467
+      "games": 25,
+      "winRate": 0.48
     },
     {
       "spells": [
         4,
         12
       ],
-      "games": 139,
-      "winRate": 0.4604
+      "games": 23,
+      "winRate": 0.5652
     }
   ],
   "skills": {
@@ -199,8 +185,8 @@
       "E",
       "W",
       "Q",
-      "Q",
-      "Q"
+      "W",
+      "W"
     ]
   }
 }

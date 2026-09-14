@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Evelynn",
+    "name": "Evelynn",
+    "id": 28
+  },
+  "role": "jungle",
+  "patch": "16.18",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-14T16:38:06.646Z",
+  "stats": {
+    "games": 8,
+    "winRate": 0.25
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1103
+        ],
+        "games": 4,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          1102
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 6,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3020
+        ],
+        "games": 2,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3100,
+          3089,
+          3135
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3100,
+          3089
+        ],
+        "games": 2,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3100,
+          4646,
+          3089
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3102
+        ],
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          4645
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          4646
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8200,
+      "primary": [
+        8112,
+        8143,
+        8140,
+        8105
+      ],
+      "secondary": [
+        8233,
+        8236
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 3,
+      "winRate": 0
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8200,
+      "primary": [
+        8112,
+        8143,
+        8137,
+        8106
+      ],
+      "secondary": [
+        8236,
+        8224
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 8,
+      "winRate": 0.25
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "Q",
+      "W",
+      "Q"
+    ]
+  }
+}

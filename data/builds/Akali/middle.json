@@ -6,13 +6,13 @@
     "id": 84
   },
   "role": "middle",
-  "patch": "16.17",
+  "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-08T14:22:54.997Z",
+  "updatedAt": "2026-09-14T16:38:06.646Z",
   "stats": {
-    "games": 209,
-    "winRate": 0.5024
+    "games": 30,
+    "winRate": 0.4333
   },
   "items": {
     "starters": [
@@ -21,16 +21,16 @@
           1056,
           2003
         ],
-        "games": 110,
-        "winRate": 0.4909
+        "games": 19,
+        "winRate": 0.4211
       },
       {
         "items": [
           1054,
           2003
         ],
-        "games": 73,
-        "winRate": 0.4932
+        "games": 10,
+        "winRate": 0.4
       }
     ],
     "boots": [
@@ -38,22 +38,22 @@
         "items": [
           1001
         ],
-        "games": 164,
-        "winRate": 0.5183
+        "games": 25,
+        "winRate": 0.4
       },
       {
         "items": [
           3020
         ],
-        "games": 32,
-        "winRate": 0.375
+        "games": 4,
+        "winRate": 0.5
       },
       {
         "items": [
           3111
         ],
-        "games": 11,
-        "winRate": 0.7273
+        "games": 1,
+        "winRate": 1
       }
     ],
     "core": [
@@ -62,24 +62,24 @@
           3146,
           4645
         ],
-        "games": 60,
-        "winRate": 0.2833
+        "games": 6,
+        "winRate": 0.8333
       },
       {
         "items": [
           3146
         ],
-        "games": 39,
-        "winRate": 0.4872
+        "games": 5,
+        "winRate": 0.2
       },
       {
         "items": [
           3146,
-          4645,
-          3089
+          3152,
+          4645
         ],
-        "games": 10,
-        "winRate": 0.6
+        "games": 2,
+        "winRate": 0.5
       }
     ],
     "situational": [
@@ -87,88 +87,74 @@
         "items": [
           3089
         ],
-        "games": 11,
-        "winRate": 0.7273
-      },
-      {
-        "items": [
-          3157
-        ],
-        "games": 10,
-        "winRate": 0.2
+        "games": 4,
+        "winRate": 0.25
       },
       {
         "items": [
           3135
         ],
-        "games": 4,
-        "winRate": 0.75
-      },
-      {
-        "items": [
-          4646
-        ],
-        "games": 3,
+        "games": 2,
         "winRate": 0
       },
       {
         "items": [
           3137
         ],
-        "games": 2,
-        "winRate": 0.5
+        "games": 1,
+        "winRate": 0
       },
       {
         "items": [
-          3102
+          4646
         ],
         "games": 1,
-        "winRate": 1
+        "winRate": 0
       }
     ]
   },
   "runes": [
     {
       "primaryStyle": 8100,
-      "secondaryStyle": 8200,
+      "secondaryStyle": 8000,
       "primary": [
-        8112,
+        8128,
         8143,
-        8140,
+        8137,
         8106
       ],
       "secondary": [
-        8275,
-        8237
+        9111,
+        8014
       ],
       "shards": [
         5008,
         5008,
-        5011
+        5001
       ],
-      "games": 26,
-      "winRate": 0.5769
+      "games": 4,
+      "winRate": 0.5
     },
     {
-      "primaryStyle": 8100,
-      "secondaryStyle": 8400,
+      "primaryStyle": 8000,
+      "secondaryStyle": 8100,
       "primary": [
-        8112,
-        8143,
-        8140,
-        8106
+        8010,
+        9111,
+        9105,
+        8014
       ],
       "secondary": [
-        8444,
-        8451
+        8143,
+        8106
       ],
       "shards": [
         5008,
         5008,
-        5011
+        5001
       ],
-      "games": 13,
-      "winRate": 0.6154
+      "games": 2,
+      "winRate": 0.5
     }
   ],
   "summoners": [
@@ -177,16 +163,16 @@
         4,
         14
       ],
-      "games": 147,
-      "winRate": 0.5102
+      "games": 18,
+      "winRate": 0.5
     },
     {
       "spells": [
         4,
         12
       ],
-      "games": 60,
-      "winRate": 0.5
+      "games": 12,
+      "winRate": 0.3333
     }
   ],
   "skills": {

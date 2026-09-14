@@ -6,13 +6,13 @@
     "id": 27
   },
   "role": "top",
-  "patch": "16.17",
+  "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-08T14:22:54.997Z",
+  "updatedAt": "2026-09-14T16:38:06.646Z",
   "stats": {
-    "games": 120,
-    "winRate": 0.55
+    "games": 20,
+    "winRate": 0.45
   },
   "items": {
     "starters": [
@@ -21,16 +21,16 @@
           1056,
           2003
         ],
-        "games": 93,
-        "winRate": 0.5376
+        "games": 14,
+        "winRate": 0.4286
       },
       {
         "items": [
-          1082,
-          2031
+          1054,
+          2003
         ],
-        "games": 10,
-        "winRate": 0.3
+        "games": 2,
+        "winRate": 0.5
       }
     ],
     "boots": [
@@ -38,96 +38,96 @@
         "items": [
           1001
         ],
-        "games": 117,
-        "winRate": 0.547
+        "games": 17,
+        "winRate": 0.4118
       },
       {
         "items": [
           3047
         ],
         "games": 2,
-        "winRate": 1
+        "winRate": 0.5
       },
       {
         "items": [
-          3111
+          3009
         ],
         "games": 1,
-        "winRate": 0
+        "winRate": 1
       }
     ],
     "core": [
       {
         "items": [
           3116,
+          2525,
           6653
         ],
-        "games": 13,
-        "winRate": 0.4615
+        "games": 4,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3116,
+          6653
+        ],
+        "games": 4,
+        "winRate": 0.25
       },
       {
         "items": [
           3116
         ],
-        "games": 8,
-        "winRate": 0.75
-      },
-      {
-        "items": [
-          3116,
-          2525,
-          6653
-        ],
-        "games": 7,
-        "winRate": 1
+        "games": 2,
+        "winRate": 0.5
       }
     ],
     "situational": [
       {
         "items": [
-          2525
-        ],
-        "games": 8,
-        "winRate": 0.25
-      },
-      {
-        "items": [
-          8010
-        ],
-        "games": 5,
-        "winRate": 0.6
-      },
-      {
-        "items": [
           6665
         ],
-        "games": 5,
-        "winRate": 0.2
-      },
-      {
-        "items": [
-          6653
-        ],
         "games": 2,
-        "winRate": 1
-      },
-      {
-        "items": [
-          2504
-        ],
-        "games": 1,
-        "winRate": 1
+        "winRate": 0
       },
       {
         "items": [
           4401
         ],
         "games": 1,
-        "winRate": 1
+        "winRate": 0
+      },
+      {
+        "items": [
+          6653
+        ],
+        "games": 1,
+        "winRate": 0
       }
     ]
   },
   "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8992,
+        8275,
+        8234,
+        8237
+      ],
+      "secondary": [
+        8017,
+        9111
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 6,
+      "winRate": 0.6667
+    },
     {
       "primaryStyle": 8200,
       "secondaryStyle": 8000,
@@ -146,29 +146,8 @@
         5008,
         5011
       ],
-      "games": 23,
-      "winRate": 0.8261
-    },
-    {
-      "primaryStyle": 8200,
-      "secondaryStyle": 8400,
-      "primary": [
-        8992,
-        8275,
-        8234,
-        8236
-      ],
-      "secondary": [
-        8242,
-        8429
-      ],
-      "shards": [
-        5008,
-        5010,
-        5013
-      ],
       "games": 3,
-      "winRate": 0.3333
+      "winRate": 0
     }
   ],
   "summoners": [
@@ -177,16 +156,16 @@
         4,
         6
       ],
-      "games": 79,
-      "winRate": 0.5443
+      "games": 12,
+      "winRate": 0.5
     },
     {
       "spells": [
         4,
         14
       ],
-      "games": 24,
-      "winRate": 0.5
+      "games": 4,
+      "winRate": 0.75
     }
   ],
   "skills": {
@@ -198,8 +177,8 @@
     "order": [
       "Q",
       "E",
-      "Q",
       "W",
+      "Q",
       "Q"
     ]
   }

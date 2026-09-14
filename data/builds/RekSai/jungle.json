@@ -6,13 +6,13 @@
     "id": 421
   },
   "role": "jungle",
-  "patch": "16.17",
+  "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-08T14:22:54.997Z",
+  "updatedAt": "2026-09-14T16:38:06.646Z",
   "stats": {
-    "games": 95,
-    "winRate": 0.5158
+    "games": 16,
+    "winRate": 0.5
   },
   "items": {
     "starters": [
@@ -20,16 +20,15 @@
         "items": [
           1101
         ],
-        "games": 58,
-        "winRate": 0.5862
+        "games": 10,
+        "winRate": 0.5
       },
       {
         "items": [
-          1103,
-          2003
+          1102
         ],
-        "games": 15,
-        "winRate": 0.5333
+        "games": 3,
+        "winRate": 0.6667
       }
     ],
     "boots": [
@@ -37,22 +36,22 @@
         "items": [
           1001
         ],
-        "games": 51,
-        "winRate": 0.4118
-      },
-      {
-        "items": [
-          3047
-        ],
-        "games": 21,
-        "winRate": 0.7143
+        "games": 13,
+        "winRate": 0.5385
       },
       {
         "items": [
           3111
         ],
-        "games": 15,
-        "winRate": 0.6667
+        "games": 2,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 1,
+        "winRate": 0
       }
     ],
     "core": [
@@ -62,92 +61,52 @@
           3161,
           6333
         ],
-        "games": 19,
-        "winRate": 0.7368
-      },
-      {
-        "items": [
-          3748
-        ],
-        "games": 11,
-        "winRate": 0.3636
+        "games": 3,
+        "winRate": 0.6667
       },
       {
         "items": [
           3748,
-          3161
+          3161,
+          2504
         ],
-        "games": 8,
+        "games": 2,
         "winRate": 0.5
+      },
+      {
+        "items": [
+          3748,
+          3053
+        ],
+        "games": 1,
+        "winRate": 1
       }
     ],
     "situational": [
       {
         "items": [
-          3026
+          3053
         ],
-        "games": 5,
+        "games": 1,
         "winRate": 1
+      },
+      {
+        "items": [
+          3036
+        ],
+        "games": 1,
+        "winRate": 0
       },
       {
         "items": [
           6333
         ],
-        "games": 4,
-        "winRate": 1
-      },
-      {
-        "items": [
-          8020
-        ],
-        "games": 4,
-        "winRate": 1
-      },
-      {
-        "items": [
-          2525
-        ],
-        "games": 2,
-        "winRate": 1
-      },
-      {
-        "items": [
-          2501
-        ],
-        "games": 2,
-        "winRate": 0
-      },
-      {
-        "items": [
-          3156
-        ],
-        "games": 2,
+        "games": 1,
         "winRate": 0
       }
     ]
   },
   "runes": [
-    {
-      "primaryStyle": 8000,
-      "secondaryStyle": 8300,
-      "primary": [
-        8010,
-        9111,
-        9104,
-        8014
-      ],
-      "secondary": [
-        8347,
-        8304
-      ],
-      "shards": [
-        5005,
-        5008,
-        5001
-      ],
-      "games": 13,
-      "winRate": 0.4615
-    },
     {
       "primaryStyle": 8100,
       "secondaryStyle": 8000,
@@ -158,16 +117,37 @@
         8135
       ],
       "secondary": [
+        9105,
+        9111
+      ],
+      "shards": [
+        5008,
+        5008,
+        5011
+      ],
+      "games": 3,
+      "winRate": 1
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8005,
         9111,
-        9104
+        9104,
+        8014
+      ],
+      "secondary": [
+        8321,
+        8347
       ],
       "shards": [
         5008,
         5008,
         5001
       ],
-      "games": 4,
-      "winRate": 0.75
+      "games": 2,
+      "winRate": 1
     }
   ],
   "summoners": [
@@ -176,14 +156,14 @@
         4,
         11
       ],
-      "games": 95,
-      "winRate": 0.5158
+      "games": 16,
+      "winRate": 0.5
     }
   ],
   "skills": {
     "priority": [
-      "Q",
       "E",
+      "Q",
       "W"
     ],
     "order": [
