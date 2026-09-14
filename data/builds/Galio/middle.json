@@ -9,10 +9,10 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T16:38:06.646Z",
+  "updatedAt": "2026-09-14T23:10:14.532Z",
   "stats": {
-    "games": 37,
-    "winRate": 0.4324
+    "games": 71,
+    "winRate": 0.4225
   },
   "items": {
     "starters": [
@@ -21,15 +21,15 @@
           1056,
           2003
         ],
-        "games": 32,
-        "winRate": 0.4688
+        "games": 60,
+        "winRate": 0.45
       },
       {
         "items": [
           1082,
           2031
         ],
-        "games": 4,
+        "games": 8,
         "winRate": 0.25
       }
     ],
@@ -38,14 +38,14 @@
         "items": [
           1001
         ],
-        "games": 30,
-        "winRate": 0.4333
+        "games": 59,
+        "winRate": 0.4068
       },
       {
         "items": [
           3020
         ],
-        "games": 3,
+        "games": 6,
         "winRate": 0.6667
       },
       {
@@ -60,19 +60,19 @@
       {
         "items": [
           3152,
-          4005
+          4005,
+          3157
         ],
-        "games": 7,
-        "winRate": 0.4286
+        "games": 12,
+        "winRate": 0.5833
       },
       {
         "items": [
           3152,
-          4005,
-          3157
+          4005
         ],
-        "games": 6,
-        "winRate": 0.6667
+        "games": 11,
+        "winRate": 0.4545
       },
       {
         "items": [
@@ -80,7 +80,7 @@
           4645,
           3089
         ],
-        "games": 2,
+        "games": 4,
         "winRate": 1
       }
     ],
@@ -89,14 +89,14 @@
         "items": [
           3157
         ],
-        "games": 2,
+        "games": 4,
         "winRate": 1
       },
       {
         "items": [
           3152
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       },
       {
@@ -127,8 +127,8 @@
         5008,
         5011
       ],
-      "games": 5,
-      "winRate": 0.6
+      "games": 9,
+      "winRate": 0.5556
     },
     {
       "primaryStyle": 8400,
@@ -148,8 +148,8 @@
         5008,
         5001
       ],
-      "games": 5,
-      "winRate": 0.6
+      "games": 8,
+      "winRate": 0.625
     }
   ],
   "summoners": [
@@ -158,7 +158,7 @@
         4,
         12
       ],
-      "games": 18,
+      "games": 33,
       "winRate": 0.3333
     },
     {
@@ -166,8 +166,8 @@
         4,
         14
       ],
-      "games": 13,
-      "winRate": 0.7692
+      "games": 25,
+      "winRate": 0.72
     }
   ],
   "skills": {

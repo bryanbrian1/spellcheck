@@ -9,10 +9,10 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T16:38:06.646Z",
+  "updatedAt": "2026-09-14T23:10:14.532Z",
   "stats": {
-    "games": 7,
-    "winRate": 0.7143
+    "games": 11,
+    "winRate": 0.8182
   },
   "items": {
     "starters": [
@@ -21,7 +21,7 @@
           1102,
           2003
         ],
-        "games": 2,
+        "games": 4,
         "winRate": 1
       },
       {
@@ -37,7 +37,7 @@
         "items": [
           3020
         ],
-        "games": 3,
+        "games": 6,
         "winRate": 1
       },
       {
@@ -58,25 +58,25 @@
     "core": [
       {
         "items": [
-          2510,
-          4633
-        ],
-        "games": 2,
-        "winRate": 0.5
-      },
-      {
-        "items": [
           2510
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       },
       {
         "items": [
           3152
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
+      },
+      {
+        "items": [
+          2510,
+          4633
+        ],
+        "games": 2,
+        "winRate": 0.5
       }
     ],
     "situational": []
@@ -100,7 +100,7 @@
         5008,
         5001
       ],
-      "games": 4,
+      "games": 8,
       "winRate": 1
     },
     {
@@ -131,8 +131,8 @@
         4,
         11
       ],
-      "games": 7,
-      "winRate": 0.7143
+      "games": 11,
+      "winRate": 0.8182
     }
   ],
   "skills": {
@@ -143,8 +143,8 @@
     ],
     "order": [
       "Q",
-      "W",
       "E",
+      "W",
       "Q",
       "Q"
     ]

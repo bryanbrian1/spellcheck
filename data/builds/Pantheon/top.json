@@ -9,10 +9,10 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T16:38:06.646Z",
+  "updatedAt": "2026-09-14T23:10:14.532Z",
   "stats": {
-    "games": 11,
-    "winRate": 0.5455
+    "games": 22,
+    "winRate": 0.4545
   },
   "items": {
     "starters": [
@@ -21,15 +21,15 @@
           1055,
           2003
         ],
-        "games": 10,
-        "winRate": 0.6
+        "games": 18,
+        "winRate": 0.5556
       },
       {
         "items": [
           1086,
           2003
         ],
-        "games": 1,
+        "games": 3,
         "winRate": 0
       }
     ],
@@ -38,11 +38,20 @@
         "items": [
           1001
         ],
-        "games": 11,
-        "winRate": 0.5455
+        "games": 22,
+        "winRate": 0.4545
       }
     ],
     "core": [
+      {
+        "items": [
+          2520,
+          6695,
+          6699
+        ],
+        "games": 2,
+        "winRate": 1
+      },
       {
         "items": [
           6699,
@@ -50,15 +59,6 @@
           3036
         ],
         "games": 2,
-        "winRate": 1
-      },
-      {
-        "items": [
-          2520,
-          6695,
-          6699
-        ],
-        "games": 1,
         "winRate": 1
       },
       {
@@ -104,7 +104,7 @@
     },
     {
       "primaryStyle": 8000,
-      "secondaryStyle": 8200,
+      "secondaryStyle": 8400,
       "primary": [
         8010,
         8009,
@@ -112,16 +112,16 @@
         8299
       ],
       "secondary": [
-        8237,
-        8210
+        8429,
+        8451
       ],
       "shards": [
-        5008,
+        5005,
         5008,
         5001
       ],
-      "games": 1,
-      "winRate": 1
+      "games": 3,
+      "winRate": 0.3333
     }
   ],
   "summoners": [
@@ -130,8 +130,16 @@
         4,
         14
       ],
-      "games": 11,
-      "winRate": 0.5455
+      "games": 21,
+      "winRate": 0.4762
+    },
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 1,
+      "winRate": 0
     }
   ],
   "skills": {

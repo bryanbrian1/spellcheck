@@ -9,10 +9,10 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T16:38:06.646Z",
+  "updatedAt": "2026-09-14T23:10:14.532Z",
   "stats": {
-    "games": 5,
-    "winRate": 0.8
+    "games": 11,
+    "winRate": 0.6364
   },
   "items": {
     "starters": [
@@ -21,8 +21,8 @@
           1056,
           2003
         ],
-        "games": 5,
-        "winRate": 0.8
+        "games": 11,
+        "winRate": 0.6364
       }
     ],
     "boots": [
@@ -30,8 +30,15 @@
         "items": [
           1001
         ],
-        "games": 5,
-        "winRate": 0.8
+        "games": 10,
+        "winRate": 0.7
+      },
+      {
+        "items": [
+          3020
+        ],
+        "games": 1,
+        "winRate": 0
       }
     ],
     "core": [
@@ -40,8 +47,8 @@
           3100,
           4645
         ],
-        "games": 1,
-        "winRate": 1
+        "games": 3,
+        "winRate": 0.6667
       },
       {
         "items": [
@@ -49,7 +56,7 @@
           4645,
           4646
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       },
       {
@@ -58,7 +65,7 @@
           4646,
           3089
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       }
     ],
@@ -67,7 +74,7 @@
         "items": [
           3157
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       }
     ]
@@ -91,7 +98,7 @@
         5008,
         5001
       ],
-      "games": 2,
+      "games": 4,
       "winRate": 0.5
     },
     {
@@ -104,16 +111,16 @@
         8106
       ],
       "secondary": [
-        8226,
-        8237
+        8237,
+        8226
       ],
       "shards": [
         5008,
         5008,
         5011
       ],
-      "games": 1,
-      "winRate": 1
+      "games": 2,
+      "winRate": 0.5
     }
   ],
   "summoners": [
@@ -122,8 +129,8 @@
         4,
         14
       ],
-      "games": 4,
-      "winRate": 0.75
+      "games": 10,
+      "winRate": 0.6
     },
     {
       "spells": [
