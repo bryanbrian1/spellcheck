@@ -100,7 +100,7 @@ img{max-width:100%;height:auto;display:block}
   border-bottom:1px solid var(--line);
 }
 .mark{display:flex;align-items:center;gap:10px;margin-bottom:22px}
-.mark img{width:22px;height:22px;border-radius:4px}
+.mark img{width:22px;height:22px;border-radius:var(--r-asset)}
 .mark span{font-size:15px;font-weight:600;color:var(--text-title);letter-spacing:-.01em}
 .mark small{font-size:13px;color:var(--text-faint);font-weight:500;margin-left:2px}
 .ver{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap}
@@ -200,7 +200,7 @@ a.install:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:
    is one the reader should weigh as a rule rather than a fact, the same
    way the app paints only its amber rails. */
 .change{display:grid;grid-template-columns:2px 1fr;gap:14px;align-items:start;margin:0 0 14px}
-.change .rail{border-radius:1px;background:var(--n-4);align-self:stretch;min-height:1.2em}
+.change .rail{border-radius:1px;background:var(--n-5);align-self:stretch;min-height:1.2em}
 .change.measured .rail{background:var(--blue)}
 .change.argued .rail{background:var(--amber)}
 .change-in{min-width:0}
@@ -299,7 +299,7 @@ a.install:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:
 .again .installs{min-width:0}
 
 .legal{padding:36px 0 44px;border-top:1px solid var(--line);margin-top:48px;color:var(--text-faint);font-size:13px;line-height:1.5}
-.legal p{max-width:78ch;margin:0 0 8px}
+.legal p{max-width:66ch;margin:0 0 8px}
 .legal a{color:var(--text-muted)}
 .legal a:hover{color:var(--text-body)}
 
@@ -312,7 +312,7 @@ a.install:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:
   .banner{grid-template-columns:1fr;align-items:start;padding-top:28px}
   .installs{min-width:0;flex-direction:row;flex-wrap:wrap;gap:10px}
   .installs .install{flex:1 1 240px}
-  .installs .fine{flex-basis:100%;max-width:none}
+  .installs .fine{flex-basis:100%;max-width:66ch}
   .doc{grid-template-columns:minmax(0,1fr);gap:24px;padding-top:24px}
   .index{position:static;min-width:0}
   .index ol{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-inline:calc(-1 * var(--gutter));padding-inline:var(--gutter)}
