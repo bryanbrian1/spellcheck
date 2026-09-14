@@ -113,9 +113,10 @@ RIOT_API_KEY=RGAPI-... node scripts/ingest/index.mjs   # a real crawl
 thing that ships a build, so the changelog entry and the version bump belong in
 the same run-up to a tag as the tag itself.
 
-Two other places repeat that entry and go stale silently: the **Latest
-release** section above, and the GitHub release description. Update the first
-by hand, the second with `gh release edit vX.Y.Z --notes-file <file>`.
+Three other places repeat that entry and go stale silently: the **Latest
+release** section above, the version banner in `site/index.html` (see
+[Website](#website)), and the GitHub release description. Update the first
+two by hand, the third with `gh release edit vX.Y.Z --notes-file <file>`.
 
 Tagging `v*` builds both platforms and publishes a GitHub prerelease. The tag
 must match the version in `package.json`, `src-tauri/tauri.conf.json` and
@@ -171,6 +172,30 @@ public by definition — it is compiled into every binary. It must match the
 `endpoints` entry in `src-tauri/tauri.conf.json`, and **that URL cannot be
 changed for copies already installed**: a shipped binary only ever looks where
 it was built to look, so changing it strands every existing install.
+
+## Website
+
+`site/` is [spellcheck.pro](https://spellcheck.pro): one page, plain HTML,
+CSS and a little JS, no build step, in the app's own visual system. It is
+deployed by Cloudflare Pages straight from this repository — project root
+`site`, no build command — so pushing to `main` publishes it.
+
+Two things about it are deliberate:
+
+- **The version, date, file names and sizes are written into `index.html`
+  by hand.** `latest.json` on the bucket sends no CORS header, so the page
+  cannot read it, and the static numbers are also what makes the page
+  honest without JavaScript. Updating them is part of cutting a release,
+  alongside the **Latest release** section above.
+- **It serves `riot.txt`**, the same token as the R2 bucket and `docs/`,
+  so the domain can stand in for the bucket at Riot's developer portal if
+  they ask for an owned host.
+
+To look at it locally:
+
+```sh
+python3 -m http.server 8765 --directory site
+```
 
 ## About
 

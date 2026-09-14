@@ -1,0 +1,12 @@
+# Cloudflare Pages headers. The fonts and images are content-addressed by
+# nothing, so only the font (which never changes) is cached long; the page
+# and its assets revalidate.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+/riot.txt
+  Content-Type: text/plain; charset=utf-8

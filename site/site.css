@@ -1,0 +1,338 @@
+/* spellcheck.pro — the website.
+   The same system as src/styles.css, applied to a document instead of a
+   window: same neutral ramp, same teal for the one action, same contract
+   that blue is a measurement and amber is an argument. Values are copied
+   rather than imported because the site ships as plain files with no build
+   step, exactly like the app. */
+@font-face{
+  font-family:"Inter";
+  font-style:normal;
+  font-weight:100 900;
+  font-display:swap;
+  src:url("fonts/Inter-latin.woff2") format("woff2");
+}
+/* Numbers, versions and paths. Bundled for the same reason as Inter: the
+   version is the page's one display element, and the system mono it would
+   fall back to differs on every OS. JetBrains Mono, OFL, latin subset,
+   variable weight. */
+@font-face{
+  font-family:"JetBrains Mono";
+  font-style:normal;
+  font-weight:400 800;
+  font-display:swap;
+  src:url("fonts/JetBrainsMono-latin.woff2") format("woff2");
+}
+:root{
+  --n-0:#07080a;--n-1:#0d0f13;--n-2:#14171d;--n-3:#1b1f26;--n-4:#232830;--n-5:#2e343e;
+  --n-6:#3a424e;--n-7:#4a515c;--n-8:#6d7683;--n-9:#a2abb8;--n-10:#cfd6df;--n-11:#e8ecf2;
+
+  --accent-1:#0d2f2c;--accent-2:#14554f;--accent-3:#1f8a80;--accent:#2fd4c4;--accent-hi:#6ce8dc;
+  --accent-on:#04211f;
+
+  --blue:#5b9cf8;--blue-dim:#16283f;
+  --amber:#f0b429;--amber-dim:#3a2c0f;
+  --red:#f2555a;
+  --green:#46c98b;
+
+  --ground:var(--n-1);
+  --panel:var(--n-2);
+  --raised:var(--n-3);
+  --line-hair:#23272f;
+  --line:#2e343e;
+
+  --text-title:var(--n-11);
+  --text-body:var(--n-10);
+  --text-muted:var(--n-9);
+  --text-faint:#7e8895; /* the app's n-8 is 4.2:1 on this ground; a document read at 13px needs 4.5 */
+
+  --font-ui:"Inter",-apple-system,BlinkMacSystemFont,system-ui,"Helvetica Neue",sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+
+  --r-asset:3px;--r-control:5px;--r-panel:7px;
+  --dur:110ms;
+  --ease:cubic-bezier(.2,.7,.3,1);
+  --t:background-color var(--dur) var(--ease),border-color var(--dur) var(--ease),color var(--dur) var(--ease),box-shadow var(--dur) var(--ease);
+
+  --rail-w:212px;
+  --notes-w:680px;
+  --gutter:clamp(16px,4vw,48px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{color-scheme:dark;scroll-behavior:smooth;scroll-padding-top:24px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  background:var(--ground);
+  color:var(--text-body);
+  font-family:var(--font-ui);
+  font-size:16px;
+  line-height:1.55;
+  font-optical-sizing:auto;
+  -webkit-font-smoothing:antialiased;
+  padding-inline:var(--gutter);
+  min-height:100vh;
+}
+::selection{background:var(--accent-2);color:var(--n-11)}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:var(--ground)}
+::-webkit-scrollbar-thumb{background:var(--n-5);border-radius:5px;border:2px solid var(--ground)}
+::-webkit-scrollbar-thumb:hover{background:var(--n-6)}
+:focus-visible{outline:none;box-shadow:0 0 0 2px var(--ground),0 0 0 4px var(--accent-3);border-radius:var(--r-asset)}
+a{color:var(--accent);text-decoration:underline;text-underline-offset:.16em;text-decoration-thickness:1px;text-decoration-color:var(--accent-2);transition:var(--t)}
+a:hover{color:var(--accent-hi);text-decoration-color:var(--accent)}
+code,kbd,.mono{font-family:var(--font-mono);font-size:.92em;font-variant-numeric:tabular-nums}
+code{color:var(--text-title);background:var(--raised);border:1px solid var(--line-hair);border-radius:var(--r-asset);padding:.08em .35em}
+kbd{color:var(--text-title);background:var(--raised);border:1px solid var(--line);border-bottom-width:2px;border-radius:var(--r-asset);padding:.06em .4em;font-size:.85em}
+strong,b{color:var(--text-title);font-weight:600}
+img{max-width:100%;height:auto;display:block}
+.skip{position:absolute;left:-999px;top:8px;background:var(--accent);color:var(--accent-on);padding:8px 12px;border-radius:var(--r-control);font-weight:600;z-index:10}
+.skip:focus{left:var(--gutter)}
+
+.page{max-width:calc(var(--rail-w) + 56px + var(--notes-w));margin:0 auto}
+
+/* ---------- version banner ---------- */
+.banner{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:24px 48px;
+  align-items:end;
+  padding:40px 0 32px;
+  border-bottom:1px solid var(--line);
+}
+.mark{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.mark img{width:22px;height:22px;border-radius:4px}
+.mark span{font-size:15px;font-weight:600;color:var(--text-title);letter-spacing:-.01em}
+.mark small{font-size:13px;color:var(--text-faint);font-weight:500;margin-left:2px}
+.ver{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap}
+.ver h1{
+  font-family:var(--font-mono);
+  font-size:clamp(56px,9vw,88px);
+  font-weight:700;
+  line-height:.92;
+  letter-spacing:-.04em;
+  color:var(--text-title);
+  font-variant-numeric:tabular-nums;
+}
+.ver-meta{display:flex;flex-direction:column;gap:3px;padding-bottom:10px}
+.ver-meta time{font-family:var(--font-mono);font-size:13px;color:var(--text-muted)}
+.ver-meta .stage{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--text-muted)}
+.lede{max-width:56ch;margin-top:20px;font-size:17px;line-height:1.5;color:var(--text-body);text-wrap:pretty}
+
+.installs{display:flex;flex-direction:column;gap:10px;min-width:280px}
+.install{
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;
+  padding:11px 14px 11px 12px;
+  background:var(--accent);color:var(--accent-on);
+  border:1px solid var(--accent);border-radius:var(--r-control);
+  text-decoration:none;font-weight:600;font-size:15px;line-height:1.2;
+  transition:var(--t),transform var(--dur) var(--ease);
+  box-shadow:0 1px 0 rgba(0,0,0,.25),0 6px 14px -8px rgba(0,0,0,.6);
+}
+a.install:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:var(--accent-on)}
+.install:active{transform:translateY(1px)}
+.install svg{width:18px;height:18px;flex-shrink:0}
+.install .os{display:block}
+.install .file{display:block;font-family:var(--font-mono);font-weight:500;font-size:11px;opacity:.78;margin-top:3px;letter-spacing:0}
+.install .size{font-family:var(--font-mono);font-size:12px;font-weight:600;opacity:.85;font-variant-numeric:tabular-nums;white-space:nowrap}
+.install.other{background:var(--raised);color:var(--text-title);border-color:var(--line);box-shadow:none}
+.install.other:hover{background:var(--n-4);border-color:var(--n-6);color:var(--text-title)}
+.install.other .file,.install.other .size{color:var(--text-muted);opacity:1}
+.installs .fine{font-size:12px;color:var(--text-faint);line-height:1.45;max-width:34ch}
+.installs .fine a{color:var(--text-muted)}
+.installs .fine a:hover{color:var(--text-body)}
+
+/* ---------- document ---------- */
+.doc{display:grid;grid-template-columns:var(--rail-w) minmax(0,var(--notes-w));gap:56px;padding-top:36px;align-items:start}
+
+.index{position:sticky;top:24px}
+.index-t{font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px}
+.index ol{list-style:none}
+.index li a{
+  display:block;padding:6px 10px;margin-left:-10px;
+  font-size:14px;color:var(--text-muted);text-decoration:none;border-radius:var(--r-asset);
+  border-left:2px solid transparent;
+  transition:var(--t);
+}
+.index li a:hover{color:var(--text-title);background:var(--panel)}
+.index li a[aria-current="true"]{color:var(--text-title);font-weight:600;border-left-color:var(--accent)}
+.index .prev{margin-top:26px;padding-top:18px;border-top:1px solid var(--line-hair)}
+.index .prev ol li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:13px}
+.index .prev ol li a{padding:0;margin:0;border:0;font-family:var(--font-mono);font-size:13px;font-variant-numeric:tabular-nums;color:var(--text-body)}
+.index .prev ol li a:hover{background:none;color:var(--accent)}
+.index .prev ol li span{color:var(--text-faint);font-size:12px;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.index .prev .more{margin-top:8px;font-size:12px}
+
+.notes{min-width:0}
+.notes > section{padding:0 0 44px;margin-bottom:44px;border-bottom:1px solid var(--line-hair)}
+.notes > section:last-child{border-bottom:0;margin-bottom:0}
+.notes h2{
+  font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.15;color:var(--text-title);
+  margin:0 0 14px;text-wrap:balance;scroll-margin-top:24px;
+}
+.notes h3{font-size:16px;font-weight:600;color:var(--text-title);margin:26px 0 8px;letter-spacing:-.01em}
+.notes p{max-width:66ch;margin:0 0 14px;text-wrap:pretty}
+.notes p:last-child{margin-bottom:0}
+.notes ul,.notes ol{max-width:66ch;margin:0 0 14px;padding-left:0;list-style:none}
+.notes li{margin:0 0 10px}
+.notes ol{counter-reset:step}
+.notes ol li{position:relative;padding-left:32px}
+.notes ol li::before{
+  counter-increment:step;content:counter(step);
+  position:absolute;left:0;top:1px;
+  width:22px;height:22px;border-radius:999px;
+  background:var(--raised);border:1px solid var(--line);
+  font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text-muted);
+  display:grid;place-items:center;
+}
+
+/* The highlight image: the app beside the client, captioned like a patch
+   note's header art. */
+.highlight{margin:0 0 26px}
+.highlight img{border-radius:var(--r-panel);border:1px solid var(--line);background:var(--n-0)}
+.highlight figcaption{font-size:13px;color:var(--text-faint);margin-top:10px;line-height:1.45;max-width:66ch}
+
+/* A change: a rail column, then text. The rail paints only when the change
+   is one the reader should weigh as a rule rather than a fact, the same
+   way the app paints only its amber rails. */
+.change{display:grid;grid-template-columns:2px 1fr;gap:14px;align-items:start;margin:0 0 14px}
+.change .rail{border-radius:1px;background:var(--n-4);align-self:stretch;min-height:1.2em}
+.change.measured .rail{background:var(--blue)}
+.change.argued .rail{background:var(--amber)}
+.change-in{min-width:0}
+.change-in p{margin:0}
+.change-in .why{display:block;color:var(--text-muted);font-size:14px;margin-top:3px;line-height:1.45}
+.change b{color:var(--text-title)}
+.change.argued b{color:var(--amber)}
+.change.measured .n{color:var(--blue)}
+
+/* The provenance tag. A button so it is focusable; the definition is a
+   sibling the button describes, revealed on hover or focus. */
+.tagwrap{position:relative;display:inline-block;vertical-align:baseline;margin-left:6px}
+.tag{
+  font:inherit;font-size:11px;font-weight:600;line-height:1;letter-spacing:.03em;
+  color:var(--text-muted);background:var(--raised);
+  border:1px solid var(--line-hair);border-radius:3px;padding:3px 6px;white-space:nowrap;
+  cursor:help;transition:var(--t);vertical-align:1px;
+}
+.tag[aria-expanded="true"]{box-shadow:0 0 0 2px var(--ground),0 0 0 4px var(--accent-3)}
+.tag.m{color:var(--blue);border-color:var(--blue-dim);background:var(--blue-dim)}
+.tag.a{color:var(--amber);border-color:var(--amber-dim);background:var(--amber-dim)}
+.tagwrap .def{
+  position:absolute;left:0;bottom:calc(100% + 8px);z-index:5;
+  width:max-content;max-width:min(320px,calc(100vw - 2 * var(--gutter)));
+  background:var(--n-3);color:var(--text-body);border:1px solid var(--line);border-radius:var(--r-control);
+  padding:8px 10px;font-size:13px;line-height:1.4;font-weight:400;letter-spacing:0;
+  box-shadow:0 6px 12px -6px rgba(0,0,0,.7),0 1px 3px rgba(0,0,0,.5);
+  display:none;pointer-events:none;
+}
+/* display, not visibility: a hidden tooltip must not widen the page. */
+.tagwrap:hover .def,.tag:focus-visible + .def,.tag[aria-expanded="true"] + .def{display:block;animation:def-in var(--dur) var(--ease)}
+@keyframes def-in{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.tag.m + .def b{color:var(--blue)}
+.tag.a + .def b{color:var(--amber)}
+
+/* One row of the app, reproduced as text so the numbers can be read rather
+   than squinted at in a screenshot. */
+.row-sample{
+  display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+  max-width:66ch;margin:16px 0;padding:12px 14px;
+  background:var(--panel);border:1px solid var(--line-hair);border-radius:var(--r-control);
+}
+.row-sample .t{font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--text-muted)}
+.row-sample .meta{font-family:var(--font-mono);font-size:13px;color:var(--text-muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.row-sample .meta b{color:var(--text-title);font-weight:600}
+.row-sample.rule{grid-template-columns:2px 1fr;display:grid;gap:12px;align-items:start}
+.row-sample.rule .rail{background:var(--amber);border-radius:1px;align-self:stretch}
+.row-sample.rule .sug{font-size:15px;color:var(--text-title)}
+.row-sample.rule .sug b{color:var(--amber)}
+.row-sample.rule .why{display:block;color:var(--text-muted);font-size:13px;margin-top:3px}
+
+/* The pipeline: client → lockfile → local API → this. A row of four
+   stations with the wire between them, not four cards. */
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:18px 0 20px;max-width:66ch}
+.pipe > div{position:relative;padding:12px 12px 12px 0}
+.pipe > div + div{padding-left:14px}
+.pipe > div + div::before{content:"";position:absolute;left:0;top:26px;width:1px;height:calc(100% - 26px);background:var(--line)}
+.pipe .st{font-size:13px;font-weight:600;color:var(--text-title);display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.pipe .st::before{content:"";width:6px;height:6px;border-radius:999px;background:var(--n-7);flex-shrink:0}
+.pipe .d{font-size:13px;color:var(--text-muted);line-height:1.4}
+.pipe code{font-size:11px}
+
+/* The legend for the whole page. */
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0 18px;max-width:66ch}
+.legend > div{display:grid;grid-template-columns:2px 1fr;gap:12px;padding:12px 14px 12px 0;background:var(--panel);border:1px solid var(--line-hair);border-radius:var(--r-control)}
+.legend .rail{border-radius:0 1px 1px 0;margin:6px 0}
+.legend .m .rail{background:var(--blue)}
+.legend .a .rail{background:var(--amber)}
+.legend h3{margin:0 0 4px;font-size:15px}
+.legend .m h3{color:var(--blue)}
+.legend .a h3{color:var(--amber)}
+.legend p{font-size:14px;margin:0;color:var(--text-muted)}
+
+/* Facts table: mono values, a source per row. */
+.facts{width:100%;max-width:66ch;border-collapse:collapse;margin:14px 0 18px;font-size:15px}
+.facts th,.facts td{text-align:left;vertical-align:top;padding:9px 12px 9px 0;border-bottom:1px solid var(--line-hair)}
+.facts th{font-weight:500;color:var(--text-muted);width:38%}
+.facts td{color:var(--text-title)}
+.facts td .mono{font-size:14px}
+.facts td small{display:block;font-size:13px;color:var(--text-faint);font-weight:400;margin-top:2px}
+.facts tr:last-child th,.facts tr:last-child td{border-bottom:0}
+
+/* Two platforms side by side for the install steps. */
+.platforms{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:6px 0 20px}
+.platforms h3{margin-top:0}
+.platforms ol{margin-bottom:0}
+
+/* Closing: the buttons again, with the version so nobody scrolls back. */
+.again{
+  display:grid;grid-template-columns:1fr auto;gap:20px 32px;align-items:center;
+  padding:22px 24px;margin-top:8px;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r-panel);
+}
+.again .v{font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--text-title);letter-spacing:-.02em;line-height:1}
+.again .v small{display:block;font-size:12px;font-weight:500;color:var(--text-faint);margin-top:6px;letter-spacing:0}
+.again .installs{min-width:0}
+
+.legal{padding:36px 0 44px;border-top:1px solid var(--line);margin-top:48px;color:var(--text-faint);font-size:13px;line-height:1.5}
+.legal p{max-width:78ch;margin:0 0 8px}
+.legal a{color:var(--text-muted)}
+.legal a:hover{color:var(--text-body)}
+
+/* ---------- narrow ---------- */
+@media (max-width:1000px){
+  :root{--rail-w:180px}
+  .doc{gap:36px}
+}
+@media (max-width:860px){
+  .banner{grid-template-columns:1fr;align-items:start;padding-top:28px}
+  .installs{min-width:0;flex-direction:row;flex-wrap:wrap;gap:10px}
+  .installs .install{flex:1 1 240px}
+  .installs .fine{flex-basis:100%;max-width:none}
+  .doc{grid-template-columns:minmax(0,1fr);gap:24px;padding-top:24px}
+  .index{position:static;min-width:0}
+  .index ol{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-inline:calc(-1 * var(--gutter));padding-inline:var(--gutter);-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent)}
+  .index ol::-webkit-scrollbar{display:none}
+  .index li a{margin:0;padding:6px 10px;white-space:nowrap;border-left:0;border-bottom:2px solid transparent;border-radius:var(--r-asset) var(--r-asset) 0 0}
+  .index li a[aria-current="true"]{border-bottom-color:var(--accent)}
+  .index .prev{display:none}
+  .pipe{grid-template-columns:1fr 1fr}
+  .pipe > div + div::before{display:none}
+  .pipe > div + div{padding-left:0}
+  .pipe > div:nth-child(odd){padding-right:14px}
+}
+@media (max-width:560px){
+  .tagwrap .def{left:auto;right:0}
+  .ver h1{font-size:56px}
+  .lede{font-size:16px}
+  .legend,.platforms{grid-template-columns:1fr}
+  .again{grid-template-columns:1fr}
+  .facts th{width:42%}
+  .again .installs{flex-direction:column}
+  .again .installs .install{flex:0 0 auto}
+  /* The closing panel is 32px narrower than the banner; the file name is
+     already printed up there, so it is the line to lose. */
+  .again .install .file{display:none}
+  .again{padding:18px 16px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:0s !important;animation-duration:0s !important}
+}
