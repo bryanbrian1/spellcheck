@@ -38,7 +38,7 @@
       <small>for League of Legends</small>
     </div>
     <div class="ver">
-      <h1>0.1.4</h1>
+      <h1><span class="sr">spellcheck </span>0.1.4</h1>
       <div class="ver-meta">
         <span class="stage">beta</span>
         <time datetime="2026-09-12">12 September 2026</time>
@@ -57,7 +57,9 @@
       <span><span class="os">Download for Windows</span><span class="file">spellcheck_0.1.4_x64-setup.exe</span></span>
       <span class="size">3.1 MB</span>
     </a>
+    <p class="fine later" hidden>spellcheck is a desktop app for macOS and Windows. <button type="button" class="copy" data-copy="https://spellcheck.pro/">Copy the link</button> for when you're at your computer.</p>
     <p class="fine">Free and open source, MIT. It isn't code-signed, so macOS blocks the first open and Windows warns on every install — two clicks each, <a href="#install">here is what to press</a>. Nothing has been tampered with; I haven't bought a certificate.</p>
+    <p class="fine">Built in public by <a href="https://github.com/bryanbrian1/spellcheck/blob/main/.github/workflows/release.yml">GitHub Actions</a> from tag <span class="mono">v0.1.4</span>; the same files are on <a href="https://github.com/bryanbrian1/spellcheck/releases/tag/v0.1.4">GitHub Releases</a>. Apple Silicon and Intel in one file; Windows is 64-bit only.</p>
   </div>
 </header>
 
@@ -135,9 +137,9 @@
       <h2>Where the data comes from</h2>
       <p>Builds come from documented APIs only. Nothing is scraped, from anyone, ever.</p>
       <table class="facts">
-        <tr><th>Win rates and samples</th><td>Riot's API, crawled daily in CI into per-champion JSON; and OP.GG's published endpoint, queried per request and never stored.<small>The crawled data ships with the app. OP.GG data doesn't — it's theirs, and it's fetched when you need it.</small></td></tr>
-        <tr><th>Names, icons, item stats</th><td>Data Dragon, Riot's own static data.</td></tr>
-        <tr><th>What happens in the app</th><td>Nothing leaves your machine except those requests. No analytics, no account, no telemetry.</td></tr>
+        <tr><th scope="row">Win rates and samples</th><td>Riot's API, crawled daily in CI into per-champion JSON; and OP.GG's published endpoint, queried per request and never stored.<small>The crawled data ships with the app. OP.GG data doesn't — it's theirs, and it's fetched when you need it.</small></td></tr>
+        <tr><th scope="row">Names, icons, item stats</th><td>Data Dragon, Riot's own static data.</td></tr>
+        <tr><th scope="row">What happens in the app</th><td>Nothing leaves your machine except those requests. No analytics, no account, no telemetry.</td></tr>
       </table>
       <p>One row, as the app draws it. The percentage is the win rate of that rune page for that champion in that role; the number after it is how many games that percentage was measured over.</p>
       <div class="row-sample">
@@ -166,10 +168,10 @@
       <h2>Small on purpose</h2>
       <p>Nothing that runs beside a game should cost more than the game does. That's not a preference about how to build it; it's the reason it exists at all, so it's written down as a constraint and every change is held to it.</p>
       <table class="facts">
-        <tr><th>Download</th><td><span class="mono">7.4 MB</span> macOS · <span class="mono">3.1 MB</span> Windows<small>The sizes of the files above, as served.</small></td></tr>
-        <tr><th>Memory budget</th><td>Under <span class="mono">120 MB</span> resident<span class="tagwrap"><button type="button" class="tag a" aria-describedby="def-a-2">argued</button><span class="def" id="def-a-2" role="tooltip"><b>Argued:</b> this is the budget the app is held to, not a measurement I'm publishing. Windows in particular has not been measured yet.</span></span><small>Set against macOS's WebKit. Windows renders in WebView2, which runs more processes, and I haven't measured it there yet — so I'm not claiming it there yet.</small></td></tr>
-        <tr><th>Made of</th><td>Rust, a system WebView, and plain TypeScript and CSS<small>No Electron, no bundled browser, no UI framework. If a dependency isn't strictly necessary it isn't in there.</small></td></tr>
-        <tr><th>Talks to</th><td>The client on <span class="mono">127.0.0.1</span>, Riot's data, OP.GG's endpoint, and the update check<small>Once at launch, for the update. Nothing installs without a press.</small></td></tr>
+        <tr><th scope="row">Download</th><td><span class="mono">7.4 MB</span> macOS · <span class="mono">3.1 MB</span> Windows<small>The sizes of the files above, as served.</small></td></tr>
+        <tr><th scope="row">Memory budget</th><td>Under <span class="mono">120 MB</span> resident<span class="tagwrap"><button type="button" class="tag a" aria-describedby="def-a-2">argued</button><span class="def" id="def-a-2" role="tooltip"><b>Argued:</b> this is the budget the app is held to, not a measurement I'm publishing. Windows in particular has not been measured yet.</span></span><small>Set against macOS's WebKit. Windows renders in WebView2, which runs more processes, and I haven't measured it there yet — so I'm not claiming it there yet.</small></td></tr>
+        <tr><th scope="row">Made of</th><td>Rust, a system WebView, and plain TypeScript and CSS<small>No Electron, no bundled browser, no UI framework. If a dependency isn't strictly necessary it isn't in there.</small></td></tr>
+        <tr><th scope="row">Talks to</th><td>The client on <span class="mono">127.0.0.1</span>, Riot's data, OP.GG's endpoint, and the update check<small>Once at launch, for the update. Nothing installs without a press.</small></td></tr>
       </table>
     </section>
 

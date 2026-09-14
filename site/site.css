@@ -76,7 +76,7 @@ body{
 ::-webkit-scrollbar-track{background:var(--ground)}
 ::-webkit-scrollbar-thumb{background:var(--n-5);border-radius:5px;border:2px solid var(--ground)}
 ::-webkit-scrollbar-thumb:hover{background:var(--n-6)}
-:focus-visible{outline:none;box-shadow:0 0 0 2px var(--ground),0 0 0 4px var(--accent-3);border-radius:var(--r-asset)}
+:focus-visible{outline:2px solid var(--accent-3);outline-offset:2px;border-radius:var(--r-asset)}
 a{color:var(--accent);text-decoration:underline;text-underline-offset:.16em;text-decoration-thickness:1px;text-decoration-color:var(--accent-2);transition:var(--t)}
 a:hover{color:var(--accent-hi);text-decoration-color:var(--accent)}
 code,kbd,.mono{font-family:var(--font-mono);font-size:.92em;font-variant-numeric:tabular-nums}
@@ -84,6 +84,7 @@ code{color:var(--text-title);background:var(--raised);border:1px solid var(--lin
 kbd{color:var(--text-title);background:var(--raised);border:1px solid var(--line);border-bottom-width:2px;border-radius:var(--r-asset);padding:.06em .4em;font-size:.85em}
 strong,b{color:var(--text-title);font-weight:600}
 img{max-width:100%;height:auto;display:block}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 .skip{position:absolute;left:-999px;top:8px;background:var(--accent);color:var(--accent-on);padding:8px 12px;border-radius:var(--r-control);font-weight:600;z-index:10}
 .skip:focus{left:var(--gutter)}
 
@@ -133,10 +134,15 @@ a.install:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:
 .install .os{display:block}
 .install .file{display:block;font-family:var(--font-mono);font-weight:500;font-size:11px;opacity:.78;margin-top:3px;letter-spacing:0}
 .install .size{font-family:var(--font-mono);font-size:12px;font-weight:600;opacity:.85;font-variant-numeric:tabular-nums;white-space:nowrap}
-.install.other{background:var(--raised);color:var(--text-title);border-color:var(--line);box-shadow:none}
-.install.other:hover{background:var(--n-4);border-color:var(--n-6);color:var(--text-title)}
-.install.other .file,.install.other .size{color:var(--text-muted);opacity:1}
-.installs .fine{font-size:12px;color:var(--text-faint);line-height:1.45;max-width:34ch}
+.install.other,.installs .install + .install{background:var(--raised);color:var(--text-title);border-color:var(--line);box-shadow:none}
+.install.other:hover,.installs .install + .install:hover{background:var(--n-4);border-color:var(--n-6);color:var(--text-title)}
+.install.other .file,.install.other .size,.installs .install + .install .file,.installs .install + .install .size{color:var(--text-muted);opacity:1}
+.installs .fine{font-size:12px;color:var(--text-faint);line-height:1.45;max-width:38ch;margin-top:2px}
+.installs .fine .mono{font-size:11px;color:var(--text-muted)}
+.installs .fine.later{color:var(--text-muted)}
+.copy{font:inherit;font-weight:600;color:var(--text-title);background:var(--raised);border:1px solid var(--line);border-radius:var(--r-asset);padding:2px 7px;cursor:pointer;transition:var(--t)}
+.copy:hover{background:var(--n-4);border-color:var(--n-6)}
+.copy[data-done]{color:var(--accent);border-color:var(--accent-2)}
 .installs .fine a{color:var(--text-muted)}
 .installs .fine a:hover{color:var(--text-body)}
 
@@ -213,7 +219,7 @@ a.install:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:
   border:1px solid var(--line-hair);border-radius:3px;padding:3px 6px;white-space:nowrap;
   cursor:help;transition:var(--t);vertical-align:1px;
 }
-.tag[aria-expanded="true"]{box-shadow:0 0 0 2px var(--ground),0 0 0 4px var(--accent-3)}
+.tag[aria-expanded="true"]{outline:2px solid var(--accent-3);outline-offset:2px}
 .tag.m{color:var(--blue);border-color:var(--blue-dim);background:var(--blue-dim)}
 .tag.a{color:var(--amber);border-color:var(--amber-dim);background:var(--amber-dim)}
 .tagwrap .def{
