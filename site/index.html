@@ -8,7 +8,7 @@
 <link rel="canonical" href="https://spellcheck.pro/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="spellcheck">
-<meta property="og:title" content="spellcheck 0.1.4">
+<meta property="og:title" content="spellcheck — the build for the champion you just locked">
 <meta property="og:description" content="Lock a champion. The build fills in beside the client — runes, summoners, items, each with the games it was measured over.">
 <meta property="og:url" content="https://spellcheck.pro/">
 <meta property="og:image" content="https://spellcheck.pro/img/in-use.jpg">
@@ -57,7 +57,7 @@
       <span><span class="os">Download for Windows</span><span class="file">spellcheck_0.1.4_x64-setup.exe</span></span>
       <span class="size">3.1 MB</span>
     </a>
-    <p class="fine">Unsigned beta. Both systems will try to stop you once — <a href="#install">here is what to click</a>. Apple Silicon and Intel in one file; Windows is 64-bit only.</p>
+    <p class="fine">Free and open source, MIT. It isn't code-signed, so macOS blocks the first open and Windows warns on every install — two clicks each, <a href="#install">here is what to press</a>. Nothing has been tampered with; I haven't bought a certificate.</p>
   </div>
 </header>
 
@@ -91,7 +91,7 @@
     <section id="what">
       <figure class="highlight">
         <img src="img/in-use.jpg" width="1600" height="1008" alt="The League client in champ select on the left with Fizz locked; spellcheck on the right showing Fizz's runes, summoners, starting items and core build, each row with a win rate and the number of games behind it." fetchpriority="high">
-        <figcaption>The client on the left, spellcheck on the right. Fizz was locked a second ago and the build is already in: Domination at 50.6% over 47,978 games, summoners over 130,787, starting items over 126,116.</figcaption>
+        <figcaption>The client on the left, spellcheck on the right. Fizz was locked a second ago and the build is already in: the rune page at 50.6% over 47,978 games, summoners over 130,787, starting items over 126,116.</figcaption>
       </figure>
       <h2>What it is</h2>
       <p>I'm a hardstuck gold mid. I built this because I was tired of alt-tabbing to a build site during the ninety seconds of champ select and reading a page that never quite matched the role I'd been given. spellcheck sits beside the client, reads the champion <em>and</em> role you lock, and shows the build for that pair. That's it.</p>
@@ -113,11 +113,15 @@
         <div class="rail"></div>
         <div class="change-in"><p><b>It never acts on its own.</b><span class="why">Rune and item imports are a button press or nothing. The buttons are there, and disabled, because the client can't be written to yet — see <a href="#known">known issues</a>.</span></p></div>
       </div>
+      <div class="change">
+        <div class="rail"></div>
+        <div class="change-in"><p><b>It never touches the game.</b><span class="why">It reads the client's own local API during champ select and Riot's Live Client Data API once the game starts, both on your machine. No game memory, no injection, no input, and it never writes to the client. Whether Riot is fine with that is Riot's call, not mine; what I can tell you is that this is all it does, and the code is there to check.</span></p></div>
+      </div>
     </section>
 
     <section id="champ-select">
       <h2>How it reads champ select</h2>
-      <p>The League client runs a small web server on your machine for its own interface. spellcheck reads the file the client writes on launch to find that server's port and password, connects to it, and subscribes to champ-select events over a WebSocket — so it hears the lock the moment it happens, without polling anything.</p>
+      <p>No Riot account credentials are involved at any point. The League client runs a small web server on your machine for its own interface, and writes its port and a throwaway password to a file when it starts — that password is the client's own, for its own local server, and it changes every launch. spellcheck reads that file, connects, and subscribes to champ-select events over a WebSocket, so it hears the lock the moment it happens without polling anything.</p>
       <div class="pipe" aria-label="How spellcheck connects to the client">
         <div><div class="st">League client</div><div class="d">Writes a <code>lockfile</code> with its port and password when it starts.</div></div>
         <div><div class="st">Lockfile</div><div class="d">spellcheck reads it. Windows installs get searched for wherever Riot's installer put them.</div></div>
@@ -125,7 +129,6 @@
         <div><div class="st">The build</div><div class="d"><code>championId</code> and <code>assignedPosition</code> arrive; the build for that pair is fetched and drawn.</div></div>
       </div>
       <p>"League isn't running" is the app's default state, not an error. When it can't find the client, the window says so and lists every path it looked in. When the client is open and it still says offline, that list is what you need to fix it.</p>
-      <p>No Riot account credentials are involved at any point. The lockfile password is the client's own, for its own local server, and it changes every time the client starts.</p>
     </section>
 
     <section id="data">
@@ -175,7 +178,7 @@
       <p>The honest list. Every one of these is in the changelog too.</p>
       <div class="change">
         <div class="rail"></div>
-        <div class="change-in"><p><b>Builds are unsigned on both platforms.</b><span class="why">macOS blocks the first open and Windows shows SmartScreen — on every update, because the updater re-runs the installer. Neither means the download was tampered with. Why none of it is signed: I'm broke. Apple wants $99 a year and a Windows certificate several hundred, and that isn't a bill worth paying for a beta yet; the release workflow is ready for the certificate the day there is one.</span></p></div>
+        <div class="change-in"><p><b>The builds aren't code-signed, so both systems warn you.</b><span class="why">macOS blocks the first open and Windows shows SmartScreen — on every update, because the updater re-runs the installer. Neither means the download was tampered with. Why none of it is signed: I'm broke. Apple wants $99 a year and a Windows certificate several hundred, and that isn't a bill worth paying for a beta yet; the release workflow is ready for the certificate the day there is one.</span></p></div>
       </div>
       <div class="change">
         <div class="rail"></div>
@@ -197,14 +200,14 @@
 
     <section id="install">
       <h2>Install</h2>
-      <p>Both systems will try to stop you, because the build isn't signed. macOS does it once per install; Windows does it on every update. It's the same two clicks each time.</p>
+      <p>Both systems will try to stop you, because the build isn't code-signed. macOS does it once per install; Windows does it on every install and every update. It's the same two clicks each time.</p>
       <div class="platforms">
         <div>
           <h3>macOS</h3>
           <ol>
-            <li>Open the <code>.dmg</code> and drag spellcheck out of it — into <code>~/Applications</code>, not <code>/Applications</code>, while it's unsigned.</li>
+            <li>Open the <code>.dmg</code> and drag spellcheck out of it — into the Applications folder inside your home folder (<code>~/Applications</code>), not the system one, while it's unsigned. If there isn't one, make it.</li>
             <li>Launch it and let it get blocked. That refused launch is what puts it in the queue for the next step.</li>
-            <li>System Settings → Privacy &amp; Security. Scroll down to Security and press <b>Open Anyway</b>. Authenticate.</li>
+            <li>System Settings → Privacy &amp; Security. Scroll down to Security and press <b>Open Anyway</b>, then enter your Mac password.</li>
             <li>Launch again. It opens, and keeps opening from then on.</li>
           </ol>
         </div>
