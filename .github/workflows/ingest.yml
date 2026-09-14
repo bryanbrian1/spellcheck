@@ -32,8 +32,12 @@ concurrency:
   group: ingest
   cancel-in-progress: false
 
+# contents to push the branch, pull-requests to open and merge it. main is
+# protected by a ruleset that requires a PR, so the bot cannot push to it
+# directly; it gets a branch and a merge commit like everyone else.
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   crawl:
@@ -102,4 +106,15 @@ jobs:
           core item group. The run count did not shrink against what was
           already committed."
 
-          git push
+          # One branch per run, named by run id so a queued second run can
+          # never collide with the first. Merged immediately: the ruleset asks
+          # for a PR and a merge commit, not a review, and the verify step
+          # above is the review.
+          branch="ingest/run-${{ github.run_id }}"
+          git push origin "HEAD:refs/heads/$branch"
+          gh pr create --base main --head "$branch" \
+            --title "Refresh crawled build data ($changed files)" \
+            --body-file <(git log -1 --format=%b)
+          gh pr merge "$branch" --merge --delete-branch
+        env:
+          GH_TOKEN: ${{ github.token }}
