@@ -315,18 +315,23 @@ a.install:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:
   .installs .fine{flex-basis:100%;max-width:none}
   .doc{grid-template-columns:minmax(0,1fr);gap:24px;padding-top:24px}
   .index{position:static;min-width:0}
-  .index ol{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-inline:calc(-1 * var(--gutter));padding-inline:var(--gutter);-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent)}
+  .index ol{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-inline:calc(-1 * var(--gutter));padding-inline:var(--gutter)}
+  /* The fade means "more to the right"; the script drops it at the end. */
+  .index ol.more{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent)}
   .index ol::-webkit-scrollbar{display:none}
   .index li a{margin:0;padding:6px 10px;white-space:nowrap;border-left:0;border-bottom:2px solid transparent;border-radius:var(--r-asset) var(--r-asset) 0 0}
   .index li a[aria-current="true"]{border-bottom-color:var(--accent)}
   .index .prev{display:none}
+  /* A floating definition has nowhere to go once the page is one column; it opens inline
+     under the sentence instead, so it can neither clip nor widen the page. */
+  .tagwrap{position:static;display:inline}
+  .tagwrap .def{position:static;width:auto;max-width:none;margin-top:8px;box-shadow:none;animation:none}
   .pipe{grid-template-columns:1fr 1fr}
   .pipe > div + div::before{display:none}
   .pipe > div + div{padding-left:0}
   .pipe > div:nth-child(odd){padding-right:14px}
 }
 @media (max-width:560px){
-  .tagwrap .def{left:auto;right:0}
   .ver h1{font-size:56px}
   .lede{font-size:16px}
   .legend,.platforms{grid-template-columns:1fr}
@@ -338,6 +343,13 @@ a.install:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:
      already printed up there, so it is the line to lose. */
   .again .install .file{display:none}
   .again{padding:18px 16px}
+}
+@media (pointer:coarse){
+  .tag{padding:6px 9px;vertical-align:0}
+  .index li a{padding:10px 12px}
+  .index .prev ol li{padding:8px 0}
+  .copy{padding:7px 11px}
+  .installs .fine a{padding-block:6px}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition-duration:0s !important;animation-duration:0s !important}

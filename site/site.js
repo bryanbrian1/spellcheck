@@ -68,6 +68,18 @@
   document.addEventListener("click", function () { closeTags(null); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeTags(null); });
 
+  // The narrow index is a scroll row. Its right-edge fade promises more,
+  //    so it only shows while there is more.
+  var row = document.querySelector(".index > ol");
+  if (row) {
+    var fade = function () {
+      row.classList.toggle("more", row.scrollWidth - row.clientWidth - row.scrollLeft > 4);
+    };
+    row.addEventListener("scroll", fade, { passive: true });
+    window.addEventListener("resize", fade);
+    fade();
+  }
+
   // 3. Mark the section in view in the index: the last heading that has
   //    crossed a line a little below the top of the viewport.
   var links = Array.prototype.slice.call(document.querySelectorAll('.index ol a[href^="#"]'));
