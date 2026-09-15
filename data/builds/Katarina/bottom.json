@@ -9,13 +9,21 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T23:10:14.532Z",
+  "updatedAt": "2026-09-15T15:04:23.537Z",
   "stats": {
-    "games": 6,
+    "games": 10,
     "winRate": 0.5
   },
   "items": {
     "starters": [
+      {
+        "items": [
+          1082,
+          2003
+        ],
+        "games": 4,
+        "winRate": 0
+      },
       {
         "items": [
           1055,
@@ -23,14 +31,6 @@
         ],
         "games": 2,
         "winRate": 1
-      },
-      {
-        "items": [
-          1082,
-          2003
-        ],
-        "games": 2,
-        "winRate": 0
       }
     ],
     "boots": [
@@ -38,14 +38,14 @@
         "items": [
           1001
         ],
-        "games": 5,
-        "winRate": 0.6
+        "games": 8,
+        "winRate": 0.625
       },
       {
         "items": [
           3020
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 0
       }
     ],
@@ -55,7 +55,7 @@
           6672,
           3302
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 1
       },
       {
@@ -64,14 +64,13 @@
           4645,
           3089
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 0
       },
       {
         "items": [
-          6672,
-          3153,
-          3302
+          3100,
+          3146
         ],
         "games": 1,
         "winRate": 1
@@ -80,27 +79,6 @@
     "situational": []
   },
   "runes": [
-    {
-      "primaryStyle": 8000,
-      "secondaryStyle": 8100,
-      "primary": [
-        8010,
-        9111,
-        9104,
-        8299
-      ],
-      "secondary": [
-        8105,
-        8143
-      ],
-      "shards": [
-        5008,
-        5008,
-        5001
-      ],
-      "games": 2,
-      "winRate": 1
-    },
     {
       "primaryStyle": 8100,
       "secondaryStyle": 8000,
@@ -119,8 +97,29 @@
         5008,
         5011
       ],
-      "games": 2,
+      "games": 4,
       "winRate": 0
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8100,
+      "primary": [
+        8010,
+        9111,
+        9104,
+        8299
+      ],
+      "secondary": [
+        8105,
+        8143
+      ],
+      "shards": [
+        5008,
+        5008,
+        5001
+      ],
+      "games": 3,
+      "winRate": 1
     }
   ],
   "summoners": [
@@ -129,15 +128,15 @@
         4,
         14
       ],
-      "games": 4,
-      "winRate": 0.25
+      "games": 7,
+      "winRate": 0.2857
     },
     {
       "spells": [
         3,
         4
       ],
-      "games": 2,
+      "games": 3,
       "winRate": 1
     }
   ],

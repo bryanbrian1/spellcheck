@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Kennen",
+    "name": "Kennen",
+    "id": 85
+  },
+  "role": "middle",
+  "patch": "16.18",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-15T15:04:23.537Z",
+  "stats": {
+    "games": 6,
+    "winRate": 0.1667
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 4,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          1055,
+          2003
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 6,
+        "winRate": 0.1667
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3152,
+          4645
+        ],
+        "games": 2,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3152,
+          4645,
+          3157
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3152
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          4645
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8400,
+      "primary": [
+        8112,
+        8139,
+        8137,
+        8106
+      ],
+      "secondary": [
+        8473,
+        8451
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 4,
+      "winRate": 0.25
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8200,
+      "primary": [
+        8112,
+        8139,
+        8140,
+        8106
+      ],
+      "secondary": [
+        8233,
+        8237
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 0
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 6,
+      "winRate": 0.1667
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "W",
+      "E"
+    ],
+    "order": [
+      "E",
+      "W",
+      "Q",
+      "Q",
+      "Q"
+    ]
+  }
+}

@@ -9,10 +9,10 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T23:10:14.532Z",
+  "updatedAt": "2026-09-15T15:04:23.537Z",
   "stats": {
-    "games": 7,
-    "winRate": 0.4286
+    "games": 11,
+    "winRate": 0.4545
   },
   "items": {
     "starters": [
@@ -21,8 +21,8 @@
           1054,
           2003
         ],
-        "games": 7,
-        "winRate": 0.4286
+        "games": 11,
+        "winRate": 0.4545
       }
     ],
     "boots": [
@@ -30,14 +30,14 @@
         "items": [
           1001
         ],
-        "games": 5,
-        "winRate": 0.6
+        "games": 8,
+        "winRate": 0.625
       },
       {
         "items": [
           3158
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 0
       }
     ],
@@ -48,7 +48,7 @@
           2520,
           6696
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 1
       },
       {
@@ -57,7 +57,7 @@
           6699,
           6696
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 0
       },
       {
@@ -66,7 +66,7 @@
           2520,
           6699
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       }
     ],
@@ -75,7 +75,7 @@
         "items": [
           2517
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 1
       }
     ]
@@ -99,7 +99,7 @@
         5008,
         5011
       ],
-      "games": 2,
+      "games": 3,
       "winRate": 1
     },
     {
@@ -120,7 +120,7 @@
         5008,
         5011
       ],
-      "games": 1,
+      "games": 2,
       "winRate": 1
     }
   ],
@@ -130,15 +130,15 @@
         3,
         4
       ],
-      "games": 5,
-      "winRate": 0.6
+      "games": 8,
+      "winRate": 0.625
     },
     {
       "spells": [
         4,
         12
       ],
-      "games": 2,
+      "games": 3,
       "winRate": 0
     }
   ],
@@ -149,8 +149,8 @@
       "W"
     ],
     "order": [
-      "Q",
       "E",
+      "Q",
       "W",
       "Q",
       "Q"

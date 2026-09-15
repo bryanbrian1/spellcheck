@@ -9,10 +9,10 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T23:10:14.532Z",
+  "updatedAt": "2026-09-15T15:04:23.537Z",
   "stats": {
-    "games": 11,
-    "winRate": 0.8182
+    "games": 17,
+    "winRate": 0.8235
   },
   "items": {
     "starters": [
@@ -21,8 +21,8 @@
           1102,
           2003
         ],
-        "games": 4,
-        "winRate": 1
+        "games": 7,
+        "winRate": 0.8571
       },
       {
         "items": [
@@ -37,8 +37,15 @@
         "items": [
           3020
         ],
-        "games": 6,
+        "games": 9,
         "winRate": 1
+      },
+      {
+        "items": [
+          3047
+        ],
+        "games": 3,
+        "winRate": 0.6667
       },
       {
         "items": [
@@ -46,13 +53,6 @@
         ],
         "games": 2,
         "winRate": 0
-      },
-      {
-        "items": [
-          3047
-        ],
-        "games": 1,
-        "winRate": 1
       }
     ],
     "core": [
@@ -60,14 +60,14 @@
         "items": [
           2510
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 1
       },
       {
         "items": [
           3152
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 1
       },
       {
@@ -75,8 +75,8 @@
           2510,
           4633
         ],
-        "games": 2,
-        "winRate": 0.5
+        "games": 3,
+        "winRate": 0.6667
       }
     ],
     "situational": []
@@ -100,8 +100,8 @@
         5008,
         5001
       ],
-      "games": 8,
-      "winRate": 1
+      "games": 13,
+      "winRate": 0.9231
     },
     {
       "primaryStyle": 8000,
@@ -121,7 +121,7 @@
         5008,
         5001
       ],
-      "games": 1,
+      "games": 2,
       "winRate": 1
     }
   ],
@@ -131,8 +131,8 @@
         4,
         11
       ],
-      "games": 11,
-      "winRate": 0.8182
+      "games": 17,
+      "winRate": 0.8235
     }
   ],
   "skills": {
@@ -143,8 +143,8 @@
     ],
     "order": [
       "Q",
-      "E",
       "W",
+      "E",
       "Q",
       "Q"
     ]

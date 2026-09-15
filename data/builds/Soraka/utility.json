@@ -9,10 +9,10 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T23:10:14.532Z",
+  "updatedAt": "2026-09-15T15:04:23.537Z",
   "stats": {
-    "games": 34,
-    "winRate": 0.5
+    "games": 54,
+    "winRate": 0.5185
   },
   "items": {
     "starters": [
@@ -20,14 +20,14 @@
         "items": [
           2003
         ],
-        "games": 33,
-        "winRate": 0.4848
+        "games": 52,
+        "winRate": 0.5
       },
       {
         "items": [
           2055
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       }
     ],
@@ -36,25 +36,32 @@
         "items": [
           1001
         ],
-        "games": 32,
-        "winRate": 0.4688
+        "games": 51,
+        "winRate": 0.4902
       },
       {
         "items": [
           3158
         ],
-        "games": 2,
+        "games": 3,
         "winRate": 1
       }
     ],
     "core": [
       {
         "items": [
+          6617
+        ],
+        "games": 11,
+        "winRate": 0.6364
+      },
+      {
+        "items": [
           6617,
           3107
         ],
-        "games": 7,
-        "winRate": 0.4286
+        "games": 11,
+        "winRate": 0.5455
       },
       {
         "items": [
@@ -63,13 +70,6 @@
         ],
         "games": 7,
         "winRate": 0
-      },
-      {
-        "items": [
-          6617
-        ],
-        "games": 5,
-        "winRate": 0.6
       }
     ],
     "situational": []
@@ -106,8 +106,8 @@
         8236
       ],
       "secondary": [
-        8463,
-        8453
+        8453,
+        8463
       ],
       "shards": [
         5007,
@@ -115,7 +115,7 @@
         5011
       ],
       "games": 2,
-      "winRate": 0
+      "winRate": 0.5
     }
   ],
   "summoners": [
@@ -124,8 +124,16 @@
         4,
         7
       ],
-      "games": 34,
-      "winRate": 0.5
+      "games": 52,
+      "winRate": 0.5385
+    },
+    {
+      "spells": [
+        3,
+        4
+      ],
+      "games": 1,
+      "winRate": 0
     }
   ],
   "skills": {

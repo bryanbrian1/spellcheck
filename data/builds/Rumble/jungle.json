@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Rumble",
+    "name": "Rumble",
+    "id": 68
+  },
+  "role": "jungle",
+  "patch": "16.18",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-15T15:04:23.537Z",
+  "stats": {
+    "games": 5,
+    "winRate": 0.6
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1101
+        ],
+        "games": 5,
+        "winRate": 0.6
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 5,
+        "winRate": 0.6
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          6653,
+          8010,
+          3157
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          6653,
+          8010
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          6653
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          4633
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          6665
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8010,
+        9111,
+        9105,
+        8017
+      ],
+      "secondary": [
+        8306,
+        8347
+      ],
+      "shards": [
+        5005,
+        5008,
+        5013
+      ],
+      "games": 5,
+      "winRate": 0.6
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        11
+      ],
+      "games": 5,
+      "winRate": 0.6
+    }
+  ],
+  "skills": {
+    "priority": [
+      "Q",
+      "E",
+      "W"
+    ],
+    "order": [
+      "Q",
+      "E",
+      "W",
+      "Q",
+      "Q"
+    ]
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Shaco",
+    "name": "Shaco",
+    "id": 35
+  },
+  "role": "utility",
+  "patch": "16.18",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-15T15:04:23.537Z",
+  "stats": {
+    "games": 5,
+    "winRate": 0.6
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 5,
+        "winRate": 0.6
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3158
+        ],
+        "games": 2,
+        "winRate": 1
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          4005
+        ],
+        "games": 3,
+        "winRate": 0.6667
+      },
+      {
+        "items": [
+          3179
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          2503,
+          4005,
+          6695
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8229,
+        8226,
+        8210,
+        8237
+      ],
+      "secondary": [
+        8009,
+        9105
+      ],
+      "shards": [
+        5007,
+        5008,
+        5011
+      ],
+      "games": 2,
+      "winRate": 0.5
+    },
+    {
+      "primaryStyle": 8100,
+      "secondaryStyle": 8000,
+      "primary": [
+        9923,
+        8143,
+        8140,
+        8105
+      ],
+      "secondary": [
+        8014,
+        9104
+      ],
+      "shards": [
+        5005,
+        5008,
+        5001
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 4,
+      "winRate": 0.75
+    },
+    {
+      "spells": [
+        7,
+        14
+      ],
+      "games": 1,
+      "winRate": 0
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "E",
+      "Q"
+    ],
+    "order": [
+      "E",
+      "W",
+      "Q",
+      "W",
+      "W"
+    ]
+  }
+}
