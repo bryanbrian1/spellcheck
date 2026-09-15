@@ -9,9 +9,9 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T16:38:06.646Z",
+  "updatedAt": "2026-09-15T15:04:23.537Z",
   "stats": {
-    "games": 1,
+    "games": 2,
     "winRate": 1
   },
   "items": {
@@ -21,7 +21,7 @@
           1086,
           2003
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       }
     ],
@@ -30,7 +30,7 @@
         "items": [
           1001
         ],
-        "games": 1,
+        "games": 2,
         "winRate": 1
       }
     ],
@@ -43,11 +43,63 @@
         ],
         "games": 1,
         "winRate": 1
+      },
+      {
+        "items": [
+          3508,
+          6676,
+          6673
+        ],
+        "games": 1,
+        "winRate": 1
       }
     ],
-    "situational": []
+    "situational": [
+      {
+        "items": [
+          3031
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3036
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3072
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ]
   },
   "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8300,
+      "primary": [
+        8010,
+        8009,
+        9103,
+        8017
+      ],
+      "secondary": [
+        8313,
+        8321
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 1,
+      "winRate": 1
+    },
     {
       "primaryStyle": 8000,
       "secondaryStyle": 8300,
@@ -78,20 +130,28 @@
       ],
       "games": 1,
       "winRate": 1
+    },
+    {
+      "spells": [
+        4,
+        21
+      ],
+      "games": 1,
+      "winRate": 1
     }
   ],
   "skills": {
     "priority": [
-      "Q",
       "E",
+      "Q",
       "W"
     ],
     "order": [
       "E",
       "W",
       "Q",
-      "Q",
-      "Q"
+      "E",
+      "E"
     ]
   }
 }

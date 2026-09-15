@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Sett",
+    "name": "Sett",
+    "id": 875
+  },
+  "role": "utility",
+  "patch": "16.18",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-15T15:04:23.537Z",
+  "stats": {
+    "games": 6,
+    "winRate": 0.5
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          2003
+        ],
+        "games": 6,
+        "winRate": 0.5
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 4,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 2,
+        "winRate": 0.5
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3050
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          3050,
+          2501
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3742,
+          3181
+        ],
+        "games": 1,
+        "winRate": 1
+      }
+    ],
+    "situational": []
+  },
+  "runes": [
+    {
+      "primaryStyle": 8300,
+      "secondaryStyle": 8200,
+      "primary": [
+        8360,
+        8306,
+        8345,
+        8347
+      ],
+      "secondary": [
+        8275,
+        8234
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 4,
+      "winRate": 0.5
+    },
+    {
+      "primaryStyle": 8300,
+      "secondaryStyle": 8200,
+      "primary": [
+        8351,
+        8306,
+        8345,
+        8347
+      ],
+      "secondary": [
+        8275,
+        8234
+      ],
+      "shards": [
+        5005,
+        5008,
+        5011
+      ],
+      "games": 2,
+      "winRate": 0.5
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 6,
+      "winRate": 0.5
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "E",
+      "Q"
+    ],
+    "order": [
+      "E",
+      "W",
+      "Q",
+      "Q",
+      "Q"
+    ]
+  }
+}

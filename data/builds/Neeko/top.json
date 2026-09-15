@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "champion": {
+    "key": "Neeko",
+    "name": "Neeko",
+    "id": 518
+  },
+  "role": "top",
+  "patch": "16.18",
+  "region": "na1",
+  "tier": "challenger+grandmaster",
+  "updatedAt": "2026-09-15T15:04:23.537Z",
+  "stats": {
+    "games": 5,
+    "winRate": 0.4
+  },
+  "items": {
+    "starters": [
+      {
+        "items": [
+          1086,
+          2003
+        ],
+        "games": 3,
+        "winRate": 0.3333
+      },
+      {
+        "items": [
+          1056,
+          2003
+        ],
+        "games": 2,
+        "winRate": 0.5
+      }
+    ],
+    "boots": [
+      {
+        "items": [
+          1001
+        ],
+        "games": 4,
+        "winRate": 0.5
+      },
+      {
+        "items": [
+          3006
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "core": [
+      {
+        "items": [
+          3124,
+          3302
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          3152,
+          4646,
+          4645
+        ],
+        "games": 1,
+        "winRate": 1
+      },
+      {
+        "items": [
+          2504,
+          3152
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ],
+    "situational": [
+      {
+        "items": [
+          3091
+        ],
+        "games": 1,
+        "winRate": 0
+      }
+    ]
+  },
+  "runes": [
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8400,
+      "primary": [
+        8008,
+        9101,
+        9104,
+        8017
+      ],
+      "secondary": [
+        8451,
+        8446
+      ],
+      "shards": [
+        5005,
+        5001,
+        5013
+      ],
+      "games": 2,
+      "winRate": 0
+    },
+    {
+      "primaryStyle": 8000,
+      "secondaryStyle": 8400,
+      "primary": [
+        8008,
+        9101,
+        9104,
+        8017
+      ],
+      "secondary": [
+        8429,
+        8451
+      ],
+      "shards": [
+        5005,
+        5010,
+        5001
+      ],
+      "games": 1,
+      "winRate": 1
+    }
+  ],
+  "summoners": [
+    {
+      "spells": [
+        4,
+        14
+      ],
+      "games": 4,
+      "winRate": 0.5
+    },
+    {
+      "spells": [
+        4,
+        12
+      ],
+      "games": 1,
+      "winRate": 0
+    }
+  ],
+  "skills": {
+    "priority": [
+      "W",
+      "E",
+      "Q"
+    ],
+    "order": [
+      "W",
+      "E",
+      "Q",
+      "W",
+      "W"
+    ]
+  }
+}

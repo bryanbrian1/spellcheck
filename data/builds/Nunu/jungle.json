@@ -9,9 +9,9 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T23:10:14.532Z",
+  "updatedAt": "2026-09-15T15:04:23.537Z",
   "stats": {
-    "games": 30,
+    "games": 42,
     "winRate": 0.5
   },
   "items": {
@@ -20,7 +20,7 @@
         "items": [
           1102
         ],
-        "games": 30,
+        "games": 42,
         "winRate": 0.5
       }
     ],
@@ -29,7 +29,7 @@
         "items": [
           1001
         ],
-        "games": 30,
+        "games": 42,
         "winRate": 0.5
       }
     ],
@@ -39,15 +39,15 @@
           6653,
           3742
         ],
-        "games": 11,
-        "winRate": 0.1818
+        "games": 17,
+        "winRate": 0.2353
       },
       {
         "items": [
           6653
         ],
-        "games": 7,
-        "winRate": 1
+        "games": 10,
+        "winRate": 0.9
       },
       {
         "items": [
@@ -87,8 +87,8 @@
         5010,
         5001
       ],
-      "games": 16,
-      "winRate": 0.4375
+      "games": 22,
+      "winRate": 0.4091
     },
     {
       "primaryStyle": 8200,
@@ -118,7 +118,7 @@
         4,
         11
       ],
-      "games": 30,
+      "games": 42,
       "winRate": 0.5
     }
   ],

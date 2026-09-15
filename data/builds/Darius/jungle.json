@@ -9,10 +9,10 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T23:10:14.532Z",
+  "updatedAt": "2026-09-15T15:04:23.537Z",
   "stats": {
-    "games": 9,
-    "winRate": 0.2222
+    "games": 13,
+    "winRate": 0.2308
   },
   "items": {
     "starters": [
@@ -20,15 +20,15 @@
         "items": [
           1102
         ],
-        "games": 6,
-        "winRate": 0.3333
+        "games": 8,
+        "winRate": 0.375
       },
       {
         "items": [
           1102,
           2003
         ],
-        "games": 3,
+        "games": 5,
         "winRate": 0
       }
     ],
@@ -37,11 +37,27 @@
         "items": [
           1001
         ],
-        "games": 9,
-        "winRate": 0.2222
+        "games": 12,
+        "winRate": 0.25
+      },
+      {
+        "items": [
+          3009
+        ],
+        "games": 1,
+        "winRate": 0
       }
     ],
     "core": [
+      {
+        "items": [
+          3078,
+          3161,
+          3053
+        ],
+        "games": 3,
+        "winRate": 0
+      },
       {
         "items": [
           3142,
@@ -50,15 +66,6 @@
         ],
         "games": 2,
         "winRate": 1
-      },
-      {
-        "items": [
-          3078,
-          3161,
-          3053
-        ],
-        "games": 2,
-        "winRate": 0
       },
       {
         "items": [
@@ -72,17 +79,17 @@
     "situational": [
       {
         "items": [
+          3036
+        ],
+        "games": 3,
+        "winRate": 0
+      },
+      {
+        "items": [
           3143
         ],
         "games": 2,
         "winRate": 1
-      },
-      {
-        "items": [
-          3036
-        ],
-        "games": 2,
-        "winRate": 0
       },
       {
         "items": [
@@ -143,8 +150,16 @@
         4,
         11
       ],
-      "games": 9,
-      "winRate": 0.2222
+      "games": 12,
+      "winRate": 0.1667
+    },
+    {
+      "spells": [
+        6,
+        11
+      ],
+      "games": 1,
+      "winRate": 1
     }
   ],
   "skills": {
@@ -154,8 +169,8 @@
       "W"
     ],
     "order": [
-      "W",
       "Q",
+      "W",
       "E",
       "Q",
       "Q"

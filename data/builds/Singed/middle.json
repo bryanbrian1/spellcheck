@@ -9,9 +9,9 @@
   "patch": "16.18",
   "region": "na1",
   "tier": "challenger+grandmaster",
-  "updatedAt": "2026-09-14T23:10:14.532Z",
+  "updatedAt": "2026-09-15T15:04:23.537Z",
   "stats": {
-    "games": 1,
+    "games": 3,
     "winRate": 0
   },
   "items": {
@@ -21,7 +21,7 @@
           1056,
           2003
         ],
-        "games": 1,
+        "games": 3,
         "winRate": 0
       }
     ],
@@ -30,7 +30,7 @@
         "items": [
           1001
         ],
-        "games": 1,
+        "games": 3,
         "winRate": 0
       }
     ],
@@ -41,6 +41,15 @@
           2525,
           6653
         ],
+        "games": 2,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3116,
+          6653,
+          2525
+        ],
         "games": 1,
         "winRate": 0
       }
@@ -49,6 +58,20 @@
       {
         "items": [
           6665
+        ],
+        "games": 2,
+        "winRate": 0
+      },
+      {
+        "items": [
+          3742
+        ],
+        "games": 1,
+        "winRate": 0
+      },
+      {
+        "items": [
+          4401
         ],
         "games": 1,
         "winRate": 0
@@ -74,6 +97,27 @@
         5008,
         5001
       ],
+      "games": 2,
+      "winRate": 0
+    },
+    {
+      "primaryStyle": 8200,
+      "secondaryStyle": 8000,
+      "primary": [
+        8992,
+        8275,
+        8234,
+        8237
+      ],
+      "secondary": [
+        8017,
+        9111
+      ],
+      "shards": [
+        5008,
+        5008,
+        5013
+      ],
       "games": 1,
       "winRate": 0
     }
@@ -84,7 +128,7 @@
         4,
         6
       ],
-      "games": 1,
+      "games": 3,
       "winRate": 0
     }
   ],
