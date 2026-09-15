@@ -10,9 +10,11 @@
     (window.matchMedia && window.matchMedia("(hover: none) and (pointer: coarse)").matches);
   var os = phone ? null : /Windows/.test(ua) ? "win" : /Mac/.test(ua) ? "mac" : null;
   if (os) {
-    document.querySelectorAll(".installs").forEach(function (group) {
-      var mine = group.querySelector('.install[data-os="' + os + '"]');
+    // The button groups, and the file list in the index rail.
+    document.querySelectorAll(".installs, .get ol").forEach(function (group) {
+      var mine = group.querySelector('[data-os="' + os + '"]');
       if (!mine) return;
+      while (mine.parentNode !== group) mine = mine.parentNode; // the <li>, in the rail
       group.querySelectorAll(".install").forEach(function (b) {
         if (b !== mine) b.classList.add("other");
       });

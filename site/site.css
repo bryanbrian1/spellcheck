@@ -160,6 +160,17 @@ a.install:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:
 }
 .index li a:hover{color:var(--text-title);background:var(--panel)}
 .index li a[aria-current="true"]{color:var(--text-title);font-weight:600;border-left-color:var(--accent)}
+/* The files, in the rail: the same rows as "Earlier", one press each. The
+   visitor's own platform is moved to the top by the script, like the
+   buttons. */
+.index .get{margin-top:26px;padding-top:18px;border-top:1px solid var(--line-hair)}
+.index .get ol li{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:0}
+.index .get ol li a{
+  flex:1;padding:5px 0;margin:0;border:0;border-radius:var(--r-asset);
+  font-size:14px;font-weight:500;color:var(--text-body);
+}
+.index .get ol li a:hover{background:none;color:var(--accent)}
+.index .get ol li span{font-family:var(--font-mono);font-size:12px;color:var(--text-faint);font-variant-numeric:tabular-nums;white-space:nowrap}
 .index .prev{margin-top:26px;padding-top:18px;border-top:1px solid var(--line-hair)}
 .index .prev ol li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:13px}
 .index .prev ol li a{padding:0;margin:0;border:0;font-family:var(--font-mono);font-size:13px;font-variant-numeric:tabular-nums;color:var(--text-body)}
@@ -321,7 +332,7 @@ a.install:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:
   .index ol::-webkit-scrollbar{display:none}
   .index li a{margin:0;padding:6px 10px;white-space:nowrap;border-left:0;border-bottom:2px solid transparent;border-radius:var(--r-asset) var(--r-asset) 0 0}
   .index li a[aria-current="true"]{border-bottom-color:var(--accent)}
-  .index .prev{display:none}
+  .index .prev,.index .get{display:none}
   /* A floating definition has nowhere to go once the page is one column; it opens inline
      under the sentence instead, so it can neither clip nor widen the page. */
   .tagwrap{position:static;display:inline}
