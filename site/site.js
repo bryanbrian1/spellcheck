@@ -38,12 +38,15 @@
         // No clipboard access: say the address instead, in a sentence
         // that still reads once the button is gone.
         var p = btn.closest("p");
-        var span = document.createElement("span");
-        span.className = "mono";
-        span.textContent = url.replace(/^https?:\/\//, "").replace(/\/$/, "");
-        p.textContent = "spellcheck is a desktop app for macOS and Windows. The address is ";
-        p.appendChild(span);
-        p.appendChild(document.createTextNode("."));
+        var line = document.createElement("span");
+        var addr = document.createElement("span");
+        addr.className = "mono";
+        addr.textContent = url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+        line.textContent = "spellcheck is a desktop app for macOS and Windows. The address is ";
+        line.appendChild(addr);
+        line.appendChild(document.createTextNode("."));
+        p.textContent = "";
+        p.appendChild(line);
       };
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(url).then(done, fallback);

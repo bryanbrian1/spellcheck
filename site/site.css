@@ -139,8 +139,10 @@ a.install:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:
 .install.other .file,.install.other .size,.installs .install + .install .file,.installs .install + .install .size{color:var(--text-muted);opacity:1}
 .installs .fine{font-size:12px;color:var(--text-faint);line-height:1.45;max-width:38ch;margin-top:2px}
 .installs .fine .mono{font-size:11px;color:var(--text-muted)}
-.installs .fine.later{color:var(--text-muted)}
-.copy{font:inherit;font-weight:600;color:var(--text-title);background:var(--raised);border:1px solid var(--line);border-radius:var(--r-asset);padding:2px 7px;cursor:pointer;transition:var(--t)}
+.installs .fine.later{color:var(--text-muted);display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.installs .fine.later[hidden]{display:none}
+.installs .fine.later span{flex:1 1 100%}
+.copy{font:inherit;font-weight:600;line-height:1.2;white-space:nowrap;color:var(--text-title);background:var(--raised);border:1px solid var(--line);border-radius:var(--r-asset);padding:2px 7px;cursor:pointer;transition:var(--t)}
 .copy:hover{background:var(--n-4);border-color:var(--n-6)}
 .copy[data-done]{color:var(--accent);border-color:var(--accent-2)}
 .installs .fine a{color:var(--text-muted)}
