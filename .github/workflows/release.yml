@@ -85,32 +85,23 @@ jobs:
       # fixed.
       fail-fast: false
       matrix:
-        # A pull request builds Windows only, and the reason is what this
-        # repository costs rather than what it needs.
+        # Both platforms build on every pull request. It was Windows only
+        # while the repository was private: Actions billed private repos per
+        # OS (Linux 1x, Windows 2x, macOS 10x) against a 2,000-minute monthly
+        # allowance, and at ~8.5 minutes a macOS build cost ~85 billed
+        # minutes — enough that building both on every pull request was
+        # about eighteen runs a month. The repository is public now and
+        # standard runners on public repos are free, so the reason is gone.
         #
-        # Actions bills a private repository per OS: Linux 1x, Windows 2x,
-        # macOS 10x. Measured against this workflow's own history — macOS
-        # around 8.5 minutes, Windows around 12 — that is ~85 billed minutes
-        # for the Mac and ~24 for Windows, so the *faster* job is 78% of the
-        # bill. On the 2,000-minute monthly allowance, building both on every
-        # pull request is about eighteen runs; one branch here has spent four.
-        #
-        # Dropping macOS rather than Windows is the counter-intuitive half,
-        # and it is the right half. The developer machine is a Mac: `cargo
-        # test` and `npm run app` exercise that target every time anyone
-        # works on this. Nothing exercises Windows — `ring` builds C, there
-        # is no MSVC toolchain on a Mac, and the app cannot be
-        # cross-compiled, so the Windows runner is the only thing in this
-        # project that can report whether the Windows build still stands.
-        # Paying 10x to be told what the developer already knows, in order to
-        # save 2x on the one thing nobody knows, is backwards.
-        #
-        # Both platforms still build on a tag, and on workflow_dispatch, so
-        # nothing reaches a tester unproven. What a pull request no longer
-        # catches is a macOS-only break landing on main between releases —
-        # the tag build catches it before anybody downloads it, and the
-        # developer's own machine catches it first.
-        platform: ${{ fromJSON(github.event_name == 'pull_request' && '["windows-latest"]' || '["macos-latest", "windows-latest"]') }}
+        # Windows is the platform that matters most here, either way. The
+        # developer machine is a Mac, so `cargo test` and `npm run app`
+        # exercise that target every time anyone works on this; nothing
+        # exercises Windows — `ring` builds C, there is no MSVC toolchain on
+        # a Mac, and the app cannot be cross-compiled — so this runner is the
+        # only thing in the project that can report whether the Windows
+        # build still stands. Building macOS as well catches a macOS-only
+        # break before it lands on main rather than at the next tag.
+        platform: ["macos-latest", "windows-latest"]
 
     runs-on: ${{ matrix.platform }}
     timeout-minutes: 60
