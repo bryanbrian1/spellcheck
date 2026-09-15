@@ -91,11 +91,10 @@ img{max-width:100%;height:auto;display:block}
 .page{max-width:calc(var(--rail-w) + 56px + var(--notes-w));margin:0 auto}
 
 /* ---------- version banner ---------- */
+/* One column, in reading order: the mark, the version, one sentence, then
+   the files. The buttons sit where the eye lands after the sentence rather
+   than in a column of their own. */
 .banner{
-  display:grid;
-  grid-template-columns:1fr auto;
-  gap:24px 48px;
-  align-items:end;
   padding:40px 0 32px;
   border-bottom:1px solid var(--line);
 }
@@ -118,7 +117,7 @@ img{max-width:100%;height:auto;display:block}
 .ver-meta .stage{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--text-muted)}
 .lede{max-width:56ch;margin-top:20px;font-size:17px;line-height:1.5;color:var(--text-body);text-wrap:pretty}
 
-.installs{display:flex;flex-direction:column;gap:10px;min-width:280px}
+.installs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;max-width:640px;margin-top:26px}
 .install{
   display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;
   padding:11px 14px 11px 12px;
@@ -137,9 +136,9 @@ a.install:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:
 .install.other,.installs .install + .install{background:var(--raised);color:var(--text-title);border-color:var(--line);box-shadow:none}
 .install.other:hover,.installs .install + .install:hover{background:var(--n-4);border-color:var(--n-6);color:var(--text-title)}
 .install.other .file,.install.other .size,.installs .install + .install .file,.installs .install + .install .size{color:var(--text-muted);opacity:1}
-.installs .fine{font-size:12px;color:var(--text-faint);line-height:1.45;max-width:38ch;margin-top:2px}
+.installs .fine{font-size:12px;color:var(--text-faint);line-height:1.45;margin-top:4px}
 .installs .fine .mono{font-size:11px;color:var(--text-muted)}
-.installs .fine.later{color:var(--text-muted);display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.installs .fine.later{grid-column:1 / -1;color:var(--text-muted);display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
 .installs .fine.later[hidden]{display:none}
 .installs .fine.later span{flex:1 1 100%}
 .copy{font:inherit;font-weight:600;line-height:1.2;white-space:nowrap;color:var(--text-title);background:var(--raised);border:1px solid var(--line);border-radius:var(--r-asset);padding:2px 7px;cursor:pointer;transition:var(--t)}
@@ -309,7 +308,7 @@ a.install:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:
 }
 .again .v{font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--text-title);letter-spacing:-.02em;line-height:1}
 .again .v small{display:block;font-size:12px;font-weight:500;color:var(--text-faint);margin-top:6px;letter-spacing:0}
-.again .installs{min-width:0}
+.again .installs{display:flex;flex-direction:column;gap:10px;min-width:280px;max-width:none;margin-top:0}
 
 .legal{padding:36px 0 44px;border-top:1px solid var(--line);margin-top:48px;color:var(--text-faint);font-size:13px;line-height:1.5}
 .legal p{max-width:66ch;margin:0 0 8px}
@@ -322,10 +321,8 @@ a.install:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:
   .doc{gap:36px}
 }
 @media (max-width:860px){
-  .banner{grid-template-columns:1fr;align-items:start;padding-top:28px}
-  .installs{min-width:0;flex-direction:row;flex-wrap:wrap;gap:10px}
-  .installs .install{flex:1 1 240px}
-  .installs .fine{flex-basis:100%;max-width:66ch}
+  .banner{padding-top:28px}
+  .installs{max-width:none}
   .doc{grid-template-columns:minmax(0,1fr);gap:24px;padding-top:24px}
   .index{position:static;min-width:0}
   .index ol{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-inline:calc(-1 * var(--gutter));padding-inline:var(--gutter)}
@@ -348,10 +345,9 @@ a.install:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:
   .ver h1{font-size:56px}
   .lede{font-size:16px}
   .legend,.platforms{grid-template-columns:1fr}
+  .installs{grid-template-columns:minmax(0,1fr)}
   .again{grid-template-columns:1fr}
   .facts th{width:42%}
-  .again .installs{flex-direction:column}
-  .again .installs .install{flex:0 0 auto}
   /* The closing panel is 32px narrower than the banner; the file name is
      already printed up there, so it is the line to lose. */
   .again .install .file{display:none}

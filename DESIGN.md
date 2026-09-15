@@ -243,9 +243,9 @@ A twelve-step cool near-black neutral ramp, one teal accent family for action, a
 
 ## Layout
 
-The site is a single `max-width` document of `212px + 56px + 680px` centred with a fluid gutter (`clamp(16px, 4vw, 48px)`). The banner is a two-column grid (text, installs) aligned to its bottom edge with a 1px line beneath; below it a two-column grid of a sticky index rail (top 24px) and a notes column, 56px apart. Sections are separated by 44px of padding, 44px of margin and a hairline. Rhythm inside prose is 14px between paragraphs, 10px between list items, 26px above a sub-heading.
+The site is a single `max-width` document of `212px + 56px + 680px` centred with a fluid gutter (`clamp(16px, 4vw, 48px)`). The banner is one column in reading order (mark, version, lede, then the install pair side by side at a 640px maximum with the fine print in two matching columns beneath) with a 1px line under it; below it a two-column grid of a sticky index rail (top 24px) and a notes column, 56px apart. Sections are separated by 44px of padding, 44px of margin and a hairline. Rhythm inside prose is 14px between paragraphs, 10px between list items, 26px above a sub-heading.
 
-Breakpoints, observed: at 1000px the rail narrows to 180px and the column gap to 36px; at 860px the banner stacks, the install buttons go side by side, the index becomes a horizontal scroll row with a fade at its right edge and the "Earlier" list hides; at 560px the legend, platforms and closing panel collapse to one column and the version drops to 56px.
+Breakpoints, observed: at 1000px the rail narrows to 180px and the column gap to 36px; at 860px the install pair goes full width, the index becomes a horizontal scroll row with a fade at its right edge and the "Earlier" list hides; at 560px the legend, platforms and closing panel collapse to one column and the version drops to 56px.
 
 The app is a single scrolling column inside a fixed window: 16px horizontal padding, 24px between blocks, a two-column `2px 1fr` grid per block so the provenance rail column always exists even when unpainted. Rows, not tiles, for anything with a name and a number.
 
